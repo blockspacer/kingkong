@@ -1,4 +1,4 @@
-project(Star)
+project(Kingkong)
 
 cmake_minimum_required(VERSION 3.5...3.16)
 
