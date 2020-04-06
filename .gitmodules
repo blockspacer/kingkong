@@ -1,3 +1,6 @@
 [submodule "third_party/boringssl"]
 	path = third_party/boringssl
 	url = https://github.com/lovethiscode/boringssl
+[submodule "third_party/boost"]
+	path = third_party/boost
+	url = https://github.com/lovethiscode/boost.git
