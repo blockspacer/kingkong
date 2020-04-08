@@ -1,8 +1,12 @@
 ﻿#ifndef _BASE_HEADER_H_
 #define _BASE_HEADER_H_
 #include <namespace_define.h>
+#include <string>
+#include <set>
+#include <memory>
+#include <mutex>
+#include <functional>
 #include <stdint.h>
-
 
 
 #ifdef WIN32

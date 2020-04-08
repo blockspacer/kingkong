@@ -1,8 +1,5 @@
 ﻿#include "time_util.h"
-#define BOOST_TEST_MODULE TIMEUTIL
-#include <boost/test/included/unit_test.hpp>
-
-BOOST_AUTO_TEST_SUITE(TIMEUTIL)
+#include <boost/test/unit_test.hpp>
 
 BOOST_AUTO_TEST_CASE(Timestamp) {
   uint64_t timestamp = BASE_TIME::GetTimestamp();
@@ -21,8 +18,6 @@ BOOST_AUTO_TEST_CASE(Timestamp) {
 
   for (size_t i = 0; i < 100; i++) {
     uint64_t tickcount = BASE_TIME::GetTickCount2();
-    printf ("tickcount:%lld\n", tickcount);
+    boost::ignore_unused(tickcount);
   }
 }
-
-BOOST_AUTO_TEST_SUITE_END()
