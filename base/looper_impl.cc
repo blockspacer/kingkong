@@ -47,6 +47,25 @@ bool LooperImpl::Cancel(uint64_t id) {
   return false;
 }
 
+void LooperImpl::DoWork() {
+  uint64_t now = BASE_TIME::GetTickCount2();
+  std::vector<Runnable> runnables;
+  {
+    //set 中是按时间顺序排列，取到不符合的直接break就可以
+    std::lock_guard<std::mutex> lock(runable_set_mutex_);
+    for (auto begin = runable_set_.begin(); begin != runable_set_.end();) {
+      if (begin->expired_time <= now) {
+        runnables.push_back(std::move(begin->runnable));
+        begin = runable_set_.erase(begin);
+      } else {
+        break;
+      }
+    }
+  }
+  for (auto& runable : runnables) {
+    runable();
+  }
+}
 END_NAMESPACE_LOOPER
 
 

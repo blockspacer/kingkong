@@ -3,3 +3,6 @@ git clone --recurse-submodules https://github.com/lovethiscode/Star.git
 
 
 git submodule update --remote --merge
+
+
+git push --recurse-submodules=check

@@ -3,6 +3,7 @@
 #include <namespace_define.h>
 #include <string>
 #include <set>
+#include <vector>
 #include <memory>
 #include <mutex>
 #include <functional>

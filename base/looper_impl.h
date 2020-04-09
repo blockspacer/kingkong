@@ -51,6 +51,9 @@ public:
 
   virtual void Wakeup(uint64_t expired_time) = 0;
 
+protected:
+  //在当前loop线程执行，取出所有到期的任务
+  void DoWork();
 
 private:
   std::set<RunnableInfo> runable_set_;
