@@ -9,6 +9,8 @@ void SetCurrentThreadName(const std::string& thread_name);
 //获取线程的名字
 std::string GetCurrentThreadName();
 
+//获取线程id
+std::string GetCurrentThreadId();
 
 END_NAMESPACE_THREAD
 #endif

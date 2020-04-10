@@ -1,19 +1,33 @@
-﻿#include "looper_impl.h"
+﻿#include "message_pump_impl.h"
 #include "time_util.h"
 #include <boost/assert.hpp>
 BEGIN_NAMESPACE_LOOPER
 
-LooperImpl::LooperImpl(const boost::string_view& name) : name_(name) {}
+MessagePumpImpl::MessagePumpImpl(const std::string& name) : name_(name) {}
 
-const char* LooperImpl::name() {
+const char* MessagePumpImpl::name() {
   return name_.c_str();
 }
 
-uint64_t LooperImpl::PostRunable(Runnable runable) {
+void MessagePumpImpl::Run() {
+  DoRun();
+  stoped_ = true;
+  std::lock_guard<std::mutex> lock(runable_set_mutex_);
+  runable_set_.clear();
+}
+
+void MessagePumpImpl::Stop() {
+  if (stoped_) {
+    return;
+  }
+  DoStop();
+}
+
+uint64_t MessagePumpImpl::PostRunable(Runnable runable) {
   return PostRunable(std::move(runable), 0);
 }
 
-uint64_t LooperImpl::PostRunable(Runnable runnable, uint64_t delay) {
+uint64_t MessagePumpImpl::PostRunable(Runnable runnable, uint64_t delay) {
   if (stoped_) {
     return 0;
   }
@@ -36,7 +50,7 @@ uint64_t LooperImpl::PostRunable(Runnable runnable, uint64_t delay) {
   return id;
 }
 
-bool LooperImpl::Cancel(uint64_t id) {
+bool MessagePumpImpl::Cancel(uint64_t id) {
   std::lock_guard<std::mutex> lock(runable_set_mutex_);
   for (auto iter = runable_set_.begin(); iter != runable_set_.end(); iter++) {
     if (iter->id == id) {
@@ -47,7 +61,32 @@ bool LooperImpl::Cancel(uint64_t id) {
   return false;
 }
 
-void LooperImpl::DoWork() {
+void MessagePumpImpl::DoOneWork() {
+  if (stoped_) {
+    return;
+  }
+  uint64_t now = BASE_TIME::GetTickCount2();
+  Runnable runnable;
+  {
+    //找到一个到期的任务
+     std::lock_guard<std::mutex> lock(runable_set_mutex_);
+    if (!runable_set_.empty() && (runable_set_.begin()->expired_time <= now)) {
+      runnable = std::move(runable_set_.begin()->runnable);
+      runable_set_.erase(runable_set_.begin());
+    }
+    //先唤醒，然后执行runnalbe。否则可能 runnable domodel 导致阻塞
+    if (!runable_set_.empty()) {
+      Wakeup(runable_set_.begin()->expired_time);
+    }
+  }
+  if (runnable) {
+    runnable();
+  }
+}
+void MessagePumpImpl::DoWork() {
+  if (stoped_) {
+    return;
+  }
   uint64_t now = BASE_TIME::GetTickCount2();
   std::vector<Runnable> runnables;
   {
@@ -64,6 +103,13 @@ void LooperImpl::DoWork() {
   }
   for (auto& runable : runnables) {
     runable();
+  }
+
+  {
+    std::lock_guard<std::mutex> lock(runable_set_mutex_);
+    if (!runable_set_.empty()) {
+      Wakeup(runable_set_.begin()->expired_time);
+    }
   }
 }
 END_NAMESPACE_LOOPER

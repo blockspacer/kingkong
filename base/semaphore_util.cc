@@ -32,7 +32,7 @@ private:
   int count_ = 0;
 };
 
-std::unique_ptr<Semaphore> CreateSemaphore() {
+std::unique_ptr<Semaphore> CreateSigalSemaphore() {
   return std::make_unique<SemaphoreImpl>();
 }
 

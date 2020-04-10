@@ -10,6 +10,13 @@
 #include <stdint.h>
 
 
+#ifndef NDEBUG
+  #define DCHECK(con) assert(con)
+#else
+  #define DCHECK(con)
+#endif
+
+
 #ifdef WIN32
 #define OS_WIN 
 #elif defined(ANDROID)

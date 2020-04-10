@@ -1,4 +1,5 @@
 ﻿#include "thread_util.h"
+#include <boost/thread.hpp>
 #ifdef OS_WIN
 #include <windows.h>
 
@@ -50,6 +51,12 @@ void SetCurrentThreadName(const std::string& thread_name) {
 
 std::string GetCurrentThreadName() {
   return "";
+}
+
+std::string GetCurrentThreadId() {
+  std::stringstream ss;
+  ss << boost::this_thread::get_id();
+  return ss.str();
 }
 
 

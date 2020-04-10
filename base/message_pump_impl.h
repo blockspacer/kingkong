@@ -1,7 +1,8 @@
-﻿#ifndef _BASE_LOOPER_IMPL_H_
-#define _BASE_LOOPER_IMPL_H_
-#include "looper.h"
+﻿#ifndef _BASE_MESSAGE_PUMP_IMPL_H_
+#define _BASE_MESSAGE_PUMP_IMPL_H_
+#include "message_pump.h"
 #include <base_header.h>
+#include <atomic>
 #include <boost/utility/string_view.hpp>
 
 BEGIN_NAMESPACE_LOOPER
@@ -37,9 +38,9 @@ struct RunnableInfo {
   uint64_t id;
 };
 
-class LooperImpl :public Looper {
+class MessagePumpImpl :public MessagePump {
 public:
-  explicit LooperImpl(const boost::string_view& name);
+  explicit MessagePumpImpl(const std::string& name);
 
   const char* name() override;
 
@@ -47,20 +48,29 @@ public:
 
   uint64_t PostRunable(Runnable runnable, uint64_t delay) override;
 
-  bool     Cancel(uint64_t id) override;
+  bool Cancel(uint64_t id) override;
+
+  void Stop() override;
 
   virtual void Wakeup(uint64_t expired_time) = 0;
+  virtual void DoRun() = 0;
+  virtual void DoStop() = 0;
 
 protected:
+  void Run() override;
+
   //在当前loop线程执行，取出所有到期的任务
   void DoWork();
+
+  //对于部分会阻塞消息循环的任务，需要一个一个执行。 比如windows 的模态框
+  void DoOneWork();
 
 private:
   std::set<RunnableInfo> runable_set_;
   std::mutex runable_set_mutex_;
   std::string name_;
   uint64_t id_ = 0;
-  bool stoped_ = false;
+  std::atomic<bool> stoped_ = false;
 };
 
 END_NAMESPACE_LOOPER

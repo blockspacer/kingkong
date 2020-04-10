@@ -1,13 +1,13 @@
-﻿#ifndef _BASE_LOOPER_H_
-#define _BASE_LOOPER_H_
+﻿#ifndef _BASE_MESSAGE_PUMP_H_
+#define _BASE_MESSAGE_PUMP_H_
 #include <base_header.h>
 BEGIN_NAMESPACE_LOOPER
 
 using Runnable = std::function<void()>;
 
-class Looper : public std::enable_shared_from_this<Looper> {
+class MessagePump : public std::enable_shared_from_this<MessagePump> {
  public:
-  virtual ~Looper() = default;
+  virtual ~MessagePump() = default;
   //线程名
   virtual const char* name() = 0;
   //启动Looper

@@ -15,7 +15,7 @@ public:
   virtual void Wait(uint64_t timeout) = 0;
 };
 
-std::unique_ptr<Semaphore> CreateSemaphore();
+std::unique_ptr<Semaphore> CreateSigalSemaphore();
 
 END_NAMESPACE_THREAD
 #endif
