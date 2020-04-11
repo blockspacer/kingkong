@@ -1,10 +1,12 @@
-﻿#include "message_pump_impl.h"
-#include "message_pump_default.h"
+﻿#include "message_loop.h"
 #include "log.h"
 #include "time_util.h"
+#include "message_pump_impl.h"
+#include "message_pump_default.h"
 #include <boost/random.hpp>
 #include <boost/test/unit_test.hpp>
-
+#include <boost/thread.hpp>
+#include <boost/random.hpp>
 
 BOOST_AUTO_TEST_CASE(RunnableInfo) {
   boost::variate_generator<boost::mt19937, boost::uniform_int<> > vgen(boost::mt19937(), boost::uniform_int<>(0, 999));
@@ -19,47 +21,98 @@ BOOST_AUTO_TEST_CASE(RunnableInfo) {
     last_expired_time = next_expired_time;
   }
 }
+
 /*
-BOOST_AUTO_TEST_CASE(MessagePump1) {
-  auto pump = std::make_shared<BASE_LOOPER::MessagePumpDefatlt>("one");
-  pump->PostRunable(
-      [] { LogInfo << "test: 10  " << BASE_TIME::GetTickCount2(); }, 10000);
+BOOST_AUTO_TEST_CASE(MessagePumpIO) {
+  auto io_pump =
+      std::make_shared<BASE_LOOPER::MessagePumpDefatlt>("io", 1);
+  io_pump->PostRunable(
+      [] { boost::this_thread::sleep(boost::posix_time::seconds(50000)); }, 100000);
 
-  pump->PostRunable(
-      [] { LogInfo << "test: 5  " << BASE_TIME::GetTickCount2(); }, 5000);
-
-  pump->PostRunable(
-      [] { LogInfo << "test: 1  " << BASE_TIME::GetTickCount2(); }, 1000);
-
-  boost::this_thread::sleep(boost::posix_time::seconds(100000));
+  io_pump->PostRunable(
+      [] { boost::this_thread::sleep(boost::posix_time::seconds(50000)); },
+      10000);
+  boost::this_thread::sleep(boost::posix_time::seconds(1000));
 }
-*/
+
+
+BOOST_AUTO_TEST_CASE(MessagePumpWork) {
+  auto work_pump = std::make_shared<BASE_LOOPER::MessagePumpDefatlt>("work", 10);
+  work_pump->PostRunable([] {
+    boost::this_thread::sleep(boost::posix_time::seconds(5000));
+    });
+  boost::uniform_int<> real(2, 10);
+  boost::random::mt19937 gen;
+  for (int i=0;i<100;i++) {
+    work_pump->PostRunable([] {
+      LogInfo << "loopname: "
+              << BASE_LOOPER::MessageLoop::CurrentMessagePump()->name();
+      });
+
+    work_pump->PostRunable([] {
+      LogInfo << "loopname: "
+              << BASE_LOOPER::MessageLoop::CurrentMessagePump()->name();
+    }, real(gen) * 1000);
+  }
+
+  //boost::this_thread::sleep(boost::posix_time::seconds(10));
+  work_pump->Stop();
+}*/
+
 BOOST_AUTO_TEST_CASE(MessagePump) {
-  std::vector<std::shared_ptr<BASE_LOOPER::MessagePumpDefatlt>> pumps;
-  for (int i = 0; i < 10;i++) {
-    std::stringstream thread_name_stream;
-    thread_name_stream << "thread:" << i;
-    pumps.push_back(std::make_shared<BASE_LOOPER::MessagePumpDefatlt>(thread_name_stream.str()));
-  }
-  for (auto& pump : pumps) {
-    for (int j = 0; j < 1000; j++) {
-      if (j % 2 == 0) {
-        pump->PostRunable([] { LogInfo << boost::this_thread::get_id(); });
-      } else {
-        pump->PostRunable(
+  while (true) {
+    BASE_LOOPER::MessageLoop::InitMessageLoop();
+      boost::uniform_int<> real(2, 10);
+      boost::random::mt19937 gen;
+      auto io_pump = BASE_LOOPER::MessageLoop::IOMessagePump();
+      auto work_pump = BASE_LOOPER::MessageLoop::WorkMessagePump();
+      auto file_pump = BASE_LOOPER::MessageLoop::FileMessagePump();
+      for (size_t i = 0; i < 1000; i++) {
+        io_pump->PostRunable([] {
+          LogInfo << "loopname: "
+                  << BASE_LOOPER::MessageLoop::CurrentMessagePump()->name();
+        });
+
+        io_pump->PostRunable(
             [] {
-              LogInfo << boost::this_thread::get_id()
-                      << " ticks:" << BASE_TIME::GetTickCount2();
+            LogInfo << "loopname: "
+                      << BASE_LOOPER::MessageLoop::CurrentMessagePump()->name();
             },
-            j * 1000);
+            real(gen) * 1000);
+
+        work_pump->PostRunable([] {
+          LogInfo << "loopname: "
+                  << BASE_LOOPER::MessageLoop::CurrentMessagePump()->name();
+
+        });
+
+        work_pump->PostRunable(
+            [] {
+             LogInfo << "loopname: "
+                      << BASE_LOOPER::MessageLoop::CurrentMessagePump()->name();
+              boost::uniform_int<> real3(2, 10);
+              boost::random::mt19937 gen3;
+              boost::this_thread::sleep(
+                  boost::posix_time::seconds(real3(gen3)));
+
+            },
+            real(gen) * 1000);
+
+        file_pump->PostRunable([] {
+          LogInfo << "loopname: "
+                  << BASE_LOOPER::MessageLoop::CurrentMessagePump()->name();
+          });
+
+        file_pump->PostRunable(
+          [] {
+            LogInfo << "loopname: "
+                     << BASE_LOOPER::MessageLoop::CurrentMessagePump()->name();
+          },
+          real(gen) * 1000);
       }
-    }
+    boost::uniform_int<> real2(2, 10);
+    boost::random::mt19937 gen2;
+    boost::this_thread::sleep(boost::posix_time::seconds(real2(gen2)));
+    BASE_LOOPER::MessageLoop::UnintMessageLoop();
   }
-  boost::this_thread::sleep(boost::posix_time::seconds(10));
-  boost::thread terminate_loop([=] {
-    for (auto& pump : pumps) {
-      pump->Stop();
-    }
-  });
-  boost::this_thread::sleep(boost::posix_time::seconds(100000));
 }

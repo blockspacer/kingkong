@@ -6,22 +6,39 @@
 #include <boost/assert.hpp>
 #include <boost/timer.hpp>
 BEGIN_NAMESPACE_LOOPER
-MessagePumpDefatlt::MessagePumpDefatlt(const std::string& name)
+//tls
+
+void FreeNullTls(MessagePump*) {
+}
+
+boost::thread_specific_ptr<MessagePump> g_tls_(FreeNullTls);
+
+MessagePumpDefatlt::MessagePumpDefatlt(const std::string& name, int32_t thread_count)
     : MessagePumpImpl(name) {
   auto semaphore = BASE_THREAD::CreateSigalSemaphore();
-  thread_ = boost::thread([sem = semaphore.get(), this]{
-    BASE_THREAD::SetCurrentThreadName(MessagePumpImpl::name());
-    work_ = new boost::asio::io_service::work(io_service_);
-    timer_ = new boost::asio::deadline_timer(io_service_);  
-    sem->Signal();
-    Run();
-  });
-  semaphore->Wait();
+  for (int32_t i = 0; i < thread_count; i++) {
+    thread_.create_thread([sem = semaphore.get(), this, i]{
+      std::stringstream thread_name;
+      thread_name << MessagePumpImpl::name() << ":" << (i + 1);
+      BASE_THREAD::SetCurrentThreadName(thread_name.str());
+      g_tls_.reset(this);
+      if (nullptr == work_) {
+        work_ = new boost::asio::io_service::work(io_service_);
+      }
+      if (nullptr == timer_) {
+        timer_ = new boost::asio::deadline_timer(io_service_);
+      }
+      sem->Signal();
+      Run();
+    });
+    semaphore->Wait();
+  }
+ 
 }
 
 
 MessagePumpDefatlt::~MessagePumpDefatlt() {
-  if (thread_.joinable()) {
+  if (!stoped()) {
     LogFatal << "thread is joinable";
   }
 }
@@ -31,7 +48,11 @@ void MessagePumpDefatlt::Wakeup(uint64_t expired_time) {
   if (expired_time > now) {
     //使用定时器来异步等待
     timer_->expires_from_now(boost::posix_time::milliseconds(expired_time - now));
-    timer_->async_wait([this] (boost::system::error_code) {
+    timer_->async_wait([this] (boost::system::error_code code) {
+      //定时器被取消的时候，也会收到回调，这里需要判断一下
+      if (code == boost::asio::error::operation_aborted) {
+        return;
+      }
       DoWork();
     });
   } else {
@@ -48,9 +69,7 @@ void MessagePumpDefatlt::DoRun() {
 
 void MessagePumpDefatlt::DoStop() {
   io_service_.stop();
-  if (thread_.joinable()) {
-    thread_.join();
-  }
+  thread_.join_all();
   //线程停止之后，不会再操作work和定时器。所以可以不用加锁
   delete timer_;
   timer_ = nullptr;
@@ -58,6 +77,13 @@ void MessagePumpDefatlt::DoStop() {
   work_ = nullptr;
 }
 
+
+std::shared_ptr<MessagePump> MessagePumpDefatlt::CurrentPump() {
+  if (g_tls_.get()) {
+    return g_tls_->shared_from_this();
+  }
+  return nullptr;
+}
 
 
 END_NAMESPACE_LOOPER

@@ -52,6 +52,10 @@ public:
 
   void Stop() override;
 
+  bool stoped() {
+    return stoped_;
+  }
+
   virtual void Wakeup(uint64_t expired_time) = 0;
   virtual void DoRun() = 0;
   virtual void DoStop() = 0;

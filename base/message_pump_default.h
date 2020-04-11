@@ -9,8 +9,11 @@ BEGIN_NAMESPACE_LOOPER
 
 class MessagePumpDefatlt :public MessagePumpImpl {
 public:
-  explicit MessagePumpDefatlt(const std::string& name);
+  MessagePumpDefatlt(const std::string& name, int32_t thread_count);
   ~MessagePumpDefatlt();
+
+
+  static std::shared_ptr<MessagePump> CurrentPump();
 
 protected:
   void Wakeup(uint64_t expired_time) override;
@@ -20,8 +23,9 @@ protected:
 
   void DoStop() override;
 
+
 private:
-  boost::thread thread_;
+  boost::thread_group thread_;
   boost::asio::io_service io_service_;
   boost::asio::deadline_timer* timer_ = nullptr;
   // 增加一个work对象

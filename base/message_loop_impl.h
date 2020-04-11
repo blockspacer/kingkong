@@ -7,11 +7,14 @@ BEGIN_NAMESPACE_LOOPER
 
 class MessageLoopImpl :public MessageLoop {
 public:
-  explicit MessageLoopImpl(const std::string& name);
+  MessageLoopImpl(const std::string& name, int32_t thread_count);
+  ~MessageLoopImpl();
 
   std::shared_ptr<MessagePump> GetMessagePump() override;
+  bool CallOnValidThread() override;
 
 private:
+  std::shared_ptr<MessagePump> pump_;
 };
 
 END_NAMESPACE_LOOPER
