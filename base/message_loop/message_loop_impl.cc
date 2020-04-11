@@ -1,5 +1,6 @@
 ﻿#include "message_loop_impl.h"
 #include "message_pump_default.h"
+#include "thread_util.h"
 #include <boost/assert.hpp>
 
 BEGIN_NAMESPACE_LOOPER
@@ -20,12 +21,16 @@ std::shared_ptr<MessagePump> MessageLoopImpl::GetMessagePump() {
 }
 
 bool MessageLoopImpl::CallOnValidThread() {
-  return pump_ == MessagePumpDefatlt::CurrentPump();
+  return pump_ == CurrentMessagePump();
 }
 
 
 std::shared_ptr<MessagePump> MessageLoop::CurrentMessagePump() {
-  return MessagePumpDefatlt::CurrentPump();
+  MessagePump* pump = (MessagePump*)BASE_THREAD::GetThreadTls();
+  if (nullptr != pump) {
+    return pump->shared_from_this();
+  }
+  return nullptr;
 }
 
 

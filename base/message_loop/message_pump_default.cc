@@ -6,12 +6,6 @@
 #include <boost/assert.hpp>
 #include <boost/timer.hpp>
 BEGIN_NAMESPACE_LOOPER
-//tls
-
-void FreeNullTls(MessagePump*) {
-}
-
-boost::thread_specific_ptr<MessagePump> g_tls_(FreeNullTls);
 
 MessagePumpDefatlt::MessagePumpDefatlt(const std::string& name, int32_t thread_count)
     : MessagePumpImpl(name) {
@@ -21,7 +15,7 @@ MessagePumpDefatlt::MessagePumpDefatlt(const std::string& name, int32_t thread_c
       std::stringstream thread_name;
       thread_name << MessagePumpImpl::name() << ":" << (i + 1);
       BASE_THREAD::SetCurrentThreadName(thread_name.str());
-      g_tls_.reset(this);
+      BASE_THREAD::SetThreadTls(this);
       if (nullptr == work_) {
         work_ = new boost::asio::io_service::work(io_service_);
       }
@@ -76,14 +70,5 @@ void MessagePumpDefatlt::DoStop() {
   delete work_;
   work_ = nullptr;
 }
-
-
-std::shared_ptr<MessagePump> MessagePumpDefatlt::CurrentPump() {
-  if (g_tls_.get()) {
-    return g_tls_->shared_from_this();
-  }
-  return nullptr;
-}
-
 
 END_NAMESPACE_LOOPER

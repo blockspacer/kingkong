@@ -12,9 +12,6 @@ public:
   MessagePumpDefatlt(const std::string& name, int32_t thread_count);
   ~MessagePumpDefatlt();
 
-
-  static std::shared_ptr<MessagePump> CurrentPump();
-
 protected:
   void Wakeup(uint64_t expired_time) override;
 

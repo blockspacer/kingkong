@@ -12,5 +12,10 @@ std::string GetCurrentThreadName();
 //获取线程id
 std::string GetCurrentThreadId();
 
+//线程TLS
+void SetThreadTls(void* value);
+void* GetThreadTls();
+
+
 END_NAMESPACE_THREAD
 #endif

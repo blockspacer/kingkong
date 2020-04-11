@@ -70,7 +70,7 @@ BOOST_AUTO_TEST_CASE(MessagePump) {
       for (size_t i = 0; i < 1000; i++) {
         io_pump->PostRunable([] {
           LogInfo << "loopname: "
-                  << BASE_LOOPER::MessageLoop::CurrentMessagePump()->name();
+                  << BASE_LOOPER::MessageLoop::CurrentMessagePump()->name();         
         });
 
         io_pump->PostRunable(

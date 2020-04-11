@@ -60,6 +60,19 @@ std::string GetCurrentThreadId() {
 }
 
 
+void FreeNullTls(void*) {}
+
+boost::thread_specific_ptr<void> g_tls_(FreeNullTls);
+
+void SetThreadTls(void* value) {
+  g_tls_.reset(value);
+}
+
+
+void* GetThreadTls() {
+  return g_tls_.get();
+}
 END_NAMESPACE_THREAD
+
 
 
