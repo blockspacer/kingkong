@@ -41,6 +41,7 @@ struct RunnableInfo {
 class MessagePumpImpl :public MessagePump {
 public:
   explicit MessagePumpImpl(const std::string& name);
+  ~MessagePumpImpl();
 
   const char* name() override;
 

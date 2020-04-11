@@ -32,9 +32,6 @@ MessagePumpDefatlt::MessagePumpDefatlt(const std::string& name, int32_t thread_c
 
 
 MessagePumpDefatlt::~MessagePumpDefatlt() {
-  if (!stoped()) {
-    LogFatal << "thread is joinable";
-  }
 }
 
 void MessagePumpDefatlt::Wakeup(uint64_t expired_time) {

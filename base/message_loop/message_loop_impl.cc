@@ -1,4 +1,5 @@
 ﻿#include "message_loop_impl.h"
+#include "message_pump_win.h"
 #include "message_pump_default.h"
 #include "thread_util.h"
 #include <boost/assert.hpp>
@@ -9,6 +10,8 @@ BEGIN_NAMESPACE_LOOPER
 MessageLoopImpl::MessageLoopImpl(const std::string& name, int32_t thread_count) {
   pump_ = std::make_shared<MessagePumpDefatlt>(name, thread_count);
 }
+
+ MessageLoopImpl::MessageLoopImpl(std::shared_ptr<MessagePump> pump) : pump_(std::move(pump)){}
 
 MessageLoopImpl::~MessageLoopImpl() {
   if (pump_) {
@@ -37,6 +40,11 @@ std::shared_ptr<MessagePump> MessageLoop::CurrentMessagePump() {
 class MessageLooperManager {
 public:
   MessageLooperManager() {
+#ifdef OS_WIN
+    loopers_[kMessagePumpTypeUI] = new MessageLoopImpl(std::make_shared<MessagePumpWin>());
+#else
+#error "not support"
+#endif
     loopers_[kMessagePumpTypeIO] = new MessageLoopImpl("IO", 1);
     loopers_[kMessagePumpTypeWork] = new MessageLoopImpl("Work", WORK_THREAD_COUNT);
     loopers_[kMessagePumpTypeFile] = new MessageLoopImpl("File", 1);
@@ -136,6 +144,10 @@ std::shared_ptr<MessagePump> MessageLoop::WorkMessagePump() {
 
 std::shared_ptr<MessagePump> MessageLoop::FileMessagePump() {
   return GetMessagePumpByType(kMessagePumpTypeFile);
+}
+
+std::shared_ptr<MessagePump> MessageLoop::UIMessagePump() {
+  return GetMessagePumpByType(kMessagePumpTypeUI);
 }
 
 END_NAMESPACE_LOOPER

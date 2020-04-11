@@ -10,6 +10,9 @@ public:
   MessagePumpWin();
   ~MessagePumpWin();
 
+public:
+  void Work();
+
 protected:
   void Wakeup(uint64_t expired_time) override;
 

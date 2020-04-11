@@ -29,10 +29,13 @@ public:
   //初始化和返初始化都需要在主线程调用
   static void InitMessageLoop();
   static void UnintMessageLoop();
+
+  static std::shared_ptr<MessagePump> UIMessagePump();
   static std::shared_ptr<MessagePump> IOMessagePump();
   static std::shared_ptr<MessagePump> WorkMessagePump();
   static std::shared_ptr<MessagePump> FileMessagePump();
 };
+
 
 END_NAMESPACE_LOOPER
 

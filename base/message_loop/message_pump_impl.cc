@@ -1,9 +1,16 @@
 ﻿#include "message_pump_impl.h"
 #include "time_util.h"
+#include "log.h"
 #include <boost/assert.hpp>
 BEGIN_NAMESPACE_LOOPER
 
 MessagePumpImpl::MessagePumpImpl(const std::string& name) : name_(name) {}
+
+ MessagePumpImpl::~MessagePumpImpl() {
+  if (!stoped()) {
+    LogFatal << "message pump is not stoped:" << name_;
+  }
+ }
 
 const char* MessagePumpImpl::name() {
   return name_.c_str();
