@@ -19,7 +19,10 @@ INCLUDE_DIRECTORIES(. ${dirlist} ../third_party/boost/libs/numeric/conversion/in
 FILE (GLOB header_files *.h)
 FILE (GLOB source_files *.c *.cc)
 
-ADD_LIBRARY (base ${header_files} ${source_files})
+FILE (GLOB message_loop message_loop/*.cc message_loop/*.h)
+SOURCE_GROUP("message_loop" FILES ${message_loop})
+
+ADD_LIBRARY (base ${header_files} ${source_files} ${message_loop})
 if (ENABLE_BASE_TEST)
     add_subdirectory(test)
 endif()

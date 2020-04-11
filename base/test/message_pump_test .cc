@@ -1,8 +1,8 @@
-﻿#include "message_loop.h"
+﻿#include "message_loop/message_loop.h"
 #include "log.h"
 #include "time_util.h"
-#include "message_pump_impl.h"
-#include "message_pump_default.h"
+#include "message_loop/message_pump_impl.h"
+#include "message_loop/message_pump_default.h"
 #include <boost/random.hpp>
 #include <boost/test/unit_test.hpp>
 #include <boost/thread.hpp>
