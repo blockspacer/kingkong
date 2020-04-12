@@ -8,20 +8,16 @@
 BEGIN_NAMESPACE_LOOPER
 
 MessagePumpDefatlt::MessagePumpDefatlt(const std::string& name, int32_t thread_count)
-    : MessagePumpImpl(name) {
+    : MessagePumpImpl(name),
+  timer_(io_service_),
+  work_(io_service_) {
   auto semaphore = BASE_THREAD::CreateSigalSemaphore();
   for (int32_t i = 0; i < thread_count; i++) {
     thread_.create_thread([sem = semaphore.get(), this, i]{
       std::stringstream thread_name;
       thread_name << MessagePumpImpl::name() << ":" << (i + 1);
       BASE_THREAD::SetCurrentThreadName(thread_name.str());
-      BASE_THREAD::SetThreadTls(this);
-      if (nullptr == work_) {
-        work_ = new boost::asio::io_service::work(io_service_);
-      }
-      if (nullptr == timer_) {
-        timer_ = new boost::asio::deadline_timer(io_service_);
-      }
+      BASE_THREAD::SetThreadTls(this);     
       sem->Signal();
       Run();
     });
@@ -38,8 +34,8 @@ void MessagePumpDefatlt::Wakeup(uint64_t expired_time) {
   auto now = BASE_TIME::GetTickCount2();
   if (expired_time > now) {
     //使用定时器来异步等待
-    timer_->expires_from_now(boost::posix_time::milliseconds(expired_time - now));
-    timer_->async_wait([this] (boost::system::error_code code) {
+    timer_.expires_from_now(boost::posix_time::milliseconds(expired_time - now));
+    timer_.async_wait([this] (boost::system::error_code code) {
       //定时器被取消的时候，也会收到回调，这里需要判断一下
       if (code == boost::asio::error::operation_aborted) {
         return;
@@ -59,13 +55,15 @@ void MessagePumpDefatlt::DoRun() {
 }
 
 void MessagePumpDefatlt::DoStop() {
+  boost::system::error_code ec;
+  timer_.cancel(ec);
   io_service_.stop();
   thread_.join_all();
-  //线程停止之后，不会再操作work和定时器。所以可以不用加锁
-  delete timer_;
-  timer_ = nullptr;
-  delete work_;
-  work_ = nullptr;
+}
+
+void* MessagePumpDefatlt::Raw() {
+  return &io_service_;
 }
 
 END_NAMESPACE_LOOPER
+

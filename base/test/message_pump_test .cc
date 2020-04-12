@@ -10,6 +10,10 @@
 
 #include <boost/random/random_device.hpp>
 
+//#define MESSAGE_PUMP_TEST
+
+#ifdef MESSAGE_PUMP_TEST
+
 BOOST_AUTO_TEST_CASE(RunnableInfo) {
   boost::variate_generator<boost::mt19937, boost::uniform_int<> > vgen(boost::mt19937(), boost::uniform_int<>(0, 999));
   std::set< BASE_LOOPER::RunnableInfo> runnable_set;
@@ -81,3 +85,4 @@ BOOST_AUTO_TEST_CASE(MessagePump) {
     BASE_LOOPER::MessageLoop::UnintMessageLoop();
   }
 }
+#endif

@@ -27,7 +27,6 @@ bool MessageLoopImpl::CallOnValidThread() {
   return pump_ == CurrentMessagePump();
 }
 
-
 std::shared_ptr<MessagePump> MessageLoop::CurrentMessagePump() {
   MessagePump* pump = (MessagePump*)BASE_THREAD::GetThreadTls();
   if (nullptr != pump) {

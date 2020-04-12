@@ -20,13 +20,14 @@ protected:
 
   void DoStop() override;
 
+  void* Raw() override;
 
 private:
   boost::thread_group thread_;
   boost::asio::io_service io_service_;
-  boost::asio::deadline_timer* timer_ = nullptr;
+  boost::asio::deadline_timer timer_;
   // 增加一个work对象
-  boost::asio::io_service::work* work_ = nullptr;
+  boost::asio::io_service::work work_;
 };
 
 END_NAMESPACE_LOOPER

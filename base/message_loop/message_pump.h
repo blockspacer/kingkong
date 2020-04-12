@@ -20,6 +20,10 @@ class MessagePump : public std::enable_shared_from_this<MessagePump> {
   virtual uint64_t PostRunable(Runnable runable, uint64_t delay) = 0;
   //取消一个Runable
   virtual bool     Cancel(uint64_t id) = 0;
+  //获取io_service 指针
+  virtual void* Raw() {
+    return nullptr;
+  }
 };
 
 END_NAMESPACE_LOOPER

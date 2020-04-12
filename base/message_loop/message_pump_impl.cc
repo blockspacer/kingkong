@@ -28,6 +28,7 @@ void MessagePumpImpl::Stop() {
     return;
   }
   DoStop();
+  stoped_ = true;
 }
 
 uint64_t MessagePumpImpl::PostRunable(Runnable runable) {
