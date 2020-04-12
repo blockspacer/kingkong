@@ -108,8 +108,9 @@ void TcpImpl::DoRecvData() {
   }
 
   auto self = shared_from_this();
-  boost::asio::async_read(socket_, boost::asio::buffer(read_buffer_.get(), MAX_RECV_READ),
-      [self](boost::system::error_code ec, std::size_t length) {
+  //读的时候指定最大读取就可以了
+  socket_.async_read_some(boost::asio::buffer(read_buffer_.get(), MAX_RECV_READ),
+      [self](boost::system::error_code ec, std::size_t length) mutable{
         if (ec) {
           //发生了错误，通知断开连接
           self->NotifyDisconnect(ec);
@@ -117,6 +118,7 @@ void TcpImpl::DoRecvData() {
         } else {
           self->NotifyRecvData(length);
         }
+        self.reset();
       });
 }
 
