@@ -12,11 +12,11 @@ foreach (child_dir ${libs_dir})
     endif()
 endforeach()
 
-
+link_directories(${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
 INCLUDE_DIRECTORIES(. .. ${dirlist} ../../third_party/boost/libs/numeric/conversion/include)
 
 FILE (GLOB header_files *.h)
 FILE (GLOB source_files *.c *.cc)
 
 ADD_EXECUTABLE (base_test ${header_files} ${source_files})
-TARGET_LINK_LIBRARIES (base_test  ws2_32 wbemuuid    Wldap32 boost base)
+TARGET_LINK_LIBRARIES (base_test  ws2_32 wbemuuid    Wldap32 boost base ssl crypto)
