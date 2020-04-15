@@ -11,7 +11,8 @@ public:
 	enum NetType {
 		kNetTypeTcp = 1,
 		kNetTypeTcpTls,
-		kNetTypeWebsocket
+		kNetTypeWebsocket,
+		kNetTypeWebsocketTls
 	};
 
 	struct NetConnectionRequest{
@@ -26,7 +27,6 @@ public:
 		virtual void OnConnect(NetConnection* tcp, int code, const std::string& msg) = 0;
 		virtual void OnRecvData(NetConnection* tcp, const void* buffer, int32_t buffer_len) = 0;
 		virtual void OnDisconnect(NetConnection* tcp, int code, const std::string& msg) = 0;
-		virtual void OnHandshake(NetConnection* tcp, int code, const std::string& msg) {}
 	};
 
 

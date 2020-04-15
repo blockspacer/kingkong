@@ -55,23 +55,7 @@ void DnsResolverImpl::Cancel() {
 void DnsResolverImpl::DoResolver() {
   auto self = shared_from_this();
   auto& io_service = *(boost::asio::io_context*)pump_->Raw();
-  std::string domain = request_->host;
-  std::string schem = HTTP_SCHEME;
-  std::string::size_type pos = request_->host.find(HTTPS_SCHEME);
-  std::string::size_type offset = 0;
-  if (pos == 0) {
-    //https 协议
-    schem = HTTPS_SCHEME;
-    offset = strlen(HTTPS_SCHEME) + SCHEME_EXT;
-  }
-  else {
-    pos = request_->host.find(HTTP_SCHEME);
-    offset = strlen(HTTP_SCHEME) + SCHEME_EXT;
-  }
-  if (std::string::npos != pos) {
-    domain = domain.substr(offset, domain.length() - offset);
-  }
-  resolver_.async_resolve(domain, schem,
+  resolver_.async_resolve(request_->host, request_->schem,
     [self](const boost::system::error_code& err,
       const boost::asio::ip::tcp::resolver::results_type& endpoints) mutable {
         self->NotifyResult(err, endpoints);

@@ -65,7 +65,7 @@ void NetConnectionImpl::OnDnsResolvered(
     dns_resolver_->Cancel();
     dns_resolver_ = nullptr;
   }
-
+  //DNS 解析失败
   if (0 != code) {
     HandleConnectStatus(code, msg);
     HandleCleanUp();
@@ -79,15 +79,17 @@ void NetConnectionImpl::DoDnsResolve() {
   auto dns_resolver_request =
       std::make_unique<BASE_NET::DnsResolver::DnsResolverRequest>();
   dns_resolver_request->host = request_->host;
+  dns_resolver_request->schem = boost::lexical_cast<std::string>(request_->port);
+
   dns_resolver_ = BASE_NET::CreateDnsResolver(std::move(dns_resolver_request),
                                          this, pump_);
   dns_resolver_->Resolver();
 }
 
 void NetConnectionImpl::NotifyConnectComplete(const boost::system::error_code& ec) {
-  HandleConnectStatus(ec.value(), ec.message());
   if (!ec) {
     switch (request_->net_type) {
+    case kNetTypeWebsocketTls:
     case kNetTypeTcpTls: {
       DoTlsHandshake();
     }
@@ -98,27 +100,48 @@ void NetConnectionImpl::NotifyConnectComplete(const boost::system::error_code& e
                           break;
     default:
     {
-      read_buffer_ = boost::shared_array<char>(new char[MAX_RECV_READ]);
-      asio_buffers_ = boost::asio::buffer(read_buffer_.get(), MAX_RECV_READ);
-      DoRecvData(asio_buffers_);
+      //普通的连接直接完成
+      HandleConnectStatus(ec.value(), ec.message());
+      StartRecvDate();
     }
     break;
     }
   }
   else {
     HandleCleanUp();
+    HandleConnectStatus(ec.value(), ec.message());
   }
 }
 
-void NetConnectionImpl::NotifyHandshakeComplete(
+void NetConnectionImpl::NotifyTlsHandshakeComplete(
     const boost::system::error_code& ec) {
-  HandleHandshake(ec);
   if (!ec) {
-    //握手成功开始接收数据
-    read_buffer_ = boost::shared_array<char>(new char[MAX_RECV_READ]);
-    asio_buffers_ = boost::asio::buffer(read_buffer_.get(), MAX_RECV_READ);
-    DoRecvData(asio_buffers_);
+    switch (request_->net_type) {
+    case kNetTypeWebsocketTls: {
+      DoWebsocketHandshake();
+    }
+                             break;
+    default: {
+      //TLS 握手成功开始接收数据
+      HandleConnectStatus(ec.value(), ec.message());
+      StartRecvDate();
+    }
+           break;
+    }
+  
   } else {
+    HandleConnectStatus(ec.value(), ec.message());
+    HandleCleanUp();
+  }
+}
+
+void NetConnectionImpl::NotifyWebsocketHandshakeComplte(const boost::system::error_code& ec) {
+  HandleConnectStatus(ec.value(), ec.message());
+  if (!ec) {
+    //Websocket 握手成功。 这是最后一步
+    StartRecvDate();
+  }
+  else {
     HandleCleanUp();
   }
 }
@@ -133,13 +156,6 @@ void NetConnectionImpl::DoSendFromQueue(std::shared_ptr<std::string> send_buffer
   if (!write_in_progress) {    
     DoSendData(boost::asio::buffer(send_buffers.front()->c_str(),
                                    send_buffers.front()->length()));
-  }
-}
-
-void NetConnectionImpl::HandleHandshake(const boost::system::error_code& ec) {
-  std::lock_guard<std::mutex> lock(mutex_);
-  if (nullptr != delegate_) {
-    delegate_->OnHandshake(this, ec.value(), ec.message());
   }
 }
 
@@ -211,6 +227,12 @@ void NetConnectionImpl::HandleRecvData(std::size_t length) {
       delegate_->OnRecvData(this, read_buffer_.get(), static_cast<int>(length));
     }
   }
+  DoRecvData(asio_buffers_);
+}
+
+void NetConnectionImpl::StartRecvDate() {
+  read_buffer_ = boost::shared_array<char>(new char[MAX_RECV_READ]);
+  asio_buffers_ = boost::asio::buffer(read_buffer_.get(), MAX_RECV_READ);
   DoRecvData(asio_buffers_);
 }
 

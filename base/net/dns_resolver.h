@@ -11,6 +11,7 @@ public:
 
 	struct DnsResolverRequest{
 		std::string host;
+		std::string schem;
 	};
 
 	class DnsResolverDelegate {

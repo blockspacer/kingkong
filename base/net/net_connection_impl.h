@@ -42,7 +42,8 @@ public:
   void NotifySendComplete(boost::system::error_code ec, std::size_t length);
   void NotifyRecvData(boost::system::error_code ec, std::size_t length);
   void NotifyConnectComplete(const boost::system::error_code& ec);
-  void NotifyHandshakeComplete(const boost::system::error_code& ec);
+  void NotifyTlsHandshakeComplete(const boost::system::error_code& ec);
+  void NotifyWebsocketHandshakeComplte(const boost::system::error_code& ec);
 
   boost::asio::io_service& GetIOService();
 
@@ -60,9 +61,8 @@ private:
   void NotifyDisconnect(boost::system::error_code& ec);
   //回调接收到了数据
   void HandleRecvData(std::size_t length);
-  //回调SSL 握手
-  void HandleHandshake(const boost::system::error_code& ec);
-
+  //开始接收数据
+  void StartRecvDate();
 
 protected:
   std::unique_ptr<NetConnection::NetConnectionRequest> request_;
