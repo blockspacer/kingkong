@@ -44,13 +44,7 @@ void TcpConnectionImpl::DoCleanUp() {
   socket_.close(ec);
 }
 
-std::shared_ptr<NetConnection> CreateTcp(
-    std::unique_ptr<NetConnection::NetConnectionRequest> request,
-    NetConnection::NetConnectionDelegate* delegate,
-    std::shared_ptr<BASE_LOOPER::MessagePump> pump) {
-  return std::make_shared<TcpConnectionImpl>(std::move(request), delegate,
-                                             std::move(pump));
-}
+
 END_NAMESPACE_NET
 
 

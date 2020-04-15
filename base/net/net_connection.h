@@ -8,9 +8,17 @@ class NetConnection {
 public:
   virtual ~NetConnection() = default;
 
+	enum NetType {
+		kNetTypeTcp = 1,
+		kNetTypeTcpTls,
+		kNetTypeWebsocket
+	};
+
 	struct NetConnectionRequest{
 		std::string host;
 		uint16_t port;
+		//是否支持tls
+		NetType net_type = kNetTypeTcp;
 	};
 
 	class NetConnectionDelegate {
@@ -18,6 +26,7 @@ public:
 		virtual void OnConnect(NetConnection* tcp, int code, const std::string& msg) = 0;
 		virtual void OnRecvData(NetConnection* tcp, const void* buffer, int32_t buffer_len) = 0;
 		virtual void OnDisconnect(NetConnection* tcp, int code, const std::string& msg) = 0;
+		virtual void OnHandshake(NetConnection* tcp, int code, const std::string& msg) {}
 	};
 
 
@@ -31,6 +40,5 @@ std::shared_ptr<NetConnection> CreateTcp(std::unique_ptr<NetConnection::NetConne
 	std::shared_ptr<BASE_LOOPER::MessagePump> pump);
 
 END_NAMESPACE_NET
-
 
 #endif

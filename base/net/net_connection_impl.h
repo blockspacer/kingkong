@@ -33,12 +33,16 @@ public:
   virtual void DoSendData(boost::asio::const_buffer& buffers) = 0;
   //协议清理资源
   virtual void DoCleanUp() = 0;
-
+  //https tcp tls 需要的握手
+  virtual void DoTlsHandshake();
+  //websocket 需要的握手
+  virtual void DoWebsocketHandshake();
 
   //通用的一些接口，具体的业务完成之后用来通知
   void NotifySendComplete(boost::system::error_code ec, std::size_t length);
   void NotifyRecvData(boost::system::error_code ec, std::size_t length);
-  void NotifyConnectComplete(const boost::system::error_code&);
+  void NotifyConnectComplete(const boost::system::error_code& ec);
+  void NotifyHandshakeComplete(const boost::system::error_code& ec);
 
   boost::asio::io_service& GetIOService();
 
@@ -56,9 +60,14 @@ private:
   void NotifyDisconnect(boost::system::error_code& ec);
   //回调接收到了数据
   void HandleRecvData(std::size_t length);
- 
-private:
+  //回调SSL 握手
+  void HandleHandshake(const boost::system::error_code& ec);
+
+
+protected:
   std::unique_ptr<NetConnection::NetConnectionRequest> request_;
+
+private:
   std::mutex mutex_;
   NetConnection::NetConnectionDelegate* delegate_ = nullptr;
   std::shared_ptr<BASE_LOOPER::MessagePump> pump_;

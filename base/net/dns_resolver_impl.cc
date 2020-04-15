@@ -3,6 +3,9 @@
 #include "dns_resolver_impl.h"
 
 BEGIN_NAMESPACE_NET
+#define HTTPS_SCHEME "https"
+#define HTTP_SCHEME  "http"
+#define SCHEME_EXT 3  //  ://
 
 DnsResolverImpl::DnsResolverImpl(
     std::unique_ptr<DnsResolver::DnsResolverRequest> request,
@@ -52,9 +55,25 @@ void DnsResolverImpl::Cancel() {
 void DnsResolverImpl::DoResolver() {
   auto self = shared_from_this();
   auto& io_service = *(boost::asio::io_context*)pump_->Raw();
-  resolver_.async_resolve(request_->host, "http",
-                           [self](const boost::system::error_code& err,
-                              const boost::asio::ip::tcp::resolver::results_type& endpoints) mutable{
+  std::string domain = request_->host;
+  std::string schem = HTTP_SCHEME;
+  std::string::size_type pos = request_->host.find(HTTPS_SCHEME);
+  std::string::size_type offset = 0;
+  if (pos == 0) {
+    //https 协议
+    schem = HTTPS_SCHEME;
+    offset = strlen(HTTPS_SCHEME) + SCHEME_EXT;
+  }
+  else {
+    pos = request_->host.find(HTTP_SCHEME);
+    offset = strlen(HTTP_SCHEME) + SCHEME_EXT;
+  }
+  if (std::string::npos != pos) {
+    domain = domain.substr(offset, domain.length() - offset);
+  }
+  resolver_.async_resolve(domain, schem,
+    [self](const boost::system::error_code& err,
+      const boost::asio::ip::tcp::resolver::results_type& endpoints) mutable {
         self->NotifyResult(err, endpoints);
         //避免 循环引用导致的内存无法释放，这里需要 手动reset
         self.reset();

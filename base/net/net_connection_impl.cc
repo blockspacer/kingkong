@@ -85,14 +85,40 @@ void NetConnectionImpl::DoDnsResolve() {
 }
 
 void NetConnectionImpl::NotifyConnectComplete(const boost::system::error_code& ec) {
-  HandleConnectStatus(ec.value(),
-    ec.message());
+  HandleConnectStatus(ec.value(), ec.message());
   if (!ec) {
+    switch (request_->net_type) {
+    case kNetTypeTcpTls: {
+      DoTlsHandshake();
+    }
+                       break;
+    case kNetTypeWebsocket: {
+      DoWebsocketHandshake();
+    }
+                          break;
+    default:
+    {
+      read_buffer_ = boost::shared_array<char>(new char[MAX_RECV_READ]);
+      asio_buffers_ = boost::asio::buffer(read_buffer_.get(), MAX_RECV_READ);
+      DoRecvData(asio_buffers_);
+    }
+    break;
+    }
+  }
+  else {
+    HandleCleanUp();
+  }
+}
+
+void NetConnectionImpl::NotifyHandshakeComplete(
+    const boost::system::error_code& ec) {
+  HandleHandshake(ec);
+  if (!ec) {
+    //握手成功开始接收数据
     read_buffer_ = boost::shared_array<char>(new char[MAX_RECV_READ]);
     asio_buffers_ = boost::asio::buffer(read_buffer_.get(), MAX_RECV_READ);
     DoRecvData(asio_buffers_);
-  }
-  else {
+  } else {
     HandleCleanUp();
   }
 }
@@ -108,6 +134,22 @@ void NetConnectionImpl::DoSendFromQueue(std::shared_ptr<std::string> send_buffer
     DoSendData(boost::asio::buffer(send_buffers.front()->c_str(),
                                    send_buffers.front()->length()));
   }
+}
+
+void NetConnectionImpl::HandleHandshake(const boost::system::error_code& ec) {
+  std::lock_guard<std::mutex> lock(mutex_);
+  if (nullptr != delegate_) {
+    delegate_->OnHandshake(this, ec.value(), ec.message());
+  }
+}
+
+void NetConnectionImpl::DoTlsHandshake() {
+  LogFatal << "Unexpected call";
+}
+
+
+void NetConnectionImpl::DoWebsocketHandshake() {
+  LogFatal << "Unexpected call";
 }
 
 void NetConnectionImpl::NotifySendComplete(boost::system::error_code ec, std::size_t length) {
@@ -147,14 +189,11 @@ void NetConnectionImpl::HandleCleanUp() {
 
 void NetConnectionImpl::HandleConnectStatus(int code, const std::string& msg) {
   //失败了。通知连接失败
-  {
-    std::lock_guard<std::mutex> lock(mutex_);
-    if (nullptr != delegate_) {
-      delegate_->OnConnect(this, code, msg);
-    }
+  std::lock_guard<std::mutex> lock(mutex_);
+  if (nullptr != delegate_) {
+    delegate_->OnConnect(this, code, msg);
   }
 }
-
 
 void NetConnectionImpl::NotifyDisconnect(boost::system::error_code& ec) {
   {
