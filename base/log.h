@@ -30,7 +30,7 @@ enum LogLevel {
 extern boost::log::sources::severity_logger<LogLevel> s_named_logger;
 
 void InitLog(LogLevel log_level, const std::string& log_dir);
-
+void UnInitLog();
 
 #define LogTrace    BOOST_LOG_FUNCTION();\
                     BOOST_LOG_SEV(BASE_LOG::s_named_logger, BASE_LOG::kLogLevelTrace)

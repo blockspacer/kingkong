@@ -126,8 +126,12 @@ void InitLogFile(LogLevel log_level, const std::string& log_dir) {
 void InitLog(LogLevel log_level, const std::string& log_dir) {
   InitConsole(log_level);
   InitLogFile(log_level, log_dir);
-  auto core = boost::log::core::get();
   boost::log::add_common_attributes();
 }
 
+void UnInitLog() {
+  boost::log::core::get()->remove_all_sinks();
+}
+
 END_NAMESPACE_LOG
+
