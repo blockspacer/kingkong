@@ -103,8 +103,8 @@ WebsocketTlsConnectionImpl::WebsocketTlsConnectionImpl(std::unique_ptr<NetConnec
 void WebsocketTlsConnectionImpl::DoTlsHandshake() {
   auto self = shared_from_this();
   ws_->next_layer().async_handshake(boost::asio::ssl::stream_base::client,
-    [self](const boost::system::error_code& error) {
-      self->NotifyTlsHandshakeComplete(error);
+    [self](boost::system::error_code ec) {
+      self->NotifyTlsHandshakeComplete(std::move(ec));
     });
 }
 

@@ -14,8 +14,8 @@ DnsResolverImpl::DnsResolverImpl(
     : request_(std::move(request)),
   delegate_(delegate),
   pump_(std::move(pump)),
-  resolver_(*(boost::asio::io_context*)pump_->Raw()) {}
-
+  resolver_(*(boost::asio::io_context*)pump_->Raw()),
+  stoped_(false) {}
 
  DnsResolverImpl::~DnsResolverImpl() {
    if (!stoped_) {
@@ -56,9 +56,9 @@ void DnsResolverImpl::DoResolver() {
   auto self = shared_from_this();
   auto& io_service = *(boost::asio::io_context*)pump_->Raw();
   resolver_.async_resolve(request_->host, request_->schem,
-    [self](const boost::system::error_code& err,
+    [self](boost::system::error_code ec,
       const boost::asio::ip::tcp::resolver::results_type& endpoints) mutable {
-        self->NotifyResult(err, endpoints);
+        self->NotifyResult(std::move(ec), endpoints);
         //避免 循环引用导致的内存无法释放，这里需要 手动reset
         self.reset();
     });
@@ -70,7 +70,7 @@ void DnsResolverImpl::DoCancel() {
 }
 
 void DnsResolverImpl::NotifyResult(
-    const boost::system::error_code& err,
+    boost::system::error_code err,
     const boost::asio::ip::tcp::resolver::results_type& endpoints) {
   {
     std::lock_guard<std::recursive_mutex> lock(mutex_);

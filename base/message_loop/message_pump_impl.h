@@ -75,7 +75,7 @@ private:
   std::mutex runable_set_mutex_;
   std::string name_;
   uint64_t id_ = 0;
-  std::atomic<bool> stoped_ = false;
+  std::atomic<bool> stoped_;
 };
 
 END_NAMESPACE_LOOPER

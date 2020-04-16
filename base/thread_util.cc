@@ -2,8 +2,9 @@
 #include <boost/thread.hpp>
 #ifdef OS_WIN
 #include <windows.h>
+#elif defined(OS_ANDROID)
 
-
+#include <sys/prctl.h>
 #endif
 
 
@@ -45,7 +46,7 @@ void SetCurrentThreadName(const std::string& thread_name) {
   pthread_setname_np(shortened_name.c_str());
 
 #elif defined(OS_ANDROID) ||defined (OS_LINUX)
-  prctl(PR_SET_NAME, name.c_str());
+  prctl(PR_SET_NAME, thread_name.c_str());
 #endif
 }
 

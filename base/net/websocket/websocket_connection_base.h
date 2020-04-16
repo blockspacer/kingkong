@@ -22,28 +22,28 @@ protected:
   void DoConnect(const boost::asio::ip::tcp::resolver::results_type& endpoints) override {
     auto self = shared_from_this();
     boost::beast::get_lowest_layer(*ws_.get()).async_connect(endpoints,
-      [self](boost::system::error_code& ec,
+      [self](boost::system::error_code ec,
         boost::asio::ip::tcp::endpoint endpoint) {
           //连接失败通知上层
-          self->NotifyConnectComplete(ec);
+          self->NotifyConnectComplete(std::move(ec));
       });
   }
 
-  void DoRecvData(boost::asio::mutable_buffer& buffers) override {
+  void DoRecvData(boost::asio::mutable_buffer buffers) override {
     auto self = shared_from_this();
     //读的时候指定最大读取就可以了
-    ws_->async_read_some(buffers, [self](boost::system::error_code& ec, std::size_t length) mutable {
-      self->NotifyRecvData(ec, length);
+    ws_->async_read_some(std::move(buffers), [self](boost::system::error_code ec, std::size_t length) mutable {
+      self->NotifyRecvData(std::move(ec), length);
       self.reset();
       });
   }
 
-  void DoSendData(boost::asio::const_buffer& buffers) override {
+  void DoSendData(boost::asio::const_buffer buffers) override {
     auto self = shared_from_this();
     ws_->async_write(
-      buffers,
-      [self](boost::system::error_code& ec, std::size_t length) mutable {
-        self->NotifySendComplete(ec, length);
+      std::move(buffers),
+      [self](boost::system::error_code ec, std::size_t length) mutable {
+        self->NotifySendComplete(std::move(ec), length);
         self.reset();
       });
   }
@@ -53,8 +53,8 @@ protected:
   }
   void DoWebsocketHandshake() override {
     auto self = shared_from_this();
-    ws_->async_handshake(request_->host, "/", [self](boost::system::error_code& ec) {
-      self->NotifyWebsocketHandshakeComplte(ec);
+    ws_->async_handshake(request_->host, "/", [self](boost::system::error_code ec) {
+      self->NotifyWebsocketHandshakeComplte(std::move(ec));
       });
   }
 

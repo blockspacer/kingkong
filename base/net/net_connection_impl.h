@@ -28,9 +28,9 @@ public:
   //不能的模块用来实现不同的连接
   virtual void DoConnect(const boost::asio::ip::tcp::resolver::results_type& endpoints) = 0;
   //具体协议实现接收数据
-  virtual void DoRecvData(boost::asio::mutable_buffer& buffers) = 0;
+  virtual void DoRecvData(boost::asio::mutable_buffer buffers) = 0;
   //协议发送数据
-  virtual void DoSendData(boost::asio::const_buffer& buffers) = 0;
+  virtual void DoSendData(boost::asio::const_buffer buffers) = 0;
   //协议清理资源
   virtual void DoCleanUp() = 0;
   //https tcp tls 需要的握手
@@ -41,9 +41,9 @@ public:
   //通用的一些接口，具体的业务完成之后用来通知
   void NotifySendComplete(boost::system::error_code ec, std::size_t length);
   void NotifyRecvData(boost::system::error_code ec, std::size_t length);
-  void NotifyConnectComplete(const boost::system::error_code& ec);
-  void NotifyTlsHandshakeComplete(const boost::system::error_code& ec);
-  void NotifyWebsocketHandshakeComplte(const boost::system::error_code& ec);
+  void NotifyConnectComplete(boost::system::error_code ec);
+  void NotifyTlsHandshakeComplete(boost::system::error_code ec);
+  void NotifyWebsocketHandshakeComplte(boost::system::error_code ec);
 
   boost::asio::io_service& GetIOService();
 
@@ -81,7 +81,7 @@ private:
   //用来DNS 解析
   std::shared_ptr<DnsResolver> dns_resolver_;
   //是否结束标志
-  std::atomic_bool stoped_ = false;
+  std::atomic_bool stoped_;
 };
 
 END_NAMESPACE_NET

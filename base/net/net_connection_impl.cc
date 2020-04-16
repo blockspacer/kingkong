@@ -9,7 +9,8 @@ NetConnectionImpl::NetConnectionImpl(std::unique_ptr<NetConnection::NetConnectio
                  std::shared_ptr<BASE_LOOPER::MessagePump> pump)
     : request_(std::move(request)),
       delegate_(delegate),
-      pump_(std::move(pump)) {}
+      pump_(std::move(pump)),
+      stoped_(false) {}
 
 
  NetConnectionImpl::~NetConnectionImpl() {
@@ -86,7 +87,7 @@ void NetConnectionImpl::DoDnsResolve() {
   dns_resolver_->Resolver();
 }
 
-void NetConnectionImpl::NotifyConnectComplete(const boost::system::error_code& ec) {
+void NetConnectionImpl::NotifyConnectComplete(boost::system::error_code ec) {
   if (!ec) {
     switch (request_->net_type) {
     case kNetTypeWebsocketTls:
@@ -113,8 +114,7 @@ void NetConnectionImpl::NotifyConnectComplete(const boost::system::error_code& e
   }
 }
 
-void NetConnectionImpl::NotifyTlsHandshakeComplete(
-    const boost::system::error_code& ec) {
+void NetConnectionImpl::NotifyTlsHandshakeComplete(boost::system::error_code ec) {
   if (!ec) {
     switch (request_->net_type) {
     case kNetTypeWebsocketTls: {
@@ -135,7 +135,7 @@ void NetConnectionImpl::NotifyTlsHandshakeComplete(
   }
 }
 
-void NetConnectionImpl::NotifyWebsocketHandshakeComplte(const boost::system::error_code& ec) {
+void NetConnectionImpl::NotifyWebsocketHandshakeComplte(boost::system::error_code ec) {
   HandleConnectStatus(ec.value(), ec.message());
   if (!ec) {
     //Websocket 握手成功。 这是最后一步

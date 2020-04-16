@@ -4,7 +4,8 @@
 #include <boost/assert.hpp>
 BEGIN_NAMESPACE_LOOPER
 
-MessagePumpImpl::MessagePumpImpl(const std::string& name) : name_(name) {}
+MessagePumpImpl::MessagePumpImpl(const std::string& name) : name_(name),
+                                                            stoped_(false) {}
 
  MessagePumpImpl::~MessagePumpImpl() {
   if (!stoped()) {

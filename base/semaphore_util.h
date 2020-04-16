@@ -1,6 +1,7 @@
 ﻿#ifndef _SEMAPHORE_UTIL_H_
 #define _SEMAPHORE_UTIL_H_
 #include <base_header.h>
+#include <condition_variable>
 #include <chrono>
 #include <ctime>
 

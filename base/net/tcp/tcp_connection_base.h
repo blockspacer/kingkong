@@ -17,22 +17,22 @@ public:
       : NetConnectionImpl(std::move(request), delegate, std::move(pump)) {}
 
 protected:
-  void DoRecvData(boost::asio::mutable_buffer& buffers) override {
+  void DoRecvData(boost::asio::mutable_buffer buffers) override {
    auto self = shared_from_this();
    //读的时候指定最大读取就可以了
-   socket_->async_read_some(buffers, [self](boost::system::error_code ec,
+   socket_->async_read_some(std::move(buffers), [self](boost::system::error_code ec,
                                            std::size_t length) mutable {
      self->NotifyRecvData(ec, length);
      self.reset();
    });
   }
 
-  void DoSendData(boost::asio::const_buffer& buffers) override {
+  void DoSendData(boost::asio::const_buffer buffers) override {
     auto self = shared_from_this();
     boost::asio::async_write(
-        *socket_, buffers,
+        *socket_, std::move(buffers),
         [self](boost::system::error_code ec, std::size_t length) {
-          self->NotifySendComplete(ec, length);
+          self->NotifySendComplete(std::move(ec), length);
         });
   }
 

@@ -1,6 +1,6 @@
 ﻿#ifndef _BASE_LOG_H_
 #define _BASE_LOG_H_
-#include <base_header.h>
+#include <base/base_header.h>
 
 #include <boost/log/common.hpp>
 #include <boost/log/expressions.hpp>

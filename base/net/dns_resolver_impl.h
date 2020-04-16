@@ -21,9 +21,8 @@ private:
   void DoResolver();
   void DoCancel();
 
- void NotifyResult(const boost::system::error_code& err,
+ void NotifyResult(boost::system::error_code err,
      const boost::asio::ip::tcp::resolver::results_type& endpoints);
-
 
 private:
   std::unique_ptr<DnsResolver::DnsResolverRequest> request_;
@@ -31,7 +30,7 @@ private:
   DnsResolver::DnsResolverDelegate* delegate_ = nullptr;
   std::shared_ptr<BASE_LOOPER::MessagePump> pump_;
   boost::asio::ip::tcp::resolver resolver_;
-  std::atomic_bool stoped_ = false;
+  std::atomic_bool stoped_;
 };
 
 END_NAMESPACE_NET

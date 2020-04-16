@@ -1,5 +1,9 @@
 ﻿#include "message_loop_impl.h"
+#ifdef OS_WIN
 #include "message_pump_win.h"
+#elif defined(OS_ANDROID)
+#include "message_pump_android.h"
+#endif
 #include "message_pump_default.h"
 #include "thread_util.h"
 #include <boost/assert.hpp>
@@ -41,6 +45,8 @@ public:
   MessageLooperManager() {
 #ifdef OS_WIN
     loopers_[kMessagePumpTypeUI] = new MessageLoopImpl(std::make_shared<MessagePumpWin>());
+#elif defined(OS_ANDROID)
+    loopers_[kMessagePumpTypeUI] = new MessageLoopImpl(std::make_shared<MessagePumpAndroid>());
 #else
 #error "not support"
 #endif

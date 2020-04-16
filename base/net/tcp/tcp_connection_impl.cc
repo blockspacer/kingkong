@@ -14,7 +14,7 @@ void TcpConnectionImpl::DoConnect(const boost::asio::ip::tcp::resolver::results_
   boost::asio::async_connect(*socket_, endpoints,
     [self](boost::system::error_code ec,
       boost::asio::ip::tcp::endpoint endpoint) {
-        self->NotifyConnectComplete(ec);
+        self->NotifyConnectComplete(std::move(ec));
     });
 }
 
