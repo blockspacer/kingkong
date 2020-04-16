@@ -5,6 +5,6 @@ cd ..
 mkdir tmp_3264_pc
 
 cd tmp_3264_pc
-cmake .. -G"Visual Studio 16 2019" -A Win32 -DCMAKE_CONFIGURATION_TYPES=Debug;Release;Release_MD
+cmake .. -G"Visual Studio 16 2019" -A Win32 -DCMAKE_CONFIGURATION_TYPES=Debug;Release;Release_MD -DENABLE_BASE_TEST=1
 pause
 @echo on
