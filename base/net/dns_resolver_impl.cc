@@ -3,9 +3,8 @@
 #include "dns_resolver_impl.h"
 
 BEGIN_NAMESPACE_NET
-#define HTTPS_SCHEME "https"
-#define HTTP_SCHEME  "http"
-#define SCHEME_EXT 3  //  ://
+
+IMPLEMET_OBJECT_RECORD(DnsResolverImpl)
 
 DnsResolverImpl::DnsResolverImpl(
     std::unique_ptr<DnsResolver::DnsResolverRequest> request,
@@ -15,12 +14,15 @@ DnsResolverImpl::DnsResolverImpl(
   delegate_(delegate),
   pump_(std::move(pump)),
   resolver_(*(boost::asio::io_context*)pump_->Raw()),
-  stoped_(false) {}
+  stoped_(false) {
+  ADD_OBJECT_RECORD();
+}
 
  DnsResolverImpl::~DnsResolverImpl() {
    if (!stoped_) {
      LogFatal << "Dns Resolver not stoped";
    }
+   REMOVE_OBJECT_RECORD()
  }
 
 void DnsResolverImpl::Resolver() {
@@ -47,8 +49,9 @@ void DnsResolverImpl::Cancel() {
   }
   //需要捕获强引用，否则Cancel 不掉
   auto self = shared_from_this();
-  pump_->PostRunable([self] {   
+  pump_->PostRunable([self] () mutable {   
       self->DoCancel();
+      self.reset();
  });
 }
 

@@ -31,6 +31,8 @@ private:
   std::shared_ptr<BASE_LOOPER::MessagePump> pump_;
   boost::asio::ip::tcp::resolver resolver_;
   std::atomic_bool stoped_;
+
+  DECLARE_OBJECT_RECORD(DnsResolverImpl)
 };
 
 END_NAMESPACE_NET

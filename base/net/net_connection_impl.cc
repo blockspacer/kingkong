@@ -4,19 +4,24 @@
 BEGIN_NAMESPACE_NET
 #define MAX_RECV_READ 1024
 
+IMPLEMET_OBJECT_RECORD(NetConnectionImpl)
+
 NetConnectionImpl::NetConnectionImpl(std::unique_ptr<NetConnection::NetConnectionRequest> request,
   NetConnection::NetConnectionDelegate* delegate,
                  std::shared_ptr<BASE_LOOPER::MessagePump> pump)
     : request_(std::move(request)),
       delegate_(delegate),
       pump_(std::move(pump)),
-      stoped_(false) {}
+      stoped_(false) {
+  ADD_OBJECT_RECORD()
+}
 
 
  NetConnectionImpl::~NetConnectionImpl() {
    if (!stoped_) {
      LogFatal << "not stoped, call DisConnect";
    }
+   REMOVE_OBJECT_RECORD()
  }
 
 void NetConnectionImpl::Connect() {

@@ -82,6 +82,8 @@ private:
   std::shared_ptr<DnsResolver> dns_resolver_;
   //是否结束标志
   std::atomic_bool stoped_;
+
+  DECLARE_OBJECT_RECORD(NetConnectionImpl)
 };
 
 END_NAMESPACE_NET

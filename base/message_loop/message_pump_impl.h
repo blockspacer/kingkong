@@ -61,6 +61,7 @@ public:
   virtual void DoRun() = 0;
   virtual void DoStop() = 0;
 
+
 protected:
   void Run() override;
 
@@ -70,12 +71,17 @@ protected:
   //对于部分会阻塞消息循环的任务，需要一个一个执行。 比如windows 的模态框
   void DoOneWork();
 
+
+  virtual void Join(){}
+
 private:
   std::set<RunnableInfo> runable_set_;
   std::mutex runable_set_mutex_;
   std::string name_;
   uint64_t id_ = 0;
   std::atomic<bool> stoped_;
+
+  DECLARE_OBJECT_RECORD(MessagePumpImpl)
 };
 
 END_NAMESPACE_LOOPER

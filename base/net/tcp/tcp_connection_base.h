@@ -31,8 +31,9 @@ protected:
     auto self = shared_from_this();
     boost::asio::async_write(
         *socket_, std::move(buffers),
-        [self](boost::system::error_code ec, std::size_t length) {
+        [self](boost::system::error_code ec, std::size_t length) mutable {
           self->NotifySendComplete(std::move(ec), length);
+          self.reset();
         });
   }
 

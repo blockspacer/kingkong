@@ -22,6 +22,8 @@ protected:
 
   void* Raw() override;
 
+  void Join() override;
+
 private:
   boost::thread_group thread_;
   boost::asio::io_service io_service_;

@@ -58,12 +58,17 @@ void MessagePumpDefatlt::DoStop() {
   boost::system::error_code ec;
   timer_.cancel(ec);
   io_service_.stop();
-  thread_.join_all();
 }
 
 void* MessagePumpDefatlt::Raw() {
   return &io_service_;
 }
 
+void MessagePumpDefatlt::Join() {
+  thread_.join_all();
+}
+
 END_NAMESPACE_LOOPER
+
+
 

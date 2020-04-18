@@ -5,6 +5,7 @@
 #include <base_header.h>
 #include <boost/beast.hpp>
 #include <boost/beast/websocket.hpp>
+#include "base/log.h"
 
 BEGIN_NAMESPACE_NET
 
@@ -23,9 +24,10 @@ protected:
     auto self = shared_from_this();
     boost::beast::get_lowest_layer(*ws_.get()).async_connect(endpoints,
       [self](boost::system::error_code ec,
-        boost::asio::ip::tcp::endpoint endpoint) {
+        boost::asio::ip::tcp::endpoint endpoint) mutable {
           //连接失败通知上层
           self->NotifyConnectComplete(std::move(ec));
+          self.reset();
       });
   }
 
@@ -53,9 +55,10 @@ protected:
   }
   void DoWebsocketHandshake() override {
     auto self = shared_from_this();
-    ws_->async_handshake(request_->host, "/", [self](boost::system::error_code ec) {
+    ws_->async_handshake(request_->host, "/", [self](boost::system::error_code ec) mutable {
       self->NotifyWebsocketHandshakeComplte(std::move(ec));
-      });
+      self.reset();
+    });
   }
 
 protected:

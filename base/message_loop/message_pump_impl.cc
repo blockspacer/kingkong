@@ -4,13 +4,18 @@
 #include <boost/assert.hpp>
 BEGIN_NAMESPACE_LOOPER
 
+IMPLEMET_OBJECT_RECORD(MessagePumpImpl)
+
 MessagePumpImpl::MessagePumpImpl(const std::string& name) : name_(name),
-                                                            stoped_(false) {}
+                                                            stoped_(false) {
+  ADD_OBJECT_RECORD()
+}
 
  MessagePumpImpl::~MessagePumpImpl() {
   if (!stoped()) {
     LogFatal << "message pump is not stoped:" << name_;
   }
+  REMOVE_OBJECT_RECORD()
  }
 
 const char* MessagePumpImpl::name() {
@@ -28,8 +33,14 @@ void MessagePumpImpl::Stop() {
   if (stoped_) {
     return;
   }
-  DoStop();
+  auto self = shared_from_this();
+  PostRunable([self] () mutable {
+    MessagePumpImpl* self_pointer = (MessagePumpImpl*)self.get();
+    self_pointer->DoStop();
+    self.reset();
+  });
   stoped_ = true;
+  Join();
 }
 
 uint64_t MessagePumpImpl::PostRunable(Runnable runable) {
@@ -71,9 +82,6 @@ bool MessagePumpImpl::Cancel(uint64_t id) {
 }
 
 void MessagePumpImpl::DoOneWork() {
-  if (stoped_) {
-    return;
-  }
   uint64_t now = BASE_TIME::GetTickCount2();
   Runnable runnable;
   {
@@ -93,9 +101,6 @@ void MessagePumpImpl::DoOneWork() {
   }
 }
 void MessagePumpImpl::DoWork() {
-  if (stoped_) {
-    return;
-  }
   uint64_t now = BASE_TIME::GetTickCount2();
   std::vector<Runnable> runnables;
   {

@@ -13,8 +13,9 @@ void TcpConnectionImpl::DoConnect(const boost::asio::ip::tcp::resolver::results_
   auto self = shared_from_this();
   boost::asio::async_connect(*socket_, endpoints,
     [self](boost::system::error_code ec,
-      boost::asio::ip::tcp::endpoint endpoint) {
+      boost::asio::ip::tcp::endpoint endpoint) mutable {
         self->NotifyConnectComplete(std::move(ec));
+        self.reset();
     });
 }
 

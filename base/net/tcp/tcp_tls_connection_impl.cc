@@ -17,9 +17,10 @@ void TcpTlsConnectionImpl::DoConnect(const boost::asio::ip::tcp::resolver::resul
   auto self = shared_from_this();
   boost::asio::async_connect(socket_->lowest_layer(), endpoints,
     [self](boost::system::error_code ec,
-      boost::asio::ip::tcp::endpoint endpoint) {
+      boost::asio::ip::tcp::endpoint endpoint) mutable {
         //连接失败通知上层
-        self->NotifyConnectComplete(ec);                    
+        self->NotifyConnectComplete(ec);     
+        self.reset();
     });
 }
 
@@ -31,19 +32,20 @@ void TcpTlsConnectionImpl::DoTlsHandshake() {
     });
 
   socket_->async_handshake(boost::asio::ssl::stream_base::client,
-    [self](boost::system::error_code ec) {
+    [self](boost::system::error_code ec) mutable {
       self->NotifyTlsHandshakeComplete(std::move(ec));
+      self.reset();
     });
 }
 
 
 bool TcpTlsConnectionImpl::VerifyCert(bool preverified, boost::asio::ssl::verify_context& ctx) {
   char subject_name[256] = {0};
-  X509* cert = X509_STORE_CTX_get_current_cert(ctx.native_handle());
+  /*X509* cert = X509_STORE_CTX_get_current_cert(ctx.native_handle());
   if (nullptr != cert) {
     X509_NAME_oneline(X509_get_subject_name(cert), subject_name, 256);
     LogDebug << subject_name;
-  }
+  }*/
 
   if (SSL_get_verify_result(socket_->native_handle()) == X509_V_OK) {
     return true;
