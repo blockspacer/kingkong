@@ -10,7 +10,7 @@ BEGIN_NAMESPACE_LOOPER
 MessagePumpDefatlt::MessagePumpDefatlt(const std::string& name, int32_t thread_count)
     : MessagePumpImpl(name),
   timer_(io_service_),
-  work_(io_service_) {
+  work_(std::make_unique<boost::asio::io_service::work>(io_service_)) {
   auto semaphore = BASE_THREAD::CreateSigalSemaphore();
   for (int32_t i = 0; i < thread_count; i++) {
     thread_.create_thread([sem = semaphore.get(), this, i]{
@@ -57,7 +57,10 @@ void MessagePumpDefatlt::DoRun() {
 void MessagePumpDefatlt::DoStop() {
   boost::system::error_code ec;
   timer_.cancel(ec);
-  io_service_.stop();
+  work_.reset();
+
+  //没有了任务之后会自动退出
+  //io_service_.stop();
 }
 
 void* MessagePumpDefatlt::Raw() {

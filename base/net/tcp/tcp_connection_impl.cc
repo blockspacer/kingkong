@@ -22,7 +22,7 @@ void TcpConnectionImpl::DoConnect(const boost::asio::ip::tcp::resolver::results_
 
 void TcpConnectionImpl::DoCleanUp() {
   boost::system::error_code ec;
-  socket_->cancel(ec);
+  socket_->shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
   socket_->close(ec);
 }
 

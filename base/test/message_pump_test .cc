@@ -10,7 +10,6 @@
 
 #include <boost/random/random_device.hpp>
 
-//#define MESSAGE_PUMP_TEST
 
 #ifdef MESSAGE_PUMP_TEST
 
@@ -29,60 +28,17 @@ BOOST_AUTO_TEST_CASE(RunnableInfo) {
 }
 
 BOOST_AUTO_TEST_CASE(MessagePump) {
-  while (true) {
-    BASE_LOOPER::MessageLoop::InitMessageLoop();
-      boost::uniform_int<> real(2, 10);
-      boost::random::mt19937 gen;
-      auto io_pump = BASE_LOOPER::MessageLoop::IOMessagePump();
-      auto work_pump = BASE_LOOPER::MessageLoop::WorkMessagePump();
-      auto file_pump = BASE_LOOPER::MessageLoop::FileMessagePump();
-      for (size_t i = 0; i < 1000; i++) {
-        io_pump->PostRunable([] {
-          LogInfo << "loopname: "
-                  << BASE_LOOPER::MessageLoop::CurrentMessagePump()->name();         
-        });
+  BASE_LOOPER::MessageLoop::InitMessageLoop();
+  boost::uniform_int<> real(2, 10);
+  boost::random::mt19937 gen;
+  auto io_pump = BASE_LOOPER::MessageLoop::IOMessagePump();
 
-        io_pump->PostRunable(
-            [] {
-            LogInfo << "loopname: "
-                      << BASE_LOOPER::MessageLoop::CurrentMessagePump()->name();
-            },
-            real(gen) * 1000);
-
-        work_pump->PostRunable([] {
-          LogInfo << "loopname: "
-                  << BASE_LOOPER::MessageLoop::CurrentMessagePump()->name();
-
-        });
-
-        work_pump->PostRunable(
-            [] {
-             LogInfo << "loopname: "
-                      << BASE_LOOPER::MessageLoop::CurrentMessagePump()->name();
-              boost::uniform_int<> real3(2, 10);
-              boost::random::mt19937 gen3;
-              boost::this_thread::sleep(
-                  boost::posix_time::seconds(real3(gen3)));
-
-            },
-            real(gen) * 1000);
-
-        file_pump->PostRunable([] {
-          LogInfo << "loopname: "
-                  << BASE_LOOPER::MessageLoop::CurrentMessagePump()->name();
-          });
-
-        file_pump->PostRunable(
-          [] {
-            LogInfo << "loopname: "
-                     << BASE_LOOPER::MessageLoop::CurrentMessagePump()->name();
-          },
-          real(gen) * 1000);
-      }
-    boost::uniform_int<> real2(2, 10);
-    boost::random::mt19937 gen2;
-    boost::this_thread::sleep(boost::posix_time::seconds(real2(gen2)));
-    BASE_LOOPER::MessageLoop::UnintMessageLoop();
+  for (int i = 0; i < 10000; i++) {
+    io_pump->PostRunable([i] {
+      LogInfo << "index:" << i;
+      });
   }
+      boost::this_thread::sleep(boost::posix_time::seconds(5));
+    BASE_LOOPER::MessageLoop::UnintMessageLoop();
 }
 #endif

@@ -29,10 +29,15 @@ public:
   static void InitMessageLoop();
   static void UnintMessageLoop();
 
+  //不能执行耗时任务，否则会卡主UI
   static std::shared_ptr<MessagePump> UIMessagePump();
+  //可以保证任务的执行顺序
   static std::shared_ptr<MessagePump> IOMessagePump();
-  static std::shared_ptr<MessagePump> WorkMessagePump();
+  //可以保证任务的执行顺序
   static std::shared_ptr<MessagePump> FileMessagePump();
+  //Work 内部是一个线程池，所以只能用来执行一个完整的任务，比如计算文件MD5，循环读文件等。如果任务有先后顺序的话，不要放到work线程，
+  //work 线程不保证任务的执行顺序
+  static std::shared_ptr<MessagePump> WorkMessagePump();
 };
 
 

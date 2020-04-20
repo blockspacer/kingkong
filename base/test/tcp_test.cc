@@ -9,148 +9,90 @@
 #include <boost/test/unit_test.hpp>
 
 
-enum { max_length = 1024 };
+#ifdef ENABLE_DNS_TEST
 
-class client
-{
-public:
-  client(boost::asio::io_service& io_service,
-    boost::asio::ssl::context& context,
-    boost::asio::ip::tcp::resolver::iterator endpoint_iterator)
-    : socket_(io_service, context)
-  {
-    socket_.set_verify_mode(boost::asio::ssl::verify_peer);
-    socket_.set_verify_callback(
-      boost::bind(&client::verify_certificate, this, _1, _2));
-
-    boost::asio::async_connect(socket_.lowest_layer(), endpoint_iterator,
-      boost::bind(&client::handle_connect, this,
-        boost::asio::placeholders::error));
-  }
-
-  bool verify_certificate(bool preverified,
-    boost::asio::ssl::verify_context& ctx)
-  {
-    // The verify callback can be used to check whether the certificate that is  
-    // being presented is valid for the peer. For example, RFC 2818 describes  
-    // the steps involved in doing this for HTTPS. Consult the OpenSSL  
-    // documentation for more details. Note that the callback is called once  
-    // for each certificate in the certificate chain, starting from the root  
-    // certificate authority.  
-
-    // In this example we will simply print the certificate's subject name.  
-    char subject_name[256];
-    X509* cert = X509_STORE_CTX_get_current_cert(ctx.native_handle());
-    X509_NAME_oneline(X509_get_subject_name(cert), subject_name, 256);
-    std::cout << "Verifying " << subject_name << "\n";
-
-    return preverified;
-  }
-
-  void handle_connect(const boost::system::error_code& error)
-  {
-    if (!error)
-    {
-      socket_.async_handshake(boost::asio::ssl::stream_base::client,
-        boost::bind(&client::handle_handshake, this,
-          boost::asio::placeholders::error));
-    }
-    else
-    {
-      std::cout << "Connect failed: " << error.message() << "\n";
-    }
-  }
-
-  void handle_handshake(const boost::system::error_code& error)
-  {
-    if (!error)
-    {
-      std::cout << "Enter message: ";
-      std::cin.getline(request_, max_length);
-      size_t request_length = strlen(request_);
-
-      boost::asio::async_write(socket_,
-        boost::asio::buffer(request_, request_length),
-        boost::bind(&client::handle_write, this,
-          boost::asio::placeholders::error,
-          boost::asio::placeholders::bytes_transferred));
-    }
-    else
-    {
-      std::cout << "Handshake failed: " << error.message() << "\n";
-    }
-  }
-
-  void handle_write(const boost::system::error_code& error,
-    size_t bytes_transferred)
-  {
-    if (!error)
-    {
-      socket_.async_read_some(boost::asio::buffer(reply_, bytes_transferred),
-        boost::bind(&client::handle_read, this,
-          boost::asio::placeholders::error,
-          boost::asio::placeholders::bytes_transferred));
-    }
-    else
-    {
-      std::cout << "Write failed: " << error.message() << "\n";
-    }
-  }
-
-  void handle_read(const boost::system::error_code& error,
-    size_t bytes_transferred)
-  {
-    if (!error)
-    {
-      std::cout << "Reply: ";
-      std::cout.write(reply_, bytes_transferred);
-      std::cout << "\n";
-    }
-    else
-    {
-      std::cout << "Read failed: " << error.message() << "\n";
-    }
-  }
-
-private:
-  boost::asio::ssl::stream<boost::asio::ip::tcp::socket> socket_;
-  char request_[max_length];
-  char reply_[max_length];
-};
-
-class DnsResolverDelegateImpl : public BASE_NET::DnsResolver::DnsResolverDelegate {
-public:
-  void OnDnsResolvered(const boost::asio::ip::tcp::resolver::results_type& result, int code, const std::string& msg) override {
+class DnsResolverDelegateImpl
+    : public BASE_NET::DnsResolver::DnsResolverDelegate {
+ public:
+  void OnDnsResolvered(
+      const boost::asio::ip::tcp::resolver::results_type& result,
+      int code,
+      const std::string& msg) override {
     for (auto& item : result) {
-       LogInfo << "item:" << item.endpoint();
+      LogInfo << "item:" << item.endpoint();
     }
   }
 };
 
-/*
-BOOST_AUTO_TEST_CASE(DNS) {
-  BASE_LOOPER::MessageLoop::InitMessageLoop();
-  auto io_pump = BASE_LOOPER::MessageLoop::IOMessagePump();
-  for (int i=0;i<1000;i++)  {
-    auto tcp_request =
-        std::make_unique<BASE_NET::DnsResolver::DnsResolverRequest>();
-    tcp_request->host = "www.baidu.com";
-    auto tcp = BASE_NET::CreateDnsResolver(std::move(tcp_request),
-                                           new DnsResolverDelegateImpl,
-                                           io_pump);
-    tcp->Resolver();
-   // boost::this_thread::sleep(boost::posix_time::milliseconds(20));
-    tcp->Cancel();
-  }
- 
-  boost::this_thread::sleep(boost::posix_time::seconds(1000));
-}
-*/
+DnsResolverDelegateImpl* dns_callback = new DnsResolverDelegateImpl;
 
+BOOST_AUTO_TEST_CASE(DnsResolver) {
+  BASE_UTIL::AtExitManager at;
+  BASE_LOOPER::MessageLoop::InitMessageLoop();
+  boost::thread_group group;
+
+  for (int i = 0; i < 5; i++) {
+    group.create_thread([] {
+      boost::uniform_int<> real2(200, 2000);
+      boost::random::mt19937 gen2;
+      auto io_pump = BASE_LOOPER::MessageLoop::IOMessagePump();
+      for (int i = 0; i < 50; i++) {
+        auto tcp_request =
+            std::make_unique<BASE_NET::DnsResolver::DnsResolverRequest>();
+        tcp_request->host = "www.baidu.com";
+        auto tcp = BASE_NET::CreateDnsResolver(std::move(tcp_request),
+                                               dns_callback, io_pump);
+        tcp->Resolver();
+        boost::this_thread::sleep(boost::posix_time::milliseconds(real2(gen2)));
+        tcp->Cancel();
+      }
+    });
+  }
+
+  for (int i = 0; i < 5; i++) {
+    group.create_thread([] {
+      boost::uniform_int<> real2(200, 2000);
+      boost::random::mt19937 gen2;
+      auto io_pump = BASE_LOOPER::MessageLoop::FileMessagePump();
+      for (int i = 0; i < 50; i++) {
+        auto tcp_request =
+            std::make_unique<BASE_NET::DnsResolver::DnsResolverRequest>();
+        tcp_request->host = "www.163.com";
+        auto tcp = BASE_NET::CreateDnsResolver(std::move(tcp_request),
+                                               dns_callback, io_pump);
+        tcp->Resolver();
+        boost::this_thread::sleep(boost::posix_time::milliseconds(real2(gen2)));
+        tcp->Cancel();
+      }
+    });
+  }
+
+  for (int i = 0; i < 5; i++) {
+    group.create_thread([] {
+      boost::uniform_int<> real2(200, 2000);
+      boost::random::mt19937 gen2;
+      auto io_pump = BASE_LOOPER::MessageLoop::WorkMessagePump();
+      for (int i = 0; i < 50; i++) {
+        auto tcp_request =
+            std::make_unique<BASE_NET::DnsResolver::DnsResolverRequest>();
+        tcp_request->host = "www.qq.com";
+        auto tcp = BASE_NET::CreateDnsResolver(std::move(tcp_request),
+                                               dns_callback, io_pump);
+        tcp->Resolver();
+        boost::this_thread::sleep(boost::posix_time::milliseconds(real2(gen2)));
+        tcp->Cancel();
+      }
+    });
+  }
+
+  group.join_all();
+  BASE_LOOPER::MessageLoop::UnintMessageLoop();
+}
+#endif // ENABLE_DNS_TEST
 
 class TcpDelegate :public BASE_NET::NetConnection::NetConnectionDelegate {
   void OnConnect(BASE_NET::NetConnection* tcp, int code, const std::string& msg) override {
-    LogInfo << "code: " << code << " msg:" << msg;
+    LogInfo << "code: " << code << " msg:" << msg << " net_type:" << tcp->net_type();
     if (0 == code) {
       std::stringstream data;
       data << "GET " << "/" << " HTTP/1.1\r\n";
@@ -165,93 +107,400 @@ class TcpDelegate :public BASE_NET::NetConnection::NetConnectionDelegate {
     LogInfo << "buffer_len: " << buffer_len;
   }
   void OnDisconnect(BASE_NET::NetConnection* tcp, int code, const std::string& msg) override {
-    LogInfo << "code: " << code << " msg:" << msg;
+    LogInfo << "code: " << code << " msg:" << msg << " net_type:" << tcp->net_type();
   }
 };
+TcpDelegate* callback = new TcpDelegate;
 
+//#define ENABLE_TCP_TEST
+
+#ifdef ENABLE_TCP_TEST
 
 BOOST_AUTO_TEST_CASE(TCP) {
+  BASE_UTIL::AtExitManager at;
   BASE_LOOPER::MessageLoop::InitMessageLoop();
-  for (int i=0;i<5;i++) {
-    boost::thread abc([] {
-      boost::uniform_int<> real2(200, 2000);
-      boost::random::mt19937 gen2;
-      auto io_pump = BASE_LOOPER::MessageLoop::IOMessagePump();
-      for (size_t i = 0; i < 10000; i++) {
-        auto tcp_request = std::make_unique<BASE_NET::NetConnection::NetConnectionRequest>();
-        tcp_request->host = "121.40.165.18";
-        tcp_request->port = 8800;
-        tcp_request->net_type = BASE_NET::NetConnection::kNetTypeWebsocket;
-        auto tcp =
-          BASE_NET::CreateTcp(std::move(tcp_request), new TcpDelegate, io_pump);
-        tcp->Connect();
-        boost::this_thread::sleep(boost::posix_time::milliseconds(real2(gen2)));
-        // boost::this_thread::sleep(boost::posix_time::seconds(10000));
-        tcp->DisConnect();
-      }
-      });
-  }
-
+  boost::thread_group group;
   for (int i = 0; i < 5; i++) {
-    boost::thread abc([] {
-      boost::uniform_int<> real2(10, 300);
+    group.create_thread([] {
+      boost::uniform_int<> real2(10, 50);
       boost::random::mt19937 gen2;
       auto io_pump = BASE_LOOPER::MessageLoop::IOMessagePump();
-      for (size_t i = 0; i < 10000; i++) {
-        auto tcp_request = std::make_unique<BASE_NET::NetConnection::NetConnectionRequest>();
+      for (size_t i = 0; i < 300; i++) {
+        auto tcp_request =
+            std::make_unique<BASE_NET::NetConnection::NetConnectionRequest>();
         tcp_request->host = "echo.websocket.org";
         tcp_request->port = 80;
         tcp_request->net_type = BASE_NET::NetConnection::kNetTypeTcp;
         auto tcp =
-          BASE_NET::CreateTcp(std::move(tcp_request), new TcpDelegate, io_pump);
+            BASE_NET::CreateTcp(std::move(tcp_request), callback, io_pump);
         tcp->Connect();
         boost::this_thread::sleep(boost::posix_time::milliseconds(real2(gen2)));
         // boost::this_thread::sleep(boost::posix_time::seconds(10000));
         tcp->DisConnect();
       }
-      });
+    });
   }
 
-
   for (int i = 0; i < 5; i++) {
-    boost::thread abc([] {
-      boost::uniform_int<> real2(10, 1000);
+    group.create_thread([] {
+      boost::uniform_int<> real2(500, 1000);
       boost::random::mt19937 gen2;
       auto io_pump = BASE_LOOPER::MessageLoop::IOMessagePump();
-      for (size_t i = 0; i < 10000; i++) {
-        auto tcp_request = std::make_unique<BASE_NET::NetConnection::NetConnectionRequest>();
-        tcp_request->host = "baidu.com";
+      for (size_t i = 0; i < 300; i++) {
+        auto tcp_request =
+            std::make_unique<BASE_NET::NetConnection::NetConnectionRequest>();
+        tcp_request->host = "echo.websocket.org";
+        tcp_request->port = 80;
+        tcp_request->net_type = BASE_NET::NetConnection::kNetTypeTcp;
+        auto tcp =
+            BASE_NET::CreateTcp(std::move(tcp_request), callback, io_pump);
+        tcp->Connect();
+        boost::this_thread::sleep(boost::posix_time::milliseconds(real2(gen2)));
+        // boost::this_thread::sleep(boost::posix_time::seconds(10000));
+        tcp->DisConnect();
+      }
+    });
+  }
+
+  for (int i = 0; i < 5; i++) {
+    group.create_thread([] {
+      boost::uniform_int<> real2(50, 300);
+      boost::random::mt19937 gen2;
+      auto io_pump = BASE_LOOPER::MessageLoop::FileMessagePump();
+      for (size_t i = 0; i < 300; i++) {
+        auto tcp_request =
+            std::make_unique<BASE_NET::NetConnection::NetConnectionRequest>();
+        tcp_request->host = "echo.websocket.org";
+        tcp_request->port = 80;
+        tcp_request->net_type = BASE_NET::NetConnection::kNetTypeTcp;
+        auto tcp =
+            BASE_NET::CreateTcp(std::move(tcp_request), callback, io_pump);
+        tcp->Connect();
+        boost::this_thread::sleep(boost::posix_time::milliseconds(real2(gen2)));
+        // boost::this_thread::sleep(boost::posix_time::seconds(10000));
+        tcp->DisConnect();
+      }
+    });
+  }
+
+  for (int i = 0; i < 5; i++) {
+    group.create_thread([] {
+      boost::uniform_int<> real2(100, 3000);
+      boost::random::mt19937 gen2;
+      auto io_pump = BASE_LOOPER::MessageLoop::WorkMessagePump();
+      for (size_t i = 0; i < 300; i++) {
+        auto tcp_request =
+            std::make_unique<BASE_NET::NetConnection::NetConnectionRequest>();
+        tcp_request->host = "echo.websocket.org";
+        tcp_request->port = 80;
+        tcp_request->net_type = BASE_NET::NetConnection::kNetTypeTcp;
+        auto tcp =
+            BASE_NET::CreateTcp(std::move(tcp_request), callback, io_pump);
+        tcp->Connect();
+        boost::this_thread::sleep(boost::posix_time::milliseconds(real2(gen2)));
+        // boost::this_thread::sleep(boost::posix_time::seconds(10000));
+        tcp->DisConnect();
+      }
+    });
+  }
+
+  group.join_all();
+  BASE_LOOPER::MessageLoop::UnintMessageLoop();
+}
+
+#endif // ENABLE_TCP_TEST
+
+
+//#define ENABLE_TCP_TLS_TEST
+#ifdef ENABLE_TCP_TLS_TEST
+
+BOOST_AUTO_TEST_CASE(TCPTLS) {
+  BASE_UTIL::AtExitManager at;
+  BASE_LOOPER::MessageLoop::InitMessageLoop();
+  boost::thread_group group;
+  for (int i = 0; i < 5; i++) {
+    group.create_thread([] {
+      boost::uniform_int<> real2(10, 50);
+      boost::random::mt19937 gen2;
+      auto io_pump = BASE_LOOPER::MessageLoop::IOMessagePump();
+      for (size_t i = 0; i < 300; i++) {
+        auto tcp_request =
+            std::make_unique<BASE_NET::NetConnection::NetConnectionRequest>();
+        tcp_request->host = "echo.websocket.org";
         tcp_request->port = 443;
         tcp_request->net_type = BASE_NET::NetConnection::kNetTypeTcpTls;
         auto tcp =
-          BASE_NET::CreateTcp(std::move(tcp_request), new TcpDelegate, io_pump);
+            BASE_NET::CreateTcp(std::move(tcp_request), callback, io_pump);
         tcp->Connect();
         boost::this_thread::sleep(boost::posix_time::milliseconds(real2(gen2)));
         // boost::this_thread::sleep(boost::posix_time::seconds(10000));
         tcp->DisConnect();
       }
-      });
+    });
   }
-    for (int i = 0; i < 5; i++) {
-      boost::thread abc([] {
-        boost::uniform_int<> real2(10, 1000);
-        boost::random::mt19937 gen2;
-        auto io_pump = BASE_LOOPER::MessageLoop::IOMessagePump();
-        for (size_t i = 0; i < 10000; i++) {
-          auto tcp_request = std::make_unique<BASE_NET::NetConnection::NetConnectionRequest>();
-          tcp_request->host = "echo.websocket.org";
-          tcp_request->port = 443;
-          tcp_request->net_type = BASE_NET::NetConnection::kNetTypeWebsocketTls;
-          auto tcp =
-            BASE_NET::CreateTcp(std::move(tcp_request), new TcpDelegate, io_pump);
-          tcp->Connect();
-          boost::this_thread::sleep(boost::posix_time::milliseconds(real2(gen2)));
-          // boost::this_thread::sleep(boost::posix_time::seconds(10000));
-          tcp->DisConnect();
-        }
-        });
+
+  for (int i = 0; i < 5; i++) {
+    group.create_thread([] {
+      boost::uniform_int<> real2(500, 1000);
+      boost::random::mt19937 gen2;
+      auto io_pump = BASE_LOOPER::MessageLoop::IOMessagePump();
+      for (size_t i = 0; i < 300; i++) {
+        auto tcp_request =
+            std::make_unique<BASE_NET::NetConnection::NetConnectionRequest>();
+        tcp_request->host = "www.baidu.com";
+        tcp_request->port = 443;
+        tcp_request->net_type = BASE_NET::NetConnection::kNetTypeTcpTls;
+        auto tcp =
+            BASE_NET::CreateTcp(std::move(tcp_request), callback, io_pump);
+        tcp->Connect();
+        boost::this_thread::sleep(boost::posix_time::milliseconds(real2(gen2)));
+        // boost::this_thread::sleep(boost::posix_time::seconds(10000));
+        tcp->DisConnect();
+      }
+    });
   }
- 
- 
-  boost::this_thread::sleep(boost::posix_time::seconds(10000));
+
+  for (int i = 0; i < 5; i++) {
+    group.create_thread([] {
+      boost::uniform_int<> real2(50, 300);
+      boost::random::mt19937 gen2;
+      auto io_pump = BASE_LOOPER::MessageLoop::FileMessagePump();
+      for (size_t i = 0; i < 300; i++) {
+        auto tcp_request =
+            std::make_unique<BASE_NET::NetConnection::NetConnectionRequest>();
+        tcp_request->host = "www.qq.com";
+        tcp_request->port = 443;
+        tcp_request->net_type = BASE_NET::NetConnection::kNetTypeTcpTls;
+        auto tcp =
+            BASE_NET::CreateTcp(std::move(tcp_request), callback, io_pump);
+        tcp->Connect();
+        boost::this_thread::sleep(boost::posix_time::milliseconds(real2(gen2)));
+        // boost::this_thread::sleep(boost::posix_time::seconds(10000));
+        tcp->DisConnect();
+      }
+    });
+  }
+
+  for (int i = 0; i < 5; i++) {
+    group.create_thread([] {
+      boost::uniform_int<> real2(100, 3000);
+      boost::random::mt19937 gen2;
+      auto io_pump = BASE_LOOPER::MessageLoop::FileMessagePump();
+      for (size_t i = 0; i < 300; i++) {
+        auto tcp_request =
+            std::make_unique<BASE_NET::NetConnection::NetConnectionRequest>();
+        tcp_request->host = "www.163.com";
+        tcp_request->port = 443;
+        tcp_request->net_type = BASE_NET::NetConnection::kNetTypeTcpTls;
+        auto tcp =
+            BASE_NET::CreateTcp(std::move(tcp_request), callback, io_pump);
+        tcp->Connect();
+        boost::this_thread::sleep(boost::posix_time::milliseconds(real2(gen2)));
+        // boost::this_thread::sleep(boost::posix_time::seconds(10000));
+        tcp->DisConnect();
+      }
+    });
+  }
+
+  group.join_all();
+  BASE_LOOPER::MessageLoop::UnintMessageLoop();
 }
+
+#endif // ENABLE_TCP_TLS_TEST
+
+
+//#define ENABLE_WEBSOCKET_TEST
+
+#ifdef ENABLE_WEBSOCKET_TEST
+
+BOOST_AUTO_TEST_CASE(WEBSOCKETTEST) {
+  BASE_UTIL::AtExitManager at;
+  BASE_LOOPER::MessageLoop::InitMessageLoop();
+  boost::thread_group group;
+  for (int i = 0; i < 5; i++) {
+    group.create_thread([] {
+      boost::uniform_int<> real2(100, 5000);
+      boost::random::mt19937 gen2;
+      auto io_pump = BASE_LOOPER::MessageLoop::IOMessagePump();
+      for (size_t i = 0; i < 300; i++) {
+        auto tcp_request =
+            std::make_unique<BASE_NET::NetConnection::NetConnectionRequest>();
+        tcp_request->host = "121.40.165.18";
+        tcp_request->port = 8800;
+        tcp_request->net_type = BASE_NET::NetConnection::kNetTypeWebsocket;
+        auto tcp =
+            BASE_NET::CreateTcp(std::move(tcp_request), callback, io_pump);
+        tcp->Connect();
+        boost::this_thread::sleep(boost::posix_time::milliseconds(real2(gen2)));
+        // boost::this_thread::sleep(boost::posix_time::seconds(10000));
+        tcp->DisConnect();
+      }
+    });
+  }
+
+  for (int i = 0; i < 5; i++) {
+    group.create_thread([] {
+      boost::uniform_int<> real2(500, 1000);
+      boost::random::mt19937 gen2;
+      auto io_pump = BASE_LOOPER::MessageLoop::IOMessagePump();
+      for (size_t i = 0; i < 300; i++) {
+        auto tcp_request =
+            std::make_unique<BASE_NET::NetConnection::NetConnectionRequest>();
+        tcp_request->host = "121.40.165.18";
+        tcp_request->port = 8800;
+        tcp_request->net_type = BASE_NET::NetConnection::kNetTypeWebsocket;
+        auto tcp =
+            BASE_NET::CreateTcp(std::move(tcp_request), callback, io_pump);
+        tcp->Connect();
+        boost::this_thread::sleep(boost::posix_time::milliseconds(real2(gen2)));
+        // boost::this_thread::sleep(boost::posix_time::seconds(10000));
+        tcp->DisConnect();
+      }
+    });
+  }
+
+  for (int i = 0; i < 5; i++) {
+    group.create_thread([] {
+      boost::uniform_int<> real2(50, 300);
+      boost::random::mt19937 gen2;
+      auto io_pump = BASE_LOOPER::MessageLoop::FileMessagePump();
+      for (size_t i = 0; i < 300; i++) {
+        auto tcp_request =
+            std::make_unique<BASE_NET::NetConnection::NetConnectionRequest>();
+        tcp_request->host = "121.40.165.18";
+        tcp_request->port = 8800;
+        tcp_request->net_type = BASE_NET::NetConnection::kNetTypeWebsocket;
+        auto tcp =
+            BASE_NET::CreateTcp(std::move(tcp_request), callback, io_pump);
+        tcp->Connect();
+        boost::this_thread::sleep(boost::posix_time::milliseconds(real2(gen2)));
+        // boost::this_thread::sleep(boost::posix_time::seconds(10000));
+        tcp->DisConnect();
+      }
+    });
+  }
+
+  for (int i = 0; i < 5; i++) {
+    group.create_thread([] {
+      boost::uniform_int<> real2(100, 3000);
+      boost::random::mt19937 gen2;
+      auto io_pump = BASE_LOOPER::MessageLoop::FileMessagePump();
+      for (size_t i = 0; i < 300; i++) {
+        auto tcp_request =
+            std::make_unique<BASE_NET::NetConnection::NetConnectionRequest>();
+        tcp_request->host = "121.40.165.18";
+        tcp_request->port = 8800;
+        tcp_request->net_type = BASE_NET::NetConnection::kNetTypeWebsocket;
+        auto tcp =
+            BASE_NET::CreateTcp(std::move(tcp_request), callback, io_pump);
+        tcp->Connect();
+        boost::this_thread::sleep(boost::posix_time::milliseconds(real2(gen2)));
+        // boost::this_thread::sleep(boost::posix_time::seconds(10000));
+        tcp->DisConnect();
+      }
+    });
+  }
+
+  group.join_all();
+  BASE_LOOPER::MessageLoop::UnintMessageLoop();
+}
+#endif // ENABLE_WEBSOCKET_TEST
+
+
+#define ENABLE_WEBSOCKET_TLS_TEST
+#ifdef ENABLE_WEBSOCKET_TLS_TEST
+
+BOOST_AUTO_TEST_CASE(WEBSOCKETTLSTEST) {
+  BASE_UTIL::AtExitManager at;
+  BASE_LOOPER::MessageLoop::InitMessageLoop();
+  boost::thread_group group;
+  for (int i = 0; i < 5; i++) {
+    group.create_thread([] {
+      boost::uniform_int<> real2(100, 5000);
+      boost::random::mt19937 gen2;
+      auto io_pump = BASE_LOOPER::MessageLoop::IOMessagePump();
+      for (size_t i = 0; i < 300; i++) {
+        auto tcp_request =
+            std::make_unique<BASE_NET::NetConnection::NetConnectionRequest>();
+        tcp_request->host = "echo.websocket.org";
+        tcp_request->port = 443;
+        tcp_request->net_type = BASE_NET::NetConnection::kNetTypeWebsocketTls;
+        auto tcp =
+            BASE_NET::CreateTcp(std::move(tcp_request), callback, io_pump);
+        tcp->Connect();
+        boost::this_thread::sleep(boost::posix_time::milliseconds(real2(gen2)));
+        // boost::this_thread::sleep(boost::posix_time::seconds(10000));
+        tcp->DisConnect();
+      }
+    });
+  }
+
+  for (int i = 0; i < 5; i++) {
+    group.create_thread([] {
+      boost::uniform_int<> real2(500, 1000);
+      boost::random::mt19937 gen2;
+      auto io_pump = BASE_LOOPER::MessageLoop::IOMessagePump();
+      for (size_t i = 0; i < 300; i++) {
+        auto tcp_request =
+            std::make_unique<BASE_NET::NetConnection::NetConnectionRequest>();
+        tcp_request->host = "echo.websocket.org";
+        tcp_request->port = 443;
+        tcp_request->net_type = BASE_NET::NetConnection::kNetTypeWebsocketTls;
+        auto tcp =
+            BASE_NET::CreateTcp(std::move(tcp_request), callback, io_pump);
+        tcp->Connect();
+        boost::this_thread::sleep(boost::posix_time::milliseconds(real2(gen2)));
+     //    boost::this_thread::sleep(boost::posix_time::seconds(10000));
+        tcp->DisConnect();
+      }
+    });
+  }
+
+  for (int i = 0; i < 5; i++) {
+    group.create_thread([] {
+      boost::uniform_int<> real2(50, 300);
+      boost::random::mt19937 gen2;
+      auto io_pump = BASE_LOOPER::MessageLoop::FileMessagePump();
+      for (size_t i = 0; i < 300; i++) {
+        auto tcp_request =
+            std::make_unique<BASE_NET::NetConnection::NetConnectionRequest>();
+        tcp_request->host = "echo.websocket.org";
+        tcp_request->port = 443;
+        tcp_request->net_type = BASE_NET::NetConnection::kNetTypeWebsocketTls;
+        auto tcp =
+            BASE_NET::CreateTcp(std::move(tcp_request), callback, io_pump);
+        tcp->Connect();
+        boost::this_thread::sleep(boost::posix_time::milliseconds(real2(gen2)));
+        //boost::this_thread::sleep(boost::posix_time::seconds(10000));
+        tcp->DisConnect();
+      }
+    });
+  }
+
+  for (int i = 0; i < 5; i++) {
+    group.create_thread([] {
+      boost::uniform_int<> real2(100, 3000);
+      boost::random::mt19937 gen2;
+      auto io_pump = BASE_LOOPER::MessageLoop::FileMessagePump();
+      for (size_t i = 0; i < 300; i++) {
+        auto tcp_request =
+            std::make_unique<BASE_NET::NetConnection::NetConnectionRequest>();
+        tcp_request->host = "echo.websocket.org";
+        tcp_request->port = 443;
+        tcp_request->net_type = BASE_NET::NetConnection::kNetTypeWebsocketTls;
+        auto tcp =
+            BASE_NET::CreateTcp(std::move(tcp_request), callback, io_pump);
+        tcp->Connect();
+        boost::this_thread::sleep(boost::posix_time::milliseconds(real2(gen2)));
+        // boost::this_thread::sleep(boost::posix_time::seconds(10000));
+        tcp->DisConnect();
+      }
+    });
+  }
+
+  group.join_all();
+  BASE_LOOPER::MessageLoop::UnintMessageLoop();
+}
+
+
+#endif  // ENABLE_TCP_TEST

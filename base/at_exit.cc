@@ -27,14 +27,15 @@ AtExitManager::~AtExitManager() {
     callback();
     tasks.pop();
   }
+  g_top_manager = nullptr;
 }
 
 void AtExitManager::RegisterCallback(AtExitCallback callback) {
-  std::lock_guard<std::mutex> lock(g_top_manager->mutex_);
   if (nullptr == g_top_manager) {
     LogFatal << "g_top_manager: null， must use temp object";
     return;
   }
+  std::lock_guard<std::mutex> lock(g_top_manager->mutex_);
   g_top_manager->stack_.push(std::move(callback));
 }
 

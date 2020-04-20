@@ -21,8 +21,9 @@ public:
 
 protected:
   void DoConnect(const boost::asio::ip::tcp::resolver::results_type& endpoints) override {
+    boost::beast::get_lowest_layer(*ws_).expires_after(std::chrono::seconds(10));
     auto self = shared_from_this();
-    boost::beast::get_lowest_layer(*ws_.get()).async_connect(endpoints,
+    boost::beast::get_lowest_layer(*ws_).async_connect(endpoints,
       [self](boost::system::error_code ec,
         boost::asio::ip::tcp::endpoint endpoint) mutable {
           //连接失败通知上层
@@ -54,8 +55,9 @@ protected:
     ws_->close(boost::beast::websocket::close_code::normal, ec);
   }
   void DoWebsocketHandshake() override {
+    boost::beast::get_lowest_layer(*ws_).expires_never();
     auto self = shared_from_this();
-    ws_->async_handshake(request_->host, "/", [self](boost::system::error_code ec) mutable {
+    ws_->async_handshake(request_->host, request_->path, [self](boost::system::error_code ec) mutable {
       self->NotifyWebsocketHandshakeComplte(std::move(ec));
       self.reset();
     });

@@ -62,6 +62,10 @@ void NetConnectionImpl::Send(const void* buffer, int32_t buffer_len) {
   });
 }
 
+NetConnection::NetType NetConnectionImpl::net_type() {
+  return request_->net_type;
+}
+
 void NetConnectionImpl::OnDnsResolvered(
     const boost::asio::ip::tcp::resolver::results_type& result,
     int code,
@@ -158,7 +162,7 @@ boost::asio::io_service& NetConnectionImpl::GetIOService() {
 void NetConnectionImpl::DoSendFromQueue(std::shared_ptr<std::string> send_buffer) {
   bool write_in_progress = !send_buffers.empty();
   send_buffers.push_back(std::move(send_buffer));
-  if (!write_in_progress) {    
+  if (!write_in_progress && !already_clean_up) {
     DoSendData(boost::asio::buffer(send_buffers.front()->c_str(),
                                    send_buffers.front()->length()));
   }
@@ -182,7 +186,7 @@ void NetConnectionImpl::NotifySendComplete(boost::system::error_code ec, std::si
   else {
     //发送成功之后，移除队头数据，判断是否需要继续发送
     send_buffers.pop_front();
-    if (!send_buffers.empty()) {
+    if (!send_buffers.empty() && !already_clean_up) {
       DoSendData(boost::asio::buffer(send_buffers.front()->c_str(),
                                      send_buffers.front()->length()));
     }
@@ -201,6 +205,10 @@ void NetConnectionImpl::NotifyRecvData(boost::system::error_code ec, std::size_t
 }
 
 void NetConnectionImpl::HandleCleanUp() {
+  if (already_clean_up) {
+    return;
+  }
+  already_clean_up = true;
   if (nullptr != dns_resolver_) {
     dns_resolver_->Cancel();
     dns_resolver_ = nullptr;

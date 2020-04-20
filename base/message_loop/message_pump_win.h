@@ -18,6 +18,7 @@ protected:
 
   void DoRun() override;
 
+  void Stop() override;
 
   void DoStop() override;
 

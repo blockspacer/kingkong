@@ -22,7 +22,7 @@ public:
   void DisConnect() override;
 
   void Send(const void* buffer, int32_t buffer_len) override;
-
+  NetConnection::NetType net_type() override;
 
 public:
   //不能的模块用来实现不同的连接
@@ -82,6 +82,8 @@ private:
   std::shared_ptr<DnsResolver> dns_resolver_;
   //是否结束标志
   std::atomic_bool stoped_;
+  //是否已经清理过
+  bool already_clean_up = false;
 
   DECLARE_OBJECT_RECORD(NetConnectionImpl)
 };

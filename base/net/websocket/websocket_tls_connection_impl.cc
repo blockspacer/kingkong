@@ -102,6 +102,7 @@ WebsocketTlsConnectionImpl::WebsocketTlsConnectionImpl(std::unique_ptr<NetConnec
 
 void WebsocketTlsConnectionImpl::DoTlsHandshake() {
   auto self = shared_from_this();
+  boost::beast::get_lowest_layer(*ws_).expires_after(std::chrono::seconds(10));
   ws_->next_layer().async_handshake(boost::asio::ssl::stream_base::client,
     [self](boost::system::error_code ec) mutable {
       self->NotifyTlsHandshakeComplete(std::move(ec));
@@ -109,7 +110,7 @@ void WebsocketTlsConnectionImpl::DoTlsHandshake() {
     });
 }
 
-END_NAMESPACE_NET
 
+END_NAMESPACE_NET
 
 

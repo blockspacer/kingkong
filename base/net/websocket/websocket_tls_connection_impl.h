@@ -18,6 +18,14 @@ public:
 protected:
   void DoTlsHandshake() override;
 
+  void DoCleanUp() override {
+    boost::system::error_code ec;
+    ws_->next_layer().next_layer().close();
+    ws_->close(boost::beast::websocket::close_code::normal, ec);
+  }
+
+
+
 private:
   static boost::asio::ssl::context s_ssl_context_;
 };

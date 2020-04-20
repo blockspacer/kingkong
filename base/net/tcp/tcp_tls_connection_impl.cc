@@ -55,7 +55,7 @@ bool TcpTlsConnectionImpl::VerifyCert(bool preverified, boost::asio::ssl::verify
 
 void TcpTlsConnectionImpl::DoCleanUp() {
   boost::system::error_code ec;
-  socket_->lowest_layer().cancel(ec);
+  socket_->lowest_layer().shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
   socket_->lowest_layer().close(ec);
 }
 

@@ -20,6 +20,9 @@ public:
 		uint16_t port;
 		//是否支持tls
 		NetType net_type = kNetTypeTcp;
+		//http，或者websocket 的paht
+		std::string path = "/";
+
 	};
 
 	class NetConnectionDelegate {
@@ -33,6 +36,7 @@ public:
 	virtual void Connect() = 0;
 	virtual void DisConnect() = 0;
 	virtual void Send(const void* buffer, int32_t buffer_len) = 0;
+	virtual NetType net_type() = 0;
 };
 
 std::shared_ptr<NetConnection> CreateTcp(std::unique_ptr<NetConnection::NetConnectionRequest> request,

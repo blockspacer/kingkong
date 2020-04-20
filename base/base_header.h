@@ -32,11 +32,11 @@
   std::mutex TypeName::s_mutex_;
 
 #define ADD_OBJECT_RECORD()                         \
-  static boost::once_flag once;                     \
+  static boost::once_flag once;                                 \
   boost::call_once([] {                             \
         BASE_UTIL::AtExitManager::RegisterCallback([]{  \
               if (!s_object_set_.empty()) {             \
-                  LogFatal << "class:" << s_class_name_ << " count:" << s_class_name_.size();\
+                  LogFatal << "class:" << s_class_name_ << " count:" << s_object_set_.size();\
               } else {\
                   LogInfo << "class:" << s_class_name_  << " ok";\
                }\
@@ -56,7 +56,7 @@ std::lock_guard<std::mutex> lock(s_mutex_);\
 #else
   #define DECLARE_OBJECT_RECORD(TypeName)
   #define IMPLEMET_OBJECT_RECORD(TypeName)
-  #define ADD_OBJECT_RECORD()
+  #define ADD_OBJECT_RECORD() 
   #define REMOVE_OBJECT_RECORD()
 #endif
 

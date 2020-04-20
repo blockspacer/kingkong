@@ -29,7 +29,7 @@ private:
   boost::asio::io_service io_service_;
   boost::asio::deadline_timer timer_;
   // 增加一个work对象
-  boost::asio::io_service::work work_;
+  std::unique_ptr<boost::asio::io_service::work> work_;
 };
 
 END_NAMESPACE_LOOPER

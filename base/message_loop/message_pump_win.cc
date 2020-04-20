@@ -59,6 +59,11 @@ void MessagePumpWin::Work() {
   DoOneWork();
 }
 
+void MessagePumpWin::Stop() {
+  stoped_ = true;
+  DoStop();
+}
+
 void MessagePumpWin::Wakeup(uint64_t expired_time) {
   auto now = BASE_TIME::GetTickCount2();
   if (expired_time > now) {
