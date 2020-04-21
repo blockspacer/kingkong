@@ -18,6 +18,3 @@ FILE (GLOB source_files *.c *.cc)
 
 
 ADD_LIBRARY (mvvm ${header_files} ${source_files})
-if (ENABLE_MVVM_TEST)
-    add_subdirectory(test)
-endif()
