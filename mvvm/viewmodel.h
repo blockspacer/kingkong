@@ -2,12 +2,11 @@
 #define _VIEW_MODEL_H
 #include <mvvm_base.h>
 #include <model.h>
-#include <viewmodel_define.h>
 #include <string>
 #include <map>
 #include <memory>
-#include <functional>
 #include <boost/any.hpp>
+#include <boost/thread/once.hpp>
 
 BEGIN_NAMESPACE_FRAME
 
@@ -18,32 +17,33 @@ BEGIN_NAMESPACE_FRAME
 
 class ViewModel : std::enable_shared_from_this<ViewModel> {
 public:
-  ViewModel(ViewModelType viewmode_type);
+  ViewModel(int32_t viewmode_type);
   virtual ~ViewModel();
 
   using ViewModelBuilder = std::function<std::shared_ptr<ViewModel>()>;
-  using PropertyChangedDelegate = std::function<void(const std::string& property_name, boost::any& value)>;
+  using PropertyChangedDelegate = std::function<void(int32_t property_id, const boost::any& before_value, const boost::any& after_value)>;
 
-  //VM 有数据改变的时候会回调给UI 曾
+  //VM 有数据改变的时候会回调给UI
   void BindPropertyChanged(PropertyChangedDelegate delegate);
 
-  //UI 层通知 viewmodel 属性有改变
-  void NotifyPropertyChanged(const std::string& property_name, boost::any& value);
-  void NotifyPropertyChanged(const std::string& property_name, boost::any&& value);
-  
+
+  //UI 数据变化通知ViewModel
+  void NotifyPropertyChanged(int32_t property_id, boost::any& value);
+  void NotifyPropertyChanged(int32_t property_id, boost::any&& value);
+
   //UI 层有动作的时候
-  void HandleEvent(int event, boost::any& value);
+  void HandleEvent(int32_t event, const boost::any& value);
 
 
-  ViewModelType viewmode_type();
+  int32_t viewmode_type();
 
   //上层绑定和解绑之后通知
-  void NotifyBind();
+  void NotifyBind(void* context);
   void NotifyUnBind();
 
   //工厂方法，用来创建VM
-  static void RegisterViewModel(ViewModelType type, ViewModelBuilder builder);
-  static std::shared_ptr<ViewModel> Create(ViewModelType type);
+  static void RegisterViewModel(int32_t type, ViewModelBuilder builder);
+  static std::shared_ptr<ViewModel> Create(int32_t type);
 
 protected:
   //VM 需要实现这个方法，用来初始化UI，或者监听一些Model数据变化
@@ -51,19 +51,25 @@ protected:
   virtual void OnDetach() = 0;
 
   //子类实现，如果有action 需要处理
-  virtual void OnEventFired(int event, boost::any& value) {}
+  virtual void OnEventFired(int32_t event, const boost::any& value) {}
+  
+  //提供给子类的帮助函数
+  void FireProperty(int32_t property_id, const boost::any& value);
 
-  //提供给子类的帮助函数, 基类在析构的时候会反注册，所以不需要子类关心析构问题
-  void SubscribEvent(ModelType model_type, int32_t event, Model::SuscribeEventDelegate delegate);
+  void* context() {
+    return context_;
+  }
 
+protected:
+  std::map<int64_t, int32_t> subscribe_ids_;
 
 private:
   PropertyChangedDelegate property_changed_delegate_;
-  std::map<std::string, boost::any> properties_;
-  ViewModelType viewmode_type_ = kViewModelTypeTest;
+  std::map<int32_t, boost::any> properties_;
+  int32_t viewmode_type_ = -1;
 
-  static std::map< ViewModelType, ViewModelBuilder> vm_builder_;
-  std::map<int64_t, ModelType> subscribe_ids_;
+  static std::map< int32_t, ViewModelBuilder> vm_builder_;
+  void* context_ = nullptr;
 };
 
 END_NAMESPACE_FRAME

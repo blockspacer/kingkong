@@ -5,35 +5,37 @@
 #define BEGIN_NAMESPACE(ns) namespace ns {
 #define END_NAMESPACE() }
 
-#define MMV_FRAME mvvm::framework
+#define MVVM_FRAME mvvm::framework
 #define BEGIN_NAMESPACE_FRAME BEGIN_NAMESPACE(mvvm) BEGIN_NAMESPACE(framework)
 #define END_NAMESPACE_FRAME END_NAMESPACE() END_NAMESPACE()
 
+//UI 用于处理 viewmode 抛上来的属性
+#define BEGIN_HANDLE_PROPERTY(property_id) switch (property_id) {
+#define HANDLE_PROPERTY(action, func) case action: { return func(before_value, after_value);}
+#define END_HANDLE_PROPERTY() default: break;}
+
+//ViewModel 处理事件
+#define BEGIN_HANDLE_EVENT(event_id) switch (event_id) {
+#define HANDLE_EVENT(event_id, func) case event_id: { return func(value);}
+#define END_HANDLE_EVENT() default: break;}
+
+//ViewModel 订阅Model 事件
+#define BEGIN_SUBSCRIE_ACTION(model_type) if (auto model = MVVM_FRAME::Model::ModelOf(model_type)) { \
+auto tmp_model_type = model_type;
+#define SUBSCRIE_ACTION(action_id, func)  {\
+int64_t id = model->SubscribeActionResult(action_id, std::bind(func, this, std::placeholders::_1));\
+subscribe_ids_[id] = tmp_model_type; }
+#define END_SUBSCRIE_ACTION() }
+
+
+//Model处理action
+#define BEGIN_HANDLE_ACTION(action_id) switch (action_id) {
+#define HANDLE_ACTION(action_id, func) case action_id: { return func(value);}
+#define END_HANDLE_ACTION() default: break;}
 
 
 BEGIN_NAMESPACE_FRAME
-//为什么不用联合体，联合体需要有一个参数指定类型，获取值得时候不方便。
-struct VMParamBase {
-  explicit VMParamBase(const char* value) { str_value = value; }
 
-  explicit VMParamBase(const std::string& value) { str_value = value; }
-
-  explicit VMParamBase(bool value) { bool_value = value; }
-
-  explicit VMParamBase(int32_t value) { int32_value = value; }
-
-  explicit VMParamBase(int64_t value) { int64_value = value; }
-
-  explicit VMParamBase(uint64_t value) { uint64_value = value; }
-
-  virtual ~VMParamBase() = default;
-
-  std::string str_value;
-  bool bool_value;
-  int32_t int32_value;
-  int64_t int64_value;
-  uint64_t uint64_value;
-};
 END_NAMESPACE_FRAME
 
 #endif

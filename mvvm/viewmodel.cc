@@ -2,7 +2,9 @@
 #include <boost/assert.hpp>
 BEGIN_NAMESPACE_FRAME
 
-ViewModel::ViewModel(ViewModelType viewmode_type): viewmode_type_(viewmode_type) {}
+std::map< int32_t, ViewModel::ViewModelBuilder> ViewModel::vm_builder_;
+
+ViewModel::ViewModel(int32_t viewmode_type): viewmode_type_(viewmode_type) {}
 
 ViewModel::~ViewModel() {
   for (auto& item : subscribe_ids_) {
@@ -10,7 +12,7 @@ ViewModel::~ViewModel() {
     if (nullptr == model) {
       continue;;
     }
-    model->UnSubscribeEvent(item.first);
+    model->UnSubscribeActionResult(item.first);
   }
   subscribe_ids_.clear();
 }
@@ -19,29 +21,25 @@ void ViewModel::BindPropertyChanged(PropertyChangedDelegate delegate) {
   property_changed_delegate_ = std::move(delegate);
 }
 
-void ViewModel::NotifyPropertyChanged(const std::string& property_name, boost::any& value) {
-  auto value_pointer =  boost::any_cast<VMParamBase>(&value);
-  BOOST_VERIFY(value_pointer != nullptr);
-
-  properties_[property_name] = value;
+void ViewModel::NotifyPropertyChanged(int32_t property_id, boost::any& value) {
+  properties_[property_id] = value;
 }
 
-void ViewModel::NotifyPropertyChanged(const std::string& property_name, boost::any&& value) {
-  auto value_pointer = boost::any_cast<VMParamBase>(&value);
-  BOOST_VERIFY(value_pointer != nullptr);
-  properties_[property_name] = std::move(value);
+void ViewModel::NotifyPropertyChanged(int32_t property_id, boost::any&& value) {
+  properties_[property_id] = std::move(value);
 }
 
-void ViewModel::HandleEvent(int event, boost::any& value) {
+void ViewModel::HandleEvent(int32_t event, const boost::any& value) {
   OnEventFired(event, value);
 }
 
-ViewModelType ViewModel::viewmode_type() {
+int32_t ViewModel::viewmode_type() {
   return viewmode_type_;
 }
 
 
-void ViewModel::NotifyBind() {
+void ViewModel::NotifyBind(void* context) {
+  context_ = context;
   OnAttach();
 }
 
@@ -49,11 +47,11 @@ void ViewModel::NotifyUnBind() {
   OnDetach();
 }
 
-void ViewModel::RegisterViewModel(ViewModelType type, ViewModelBuilder builder) {
+void ViewModel::RegisterViewModel(int32_t type, ViewModelBuilder builder) {
   vm_builder_[type] = std::move(builder);
 }
 
-std::shared_ptr<ViewModel> ViewModel::Create(ViewModelType type) {
+std::shared_ptr<ViewModel> ViewModel::Create(int32_t type) {
   auto iter = vm_builder_.find(type);
   if (iter == vm_builder_.end()) {
     return nullptr;
@@ -61,15 +59,17 @@ std::shared_ptr<ViewModel> ViewModel::Create(ViewModelType type) {
   return iter->second();
 }
 
-void ViewModel::SubscribEvent(ModelType model_type,
-                              int32_t event,
-                              Model::SuscribeEventDelegate delegate) {
-  auto model = Model::ModelOf(model_type);
-  if (nullptr == model) {
-    return;
+void ViewModel::FireProperty(int32_t property_id, const boost::any& value) {
+  if (property_changed_delegate_) {
+    auto iter = properties_.find(property_id);
+    if (iter != properties_.end()) {
+      property_changed_delegate_(property_id, iter->second, value);
+    }
+    else {
+      property_changed_delegate_(property_id, boost::any(), value);
+    }
+    properties_[property_id] = value;
   }
-  int64_t id = model->SubscribeEvent(event, std::move(delegate));
-  subscribe_ids_[id] = model_type;
 }
 END_NAMESPACE_FRAME
 

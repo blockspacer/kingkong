@@ -47,7 +47,8 @@ void UnInitLog();
 #define LogError    BOOST_LOG_FUNCTION();\
                     BOOST_LOG_SEV(BASE_LOG::s_named_logger, BASE_LOG::kLogLevelError)
 
-#define LogFatal    BOOST_LOG_FUNCTION();\
+#define LogFatal    BOOST_VERIFY(false);\
+                    BOOST_LOG_FUNCTION();\
                     BOOST_LOG_SEV(BASE_LOG::s_named_logger, BASE_LOG::kLogLevelFatal) 
 
 END_NAMESPACE_LOG

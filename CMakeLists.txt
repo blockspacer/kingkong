@@ -12,6 +12,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/../bin)
 add_subdirectory(base)
 add_subdirectory(mvvm)
 add_subdirectory(third_party)
+add_subdirectory(app)
 
 
 
