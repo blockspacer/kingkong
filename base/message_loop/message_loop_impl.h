@@ -1,7 +1,7 @@
 ﻿#ifndef _BASE_MESSAGE_LOOP_IMPL_H_
 #define _BASE_MESSAGE_LOOP_IMPL_H_
-#include "message_loop.h"
-#include <base_header.h>
+#include <base/message_loop/message_loop.h>
+#include <base/base_header.h>
 
 BEGIN_NAMESPACE_LOOPER
 

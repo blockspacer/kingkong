@@ -1,8 +1,8 @@
 ﻿#ifndef _BASE_WEBSOCKET_CONNECTION_BASE_H_
 #define _BASE_WEBSOCKET_CONNECTION_BASE_H_
 
-#include "net/net_connection_impl.h"
-#include <base_header.h>
+#include <base/net/net_connection_impl.h>
+#include <base/base_header.h>
 #include <boost/beast.hpp>
 #include <boost/beast/websocket.hpp>
 #include "base/log.h"

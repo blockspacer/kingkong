@@ -31,8 +31,7 @@ AtExitManager::~AtExitManager() {
 }
 
 void AtExitManager::RegisterCallback(AtExitCallback callback) {
-  if (nullptr == g_top_manager) {
-    LogFatal << "g_top_manager: null， must use temp object";
+  if (nullptr == g_top_manager) {   
     return;
   }
   std::lock_guard<std::mutex> lock(g_top_manager->mutex_);

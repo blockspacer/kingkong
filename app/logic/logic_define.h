@@ -1,7 +1,7 @@
 ﻿#ifndef _APP_LOGIC_H_
 #define _APP_LOGIC_H_
-#include <viewmodel.h>
-#include <model.h>
+#include <mvvm/viewmodel.h>
+#include <mvvm/model.h>
 
 enum ModelType {
   kModelTypeBegin = 0,

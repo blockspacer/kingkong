@@ -1,8 +1,8 @@
 ﻿#ifndef _BASE_DNS_RESOLVER_IMPL_H_
 #define _BASE_DNS_RESOLVER_IMPL_H_
-#include "message_loop/message_pump.h"
-#include "dns_resolver.h"
-#include <base_header.h>
+#include <base/message_loop/message_pump.h>
+#include <base/net/dns_resolver.h>
+#include <base/base_header.h>
 
 BEGIN_NAMESPACE_NET
 class DnsResolverImpl :public DnsResolver, public std::enable_shared_from_this<DnsResolverImpl> {

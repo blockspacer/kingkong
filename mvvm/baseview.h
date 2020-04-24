@@ -1,8 +1,8 @@
 ﻿#ifndef _BASE_VIEW_H_
 #define _BASE_VIEW_H_
 #include <memory>
-#include <mvvm_base.h>
-#include <viewmodel.h>
+#include <mvvm/mvvm_base.h>
+#include <mvvm/viewmodel.h>
 
 BEGIN_NAMESPACE_FRAME
 

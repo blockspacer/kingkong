@@ -1,7 +1,7 @@
 ﻿#ifndef _BASE_MESSAGE_PUMP_WIN_H_
 #define _BASE_MESSAGE_PUMP_WIN_H_
-#include "message_pump_impl.h"
-#include <base_header.h>
+#include <base/message_loop/message_pump_impl.h>
+#include <base/base_header.h>
 
 BEGIN_NAMESPACE_LOOPER
 

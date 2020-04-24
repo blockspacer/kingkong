@@ -15,7 +15,7 @@ endforeach()
 set(CMAKE_MFC_FLAG 2) 
 
 link_directories(${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
-INCLUDE_DIRECTORIES(. .. ${dirlist} ../../third_party/boost/libs/numeric/conversion/include ../../third_party/boringssl/include ../../base ../../mvvm)
+INCLUDE_DIRECTORIES(. .. ../../ ${dirlist} ../../third_party/boost/libs/numeric/conversion/include ../../third_party/boringssl/include ../../base ../../mvvm)
 
 FILE (GLOB header_files *.h)
 FILE (GLOB source_files *.c *.cc *.cpp)

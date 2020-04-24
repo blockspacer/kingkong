@@ -11,7 +11,7 @@ foreach (child_dir ${libs_dir})
     endif()
 endforeach()
 
-INCLUDE_DIRECTORIES(. .. ${dirlist} ../third_party/boost/libs/numeric/conversion/include ../third_party/boringssl/include)
+INCLUDE_DIRECTORIES(. .. ../.. ${dirlist} ../third_party/boost/libs/numeric/conversion/include ../third_party/boringssl/include)
 
 FILE (GLOB header_files *.h)
 FILE (GLOB source_files *.c *.cc)

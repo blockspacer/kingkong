@@ -1,7 +1,7 @@
 ﻿#ifndef _VIEW_MODEL_H
 #define _VIEW_MODEL_H
-#include <mvvm_base.h>
-#include <model.h>
+#include <mvvm/mvvm_base.h>
+#include <mvvm/model.h>
 #include <string>
 #include <map>
 #include <memory>

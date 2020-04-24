@@ -1,8 +1,8 @@
 ﻿#ifndef _BASE_TCP_CONNECTION_BASE_H_
 #define _BASE_TCP_CONNECTION_BASE_H_
 
-#include "net/net_connection_impl.h"
-#include <base_header.h>
+#include <base/net/net_connection_impl.h>
+#include <base/base_header.h>
 #include <boost/asio.hpp>
 
 BEGIN_NAMESPACE_NET

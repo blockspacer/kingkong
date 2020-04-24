@@ -1,6 +1,6 @@
 ﻿#ifndef _MODEL_H
 #define _MODEL_H
-#include <mvvm_base.h>
+#include <mvvm/mvvm_base.h>
 #include <string>
 #include <map>
 #include <memory>

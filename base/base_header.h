@@ -1,6 +1,6 @@
 ﻿#ifndef _BASE_HEADER_H_
 #define _BASE_HEADER_H_
-#include <namespace_define.h>
+#include <base/namespace_define.h>
 #include <string>
 #include <set>
 #include <vector>
@@ -8,7 +8,7 @@
 #include <mutex>
 #include <functional>
 #include <stdint.h>
-#include <at_exit.h>
+#include <base/at_exit.h>
 #include <boost/thread/once.hpp>
 
 

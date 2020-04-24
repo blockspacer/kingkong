@@ -1,7 +1,7 @@
 ﻿#ifndef _BASE_NET_CONNECTION_H_
 #define _BASE_NET_CONNECTION_H_
-#include "message_loop/message_pump.h"
-#include <base_header.h>
+#include <base/message_loop/message_pump.h>
+#include <base/base_header.h>
 
 BEGIN_NAMESPACE_NET
 class NetConnection {

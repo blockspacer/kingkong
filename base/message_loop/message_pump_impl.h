@@ -1,7 +1,7 @@
 ﻿#ifndef _BASE_MESSAGE_PUMP_IMPL_H_
 #define _BASE_MESSAGE_PUMP_IMPL_H_
-#include "message_pump.h"
-#include <base_header.h>
+#include <base/message_loop/message_pump.h>
+#include <base/base_header.h>
 #include <atomic>
 #include <boost/utility/string_view.hpp>
 

@@ -1,9 +1,9 @@
 ﻿#ifndef _BASE_NET_CONNECTION_IMPL_H_
 #define _BASE_NET_CONNECTION_IMPL_H_
 
-#include "dns_resolver.h"
-#include "net_connection.h"
-#include <base_header.h>
+#include <base/net/dns_resolver.h>
+#include <base/net/net_connection.h>
+#include <base/base_header.h>
 #include <boost/shared_array.hpp>
 #include <boost/asio.hpp>
 #include <queue>

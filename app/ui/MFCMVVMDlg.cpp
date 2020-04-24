@@ -8,6 +8,8 @@
 #include "MFCMVVMDlg.h"
 #include "afxdialogex.h"
 #include <string_util.h>
+#include <boost/filesystem.hpp>
+#include <string>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -130,7 +132,6 @@ BOOL CMFCMVVMDlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// 设置小图标
 
 	// TODO: 在此添加额外的初始化代码
-	Application::get_mutable_instance().Init();
 	BindVM(kViewModelMain);
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
