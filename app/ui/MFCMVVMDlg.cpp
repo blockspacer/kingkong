@@ -82,6 +82,9 @@ void CMFCMVVMDlg::OnUserNameChange(const boost::any& before_value, const boost::
 }
 
 void CMFCMVVMDlg::OnPasswdChange(const boost::any& before_value, const boost::any& after_value) {
+	const Main::UserNameParam* value = boost::any_cast<Main::UserNameParam>(&after_value);
+	value_ = BASE_STRING_UTIL::Utf8ToUnicode(value->school).c_str();
+  UpdateData(FALSE);
 }
 
 BEGIN_MESSAGE_MAP(CMFCMVVMDlg, CDialogEx)
@@ -91,6 +94,7 @@ BEGIN_MESSAGE_MAP(CMFCMVVMDlg, CDialogEx)
 	ON_EN_CHANGE(IDC_EDIT_PASSWD, &CMFCMVVMDlg::OnEnChangeEditPasswd)
 	ON_EN_CHANGE(IDC_EDIT_USERNAME, &CMFCMVVMDlg::OnEnChangeEditUsername)
 	ON_BN_CLICKED(IDC_BUTTON_LOGIN, &CMFCMVVMDlg::OnBnClickedButtonLogin)
+	ON_BN_CLICKED(IDC_BUTTON_LOGOUT, &CMFCMVVMDlg::OnBnClickedButtonLogout)
 END_MESSAGE_MAP()
 
 
@@ -215,4 +219,11 @@ void CMFCMVVMDlg::OnBnClickedButtonLogin()
 {
 	// TODO: 在此添加控件通知处理程序代码
 	vm_->HandleEvent(Main::kEventLogin, nullptr);
+}
+
+
+void CMFCMVVMDlg::OnBnClickedButtonLogout()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	vm_->HandleEvent(Main::kEventLogout, nullptr);
 }

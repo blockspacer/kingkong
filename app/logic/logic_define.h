@@ -21,7 +21,8 @@ namespace Main {
   };
 
   enum Event {
-    kEventLogin
+    kEventLogin,
+    kEventLogout
   };
 
   enum Action {

@@ -17,6 +17,8 @@ public:
 
 private:
   void HandleLogin(const boost::any& value);
+  void HandleLogout(const boost::any& value);
+
   //处理model 的动作回调
   void OnLoginComplete(const boost::any& value);
   void OnLogoutComplete(const boost::any& value);

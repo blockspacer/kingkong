@@ -11,6 +11,8 @@
 #define IDC_EDIT_PASSWD                 1001
 #define IDC_EDIT1                       1003
 #define IDC_BUTTON_LOGIN                1004
+#define IDC_BUTTON_LOGIN2               1005
+#define IDC_BUTTON_LOGOUT               1005
 
 // Next default values for new objects
 // 

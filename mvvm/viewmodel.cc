@@ -71,6 +71,11 @@ void ViewModel::FireProperty(int32_t property_id, const boost::any& value) {
     properties_[property_id] = value;
   }
 }
+
+void ViewModel::FireProperty(int32_t property_id, const char* value) {
+  FireProperty(property_id, (value != nullptr) ? std::string(value) : std::string(""));
+}
+
 END_NAMESPACE_FRAME
 
 

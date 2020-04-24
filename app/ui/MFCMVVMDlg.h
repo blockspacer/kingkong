@@ -43,4 +43,5 @@ public:
 	afx_msg void OnEnChangeEditPasswd();
 	afx_msg void OnEnChangeEditUsername();
   afx_msg void OnBnClickedButtonLogin();
+	afx_msg void OnBnClickedButtonLogout();
 };

@@ -14,7 +14,7 @@ public:
 
 private:
   void HandleLogin(const boost::any& value);
-
+  void HandleLogout(const boost::any& value);
 };
 
 

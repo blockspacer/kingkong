@@ -54,6 +54,7 @@ protected:
   virtual void OnEventFired(int32_t event, const boost::any& value) {}
   
   //提供给子类的帮助函数
+  void FireProperty(int32_t property_id, const char* value);
   void FireProperty(int32_t property_id, const boost::any& value);
 
   void* context() {
