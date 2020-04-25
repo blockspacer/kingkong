@@ -54,3 +54,8 @@ ADD_LIBRARY (base ${header_files} ${source_files} ${message_loop} ${message_loop
 if (ENABLE_BASE_TEST)
     add_subdirectory(test)
 endif()
+
+
+if(ANDROID)
+    target_link_libraries(base boost ssl crypto)
+endif(ANDROID)

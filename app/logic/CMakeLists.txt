@@ -21,3 +21,6 @@ FILE (GLOB source_files *.c *.cc *.cpp)
 
 
 add_library (logic ${header_files} ${source_files})
+if(ANDROID)
+    target_link_libraries(logic boost base mvvm)
+endif(ANDROID)
