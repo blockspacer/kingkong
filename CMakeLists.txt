@@ -23,7 +23,9 @@ set_target_folder_if_exist(pem boringssl)
 add_subdirectory(base)
 add_subdirectory(mvvm)
 add_subdirectory(third_party)
-add_subdirectory(app)
+if (ENABLE_UI)
+	add_subdirectory(app)
+endif()
 
 
 
