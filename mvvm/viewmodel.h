@@ -15,7 +15,7 @@ BEGIN_NAMESPACE_FRAME
 //属性的内容使用结构体，Variant 这些虽然灵活，但是非常容易出错，并且完全不知道里面的内容，需要有文档记录Variant 字段。存进去很方便，但是读取
 //却麻烦容易出错。boost::any 内部是一个 VMParamBase 或者子类，使用的时候强转成真实类型再来操作
 
-class ViewModel : std::enable_shared_from_this<ViewModel> {
+class ViewModel : public std::enable_shared_from_this<ViewModel> {
 public:
   ViewModel(int32_t viewmode_type);
   virtual ~ViewModel();
