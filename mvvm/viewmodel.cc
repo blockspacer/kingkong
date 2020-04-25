@@ -1,16 +1,21 @@
 ﻿#include "viewmodel.h"
 #include <boost/assert.hpp>
-BEGIN_NAMESPACE_FRAME
 
+BEGIN_NAMESPACE_FRAME
 std::map< int32_t, ViewModel::ViewModelBuilder> ViewModel::vm_builder_;
 
 ViewModel::ViewModel(int32_t viewmode_type): viewmode_type_(viewmode_type) {}
 
 ViewModel::~ViewModel() {
+  UnSubscrieAllAction();
+}
+
+void ViewModel::UnSubscrieAllAction() {
   for (auto& item : subscribe_ids_) {
     auto model = Model::ModelOf(item.second);
     if (nullptr == model) {
-      continue;;
+      continue;
+      ;
     }
     model->UnSubscribeActionResult(item.first);
   }
@@ -45,6 +50,7 @@ void ViewModel::NotifyBind(void* context) {
 
 void ViewModel::NotifyUnBind() {
   OnDetach();
+  UnSubscrieAllAction();
 }
 
 void ViewModel::RegisterViewModel(int32_t type, ViewModelBuilder builder) {

@@ -33,9 +33,4 @@ subscribe_ids_[id] = tmp_model_type; }
 #define HANDLE_ACTION(action_id, func) case action_id: { return func(value);}
 #define END_HANDLE_ACTION() default: break;}
 
-
-BEGIN_NAMESPACE_FRAME
-
-END_NAMESPACE_FRAME
-
 #endif

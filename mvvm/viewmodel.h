@@ -65,6 +65,8 @@ protected:
   std::map<int64_t, int32_t> subscribe_ids_;
 
 private:
+  void UnSubscrieAllAction();
+
   PropertyChangedDelegate property_changed_delegate_;
   std::map<int32_t, boost::any> properties_;
   int32_t viewmode_type_ = -1;
