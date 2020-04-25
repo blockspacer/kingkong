@@ -3,7 +3,7 @@
 //
 
 #pragma once
-#include <baseview.h>
+#include <mvvm/baseview.h>
 #include <logic/logic_define.h>
 #include <logic/application.h>
 

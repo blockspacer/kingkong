@@ -7,7 +7,7 @@
 #include "MFCMVVM.h"
 #include "MFCMVVMDlg.h"
 #include "afxdialogex.h"
-#include <string_util.h>
+#include <base/string_util.h>
 #include <boost/filesystem.hpp>
 #include <string>
 
