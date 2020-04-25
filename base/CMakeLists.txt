@@ -57,5 +57,5 @@ endif()
 
 
 if(ANDROID)
-    target_link_libraries(base boost ssl crypto)
+    target_link_libraries(base boost ssl crypto android)
 endif(ANDROID)

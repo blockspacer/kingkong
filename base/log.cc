@@ -10,6 +10,7 @@
 #include <boost/phoenix.hpp>
 #include <boost/log/sources/logger.hpp>
 #include <boost/log/support/date_time.hpp>
+#include <boost/filesystem.hpp>
 
 BEGIN_NAMESPACE_LOG
 
@@ -81,8 +82,10 @@ void InitConsole(LogLevel log_level) {
 }
 
 void InitLogFile(LogLevel log_level, const std::string& log_dir) {
+  boost::filesystem::path log_part_name(log_dir);
+  log_part_name = log_part_name / "%Y-%m-%d %H.log";
   auto file_sink = boost::log::add_file_log(
-    boost::log::keywords::file_name = "%Y-%m-%d %H.log",  //文件名
+    boost::log::keywords::file_name = log_part_name,  //文件路径
     boost::log::keywords::rotation_size =
     10 * 1024 * 1024,  //单个文件限制大小
     boost::log::keywords::time_based_rotation =
