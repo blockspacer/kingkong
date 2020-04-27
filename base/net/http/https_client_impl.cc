@@ -2,6 +2,9 @@
 #include "log.h"
 
 BEGIN_NAMESPACE_NET
+
+boost::asio::ssl::context HttpsClientImpl::ssl_context_(boost::asio::ssl::context::sslv23_client);
+
 HttpsClientImpl::HttpsClientImpl(
     std::unique_ptr<HttpClientRequest> http_request,
     std::unique_ptr<NetConnection::NetConnectionRequest> net_connection_request,
@@ -10,10 +13,14 @@ HttpsClientImpl::HttpsClientImpl(
     : HttpConnectionBase(std::move(http_request),
                          std::move(net_connection_request),
                          delegate,
-                         std::move(pump)),
-  ssl_context_(boost::asio::ssl::context::sslv23_client) {
-  boost::system::error_code ec;
-  ssl_context_.set_default_verify_paths(ec);
+                         std::move(pump)) {
+  static boost::once_flag once;
+  boost::call_once(
+      [] {
+        boost::system::error_code ec;
+        ssl_context_.set_default_verify_paths(ec);
+      },
+      once);
   stream_ = std::make_unique<boost::beast::ssl_stream<boost::beast::tcp_stream>>(GetIOService(), ssl_context_);
 }
 

@@ -20,7 +20,7 @@ class HttpsClientImpl : public HttpConnectionBase<boost::beast::ssl_stream<boost
 
   void DoTlsHandshake() override;
  private:
-   boost::asio::ssl::context ssl_context_;
+   static boost::asio::ssl::context ssl_context_;
 };
 
 END_NAMESPACE_NET

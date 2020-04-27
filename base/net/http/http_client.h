@@ -2,7 +2,7 @@
 #define _HTTP_CLIENT_H_
 #include <base/message_loop/message_pump.h>
 #include <base/base_header.h>
-
+#include <map>
 BEGIN_NAMESPACE_NET
 
 class HttpClient {
