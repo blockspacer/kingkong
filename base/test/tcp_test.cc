@@ -6,8 +6,9 @@
 #include <boost/asio/ssl.hpp> 
 #include <boost/filesystem.hpp>
 #include "message_loop/message_loop.h"
+#include <net/http/http_client.h>
 #include <boost/test/unit_test.hpp>
-
+#include "net/http/http_client.h"
 
 #ifdef ENABLE_DNS_TEST
 
@@ -407,7 +408,6 @@ BOOST_AUTO_TEST_CASE(WEBSOCKETTEST) {
 #endif // ENABLE_WEBSOCKET_TEST
 
 
-#define ENABLE_WEBSOCKET_TLS_TEST
 #ifdef ENABLE_WEBSOCKET_TLS_TEST
 
 BOOST_AUTO_TEST_CASE(WEBSOCKETTLSTEST) {
@@ -504,3 +504,33 @@ BOOST_AUTO_TEST_CASE(WEBSOCKETTLSTEST) {
 
 
 #endif  // ENABLE_TCP_TEST
+
+class HttpDelegate :public BASE_NET::HttpClient::HttpClientDelegate {
+public:
+  void OnHttpResponse(int32_t http_code, const std::string& content) {
+    LogInfo << "http_code: " << http_code << " content:" << content;
+  }
+};
+
+
+HttpDelegate* g_httpdelete = new HttpDelegate;
+
+BOOST_AUTO_TEST_CASE(HttpTest) {
+  BASE_UTIL::AtExitManager at;
+  BASE_LOOPER::MessageLoop::InitMessageLoop();
+  boost::thread_group group;
+  boost::uniform_int<> real2(100, 5000);
+  boost::random::mt19937 gen2;
+  auto io_pump = BASE_LOOPER::MessageLoop::IOMessagePump();
+  for (size_t i = 0; i < 10000; i++) {
+    auto tcp_request =
+      std::make_unique<BASE_NET::HttpClient::HttpClientRequest>();
+    tcp_request->url = "https://www.qq.com";
+    auto tcp =
+      BASE_NET::CreateHttpClient(std::move(tcp_request), g_httpdelete, io_pump);
+    tcp->Request();
+    boost::this_thread::sleep(boost::posix_time::milliseconds(real2(gen2)));
+    //boost::this_thread::sleep(boost::posix_time::seconds(10000));
+    tcp->Cancel();
+  }
+}

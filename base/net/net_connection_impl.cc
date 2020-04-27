@@ -100,7 +100,8 @@ void NetConnectionImpl::NotifyConnectComplete(boost::system::error_code ec) {
   if (!ec) {
     switch (request_->net_type) {
     case kNetTypeWebsocketTls:
-    case kNetTypeTcpTls: {
+    case kNetTypeTcpTls: 
+    case kNetTypeHttps: {
       DoTlsHandshake();
     }
                        break;

@@ -8,6 +8,7 @@
 #include "MFCMVVMDlg.h"
 #include "afxdialogex.h"
 #include <base/string_util.h>
+#include <base/log.h>
 #include <boost/filesystem.hpp>
 #include <string>
 
@@ -219,6 +220,7 @@ void CMFCMVVMDlg::OnEnChangeEditUsername() {
 void CMFCMVVMDlg::OnBnClickedButtonLogin()
 {
 	// TODO: 在此添加控件通知处理程序代码
+	LogInfo << "11";
 	vm_->HandleEvent(Main::kEventLogin, nullptr);
 }
 

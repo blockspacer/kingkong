@@ -57,7 +57,6 @@ void DnsResolverImpl::Cancel() {
 
 void DnsResolverImpl::DoResolver() {
   auto self = shared_from_this();
-  auto& io_service = *(boost::asio::io_context*)pump_->Raw();
   resolver_.async_resolve(request_->host, request_->schem,
     [self](boost::system::error_code ec,
       const boost::asio::ip::tcp::resolver::results_type& endpoints) mutable {

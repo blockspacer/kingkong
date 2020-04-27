@@ -12,7 +12,9 @@ public:
 		kNetTypeTcp = 1,
 		kNetTypeTcpTls,
 		kNetTypeWebsocket,
-		kNetTypeWebsocketTls
+		kNetTypeWebsocketTls,
+		kNetTypeHttp,
+		kNetTypeHttps,
 	};
 
 	struct NetConnectionRequest{
