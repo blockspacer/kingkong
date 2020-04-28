@@ -519,18 +519,61 @@ BOOST_AUTO_TEST_CASE(HttpTest) {
   BASE_UTIL::AtExitManager at;
   BASE_LOOPER::MessageLoop::InitMessageLoop();
   boost::thread_group group;
-  boost::uniform_int<> real2(100, 5000);
-  boost::random::mt19937 gen2;
-  auto io_pump = BASE_LOOPER::MessageLoop::IOMessagePump();
-  for (size_t i = 0; i < 10000; i++) {
-    auto tcp_request =
-      std::make_unique<BASE_NET::HttpClient::HttpClientRequest>();
-    tcp_request->url = "https://www.qq.com";
-    auto tcp =
-      BASE_NET::CreateHttpClient(std::move(tcp_request), g_httpdelete, io_pump);
-    tcp->Request();
-    boost::this_thread::sleep(boost::posix_time::milliseconds(real2(gen2)));
-    //boost::this_thread::sleep(boost::posix_time::seconds(10000));
-    tcp->Cancel();
+  for (int i = 0; i < 5; i++) {
+    group.create_thread([] {
+      boost::uniform_int<> real2(100, 5000);
+      boost::random::mt19937 gen2;
+      auto io_pump = BASE_LOOPER::MessageLoop::IOMessagePump();
+      for (size_t i = 0; i < 10000; i++) {
+        auto tcp_request =
+          std::make_unique<BASE_NET::HttpClient::HttpClientRequest>();
+        tcp_request->url = "https://www.qq.com";
+        auto tcp =
+          BASE_NET::CreateHttpClient(std::move(tcp_request), g_httpdelete, io_pump);
+        tcp->Request();
+        boost::this_thread::sleep(boost::posix_time::milliseconds(real2(gen2)));
+        //boost::this_thread::sleep(boost::posix_time::seconds(10000));
+        tcp->Cancel();
+      }
+      });
   }
+
+    for (int i = 0; i < 5; i++) {
+      group.create_thread([] {
+        boost::uniform_int<> real2(100, 5000);
+        boost::random::mt19937 gen2;
+        auto io_pump = BASE_LOOPER::MessageLoop::IOMessagePump();
+        for (size_t i = 0; i < 10000; i++) {
+          auto tcp_request =
+            std::make_unique<BASE_NET::HttpClient::HttpClientRequest>();
+          tcp_request->url = "http://www.qq.com";
+          auto tcp =
+            BASE_NET::CreateHttpClient(std::move(tcp_request), g_httpdelete, io_pump);
+          tcp->Request();
+          boost::this_thread::sleep(boost::posix_time::milliseconds(real2(gen2)));
+          //boost::this_thread::sleep(boost::posix_time::seconds(10000));
+          tcp->Cancel();
+        }
+        });
+    }
+
+    for (int i = 0; i < 5; i++) {
+      group.create_thread([] {
+        boost::uniform_int<> real2(100, 5000);
+        boost::random::mt19937 gen2;
+        auto io_pump = BASE_LOOPER::MessageLoop::IOMessagePump();
+        for (size_t i = 0; i < 10000; i++) {
+          auto tcp_request =
+            std::make_unique<BASE_NET::HttpClient::HttpClientRequest>();
+          tcp_request->url = "https://www.baidu.com";
+          auto tcp =
+            BASE_NET::CreateHttpClient(std::move(tcp_request), g_httpdelete, io_pump);
+          tcp->Request();
+          boost::this_thread::sleep(boost::posix_time::milliseconds(real2(gen2)));
+          //boost::this_thread::sleep(boost::posix_time::seconds(10000));
+          tcp->Cancel();
+        }
+        });
+    }
+    group.join_all();
 }

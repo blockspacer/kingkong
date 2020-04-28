@@ -78,6 +78,13 @@ void CMFCMVVMDlg::OnPropertyChanged(int32_t property_id, const boost::any& befor
 	END_HANDLE_PROPERTY()
 }
 
+void CMFCMVVMDlg::OnEventFired(int32_t event_id, const boost::any& value) {
+	BEGIN_HANDLE_EVENT(event_id)
+		HANDLE_EVENT(Main::kEventLogin, OnLogin);
+		HANDLE_EVENT(Main::kEventLogout, OnLogout);
+	END_HANDLE_EVENT()
+}
+
 void CMFCMVVMDlg::OnUserNameChange(const boost::any& before_value, const boost::any& after_value) {
 	std::wstring wstr_value = BASE_STRING_UTIL::Utf8ToUnicode(boost::any_cast<std::string>(after_value));
 	username_ = wstr_value.c_str();
@@ -88,6 +95,14 @@ void CMFCMVVMDlg::OnPasswdChange(const boost::any& before_value, const boost::an
 	const Main::UserNameParam* value = boost::any_cast<Main::UserNameParam>(&after_value);
 	value_ = BASE_STRING_UTIL::Utf8ToUnicode(value->school).c_str();
   UpdateData(FALSE);
+}
+
+void CMFCMVVMDlg::OnLogin(const boost::any& value) {
+
+}
+
+void CMFCMVVMDlg::OnLogout(const boost::any& value) {
+
 }
 
 BEGIN_MESSAGE_MAP(CMFCMVVMDlg, CDialogEx)

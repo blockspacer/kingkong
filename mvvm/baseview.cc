@@ -12,6 +12,10 @@ void BaseView::BindVM(int32_t type) {
   vm_->BindPropertyChanged([this](int32_t property_id, const boost::any& before_value, const boost::any& after_value) {
     OnPropertyChanged(property_id, before_value, after_value);
   });
+
+  vm_->BindEvent([this](int32_t event_id, const boost::any& value) {
+    OnEventFired(event_id, value);
+  });
   //通知VM，上层已经绑定完成了，可以开始抛属性了
   vm_->NotifyBind(this);
 }

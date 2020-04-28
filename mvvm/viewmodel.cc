@@ -26,6 +26,10 @@ void ViewModel::BindPropertyChanged(PropertyChangedDelegate delegate) {
   property_changed_delegate_ = std::move(delegate);
 }
 
+void ViewModel::BindEvent(EventFiredDelegate event_fired_delegate) {
+  event_fired_delegate_ = std::move(event_fired_delegate);
+}
+
 void ViewModel::NotifyPropertyChanged(int32_t property_id, boost::any& value) {
   properties_[property_id] = value;
 }
@@ -49,6 +53,9 @@ void ViewModel::NotifyBind(void* context) {
 }
 
 void ViewModel::NotifyUnBind() {
+  property_changed_delegate_ = nullptr;
+  event_fired_delegate_ = nullptr;
+  properties_.clear();
   OnDetach();
   UnSubscrieAllAction();
 }
@@ -80,6 +87,14 @@ void ViewModel::FireProperty(int32_t property_id, const boost::any& value) {
 
 void ViewModel::FireProperty(int32_t property_id, const char* value) {
   FireProperty(property_id, (value != nullptr) ? std::string(value) : std::string(""));
+}
+
+void ViewModel::FireEvent(int32_t event_id, const char* value) {
+  event_fired_delegate_(event_id, std::string(value));
+}
+
+void ViewModel::FireEvent(int32_t event_id, const boost::any& value) {
+  event_fired_delegate_(event_id, value);
 }
 
 END_NAMESPACE_FRAME

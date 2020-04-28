@@ -22,10 +22,12 @@ public:
 
   using ViewModelBuilder = std::function<std::shared_ptr<ViewModel>()>;
   using PropertyChangedDelegate = std::function<void(int32_t property_id, const boost::any& before_value, const boost::any& after_value)>;
+  using EventFiredDelegate = std::function<void(int32_t event_id, const boost::any& value)>;
 
   //VM 有数据改变的时候会回调给UI
   void BindPropertyChanged(PropertyChangedDelegate delegate);
-
+  //绑定事件
+  void BindEvent(EventFiredDelegate event_fired_delegate);
 
   //UI 数据变化通知ViewModel
   void NotifyPropertyChanged(int32_t property_id, boost::any& value);
@@ -57,6 +59,9 @@ protected:
   void FireProperty(int32_t property_id, const char* value);
   void FireProperty(int32_t property_id, const boost::any& value);
 
+  void FireEvent(int32_t event_id, const char* value);
+  void FireEvent(int32_t event_id, const boost::any& value);
+
   void* context() {
     return context_;
   }
@@ -68,6 +73,8 @@ private:
   void UnSubscrieAllAction();
 
   PropertyChangedDelegate property_changed_delegate_;
+  EventFiredDelegate event_fired_delegate_;
+
   std::map<int32_t, boost::any> properties_;
   int32_t viewmode_type_ = -1;
 

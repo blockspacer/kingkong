@@ -24,10 +24,15 @@ public:
 	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV 支持
 
 	void OnPropertyChanged(int32_t property_id, const boost::any& before_value, const boost::any& after_value) override;
-// 实现
+	void OnEventFired(int32_t event_id, const boost::any& value) override;
+	
+	// 实现
 protected:
 	void OnUserNameChange(const boost::any& before_value, const boost::any& after_value);
 	void OnPasswdChange(const boost::any& before_value, const boost::any& after_value);
+
+	void OnLogin(const boost::any& value);
+	void OnLogout(const boost::any& value);
 
 	HICON m_hIcon;
 

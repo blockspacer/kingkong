@@ -14,7 +14,7 @@
 #define HANDLE_PROPERTY(action, func) case action: { return func(before_value, after_value);}
 #define END_HANDLE_PROPERTY() default: break;}
 
-//ViewModel 处理事件
+//UI ViewModel 处理事件
 #define BEGIN_HANDLE_EVENT(event_id) switch (event_id) {
 #define HANDLE_EVENT(event_id, func) case event_id: { return func(value);}
 #define END_HANDLE_EVENT() default: break;}
