@@ -76,10 +76,10 @@ void ViewModel::FireProperty(int32_t property_id, const boost::any& value) {
   if (property_changed_delegate_) {
     auto iter = properties_.find(property_id);
     if (iter != properties_.end()) {
-      property_changed_delegate_(property_id, iter->second, value);
+      property_changed_delegate_(property_id, value);
     }
     else {
-      property_changed_delegate_(property_id, boost::any(), value);
+      property_changed_delegate_(property_id, value);
     }
     properties_[property_id] = value;
   }

@@ -21,7 +21,7 @@ public:
   virtual ~ViewModel();
 
   using ViewModelBuilder = std::function<std::shared_ptr<ViewModel>()>;
-  using PropertyChangedDelegate = std::function<void(int32_t property_id, const boost::any& before_value, const boost::any& after_value)>;
+  using PropertyChangedDelegate = std::function<void(int32_t property_id, const boost::any& value)>;
   using EventFiredDelegate = std::function<void(int32_t event_id, const boost::any& value)>;
 
   //VM 有数据改变的时候会回调给UI

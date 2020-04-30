@@ -17,4 +17,15 @@ FILE (GLOB header_files *.h)
 FILE (GLOB source_files *.c *.cc)
 
 
-ADD_LIBRARY (mvvm ${header_files} ${source_files})
+FILE (GLOB jni jni/*.cc jni/*.h)
+SOURCE_GROUP("jni" FILES ${jni})
+
+
+if(ANDROID)
+    ADD_LIBRARY (mvvm ${header_files} ${source_files} ${jni})
+else(ANDROID)
+    ADD_LIBRARY (mvvm ${header_files} ${source_files})
+endif(ANDROID)
+
+
+
