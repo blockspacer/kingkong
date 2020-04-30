@@ -1,3 +1,4 @@
 add_subdirectory(boringssl boringssl)
 add_subdirectory(boost boost)
 add_subdirectory(sqlite3 sqlite3)
+add_subdirectory(protobuf-3.11.4/cmake protobuf)
