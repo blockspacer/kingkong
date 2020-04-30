@@ -16,5 +16,5 @@ INCLUDE_DIRECTORIES(. .. ../.. ${dirlist} ../third_party/boost/libs/numeric/conv
 FILE (GLOB header_files *.h)
 FILE (GLOB source_files *.c *.cc)
 
-
 ADD_LIBRARY (mvvm ${header_files} ${source_files})
+
