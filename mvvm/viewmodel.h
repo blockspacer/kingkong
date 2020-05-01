@@ -2,10 +2,6 @@
 #define _VIEW_MODEL_H
 #include <mvvm/mvvm_base.h>
 #include <mvvm/model.h>
-#include <string>
-#include <map>
-#include <memory>
-#include <boost/any.hpp>
 #include <boost/thread/once.hpp>
 
 BEGIN_NAMESPACE_FRAME
@@ -21,20 +17,16 @@ public:
   virtual ~ViewModel();
 
   using ViewModelBuilder = std::function<std::shared_ptr<ViewModel>()>;
-  using PropertyChangedDelegate = std::function<void(int32_t property_id, const boost::any& value)>;
-  using EventFiredDelegate = std::function<void(int32_t event_id, const boost::any& value)>;
+  using PropertyChangedDelegate = std::function<void(int32_t property_id, const ::google::protobuf::Message* value)>;
+  using EventFiredDelegate = std::function<void(int32_t event_id, const ::google::protobuf::Message* value)>;
 
   //VM 有数据改变的时候会回调给UI
   void BindPropertyChanged(PropertyChangedDelegate delegate);
   //绑定事件
   void BindEvent(EventFiredDelegate event_fired_delegate);
 
-  //UI 数据变化通知ViewModel
-  void NotifyPropertyChanged(int32_t property_id, boost::any& value);
-  void NotifyPropertyChanged(int32_t property_id, boost::any&& value);
-
   //UI 层有动作的时候
-  void HandleEvent(int32_t event, const boost::any& value);
+  void HandleEvent(int32_t event, const ::google::protobuf::Message* value);
 
 
   int32_t viewmode_type();
@@ -53,14 +45,10 @@ protected:
   virtual void OnDetach() = 0;
 
   //子类实现，如果有action 需要处理
-  virtual void OnEventFired(int32_t event, const boost::any& value) {}
+  virtual void OnEventFired(int32_t event, const ::google::protobuf::Message* value) {}
   
   //提供给子类的帮助函数
-  void FireProperty(int32_t property_id, const char* value);
-  void FireProperty(int32_t property_id, const boost::any& value);
-
-  void FireEvent(int32_t event_id, const char* value);
-  void FireEvent(int32_t event_id, const boost::any& value);
+  void FireProperty(int32_t property_id, const ::google::protobuf::Message* value);
 
   void* context() {
     return context_;
@@ -75,7 +63,6 @@ private:
   PropertyChangedDelegate property_changed_delegate_;
   EventFiredDelegate event_fired_delegate_;
 
-  std::map<int32_t, boost::any> properties_;
   int32_t viewmode_type_ = -1;
 
   static std::map< int32_t, ViewModelBuilder> vm_builder_;

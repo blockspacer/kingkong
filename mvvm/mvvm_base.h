@@ -1,6 +1,9 @@
 ﻿#ifndef _MVVM_BASE_H
 #define _MVVM_BASE_H
 #include <string>
+#include <map>
+#include <memory>
+#include <google/protobuf/message.h>
 
 #define BEGIN_NAMESPACE(ns) namespace ns {
 #define END_NAMESPACE() }
@@ -11,7 +14,7 @@
 
 //UI 用于处理 viewmode 抛上来的属性
 #define BEGIN_HANDLE_PROPERTY(property_id) switch (property_id) {
-#define HANDLE_PROPERTY(action, func) case action: { return func(before_value, after_value);}
+#define HANDLE_PROPERTY(action, func) case action: { return func(new_value);}
 #define END_HANDLE_PROPERTY() default: break;}
 
 //UI ViewModel 处理事件

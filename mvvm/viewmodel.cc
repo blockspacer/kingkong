@@ -30,15 +30,7 @@ void ViewModel::BindEvent(EventFiredDelegate event_fired_delegate) {
   event_fired_delegate_ = std::move(event_fired_delegate);
 }
 
-void ViewModel::NotifyPropertyChanged(int32_t property_id, boost::any& value) {
-  properties_[property_id] = value;
-}
-
-void ViewModel::NotifyPropertyChanged(int32_t property_id, boost::any&& value) {
-  properties_[property_id] = std::move(value);
-}
-
-void ViewModel::HandleEvent(int32_t event, const boost::any& value) {
+void ViewModel::HandleEvent(int32_t event, const ::google::protobuf::Message* value) {
   OnEventFired(event, value);
 }
 
@@ -55,7 +47,6 @@ void ViewModel::NotifyBind(void* context) {
 void ViewModel::NotifyUnBind() {
   property_changed_delegate_ = nullptr;
   event_fired_delegate_ = nullptr;
-  properties_.clear();
   OnDetach();
   UnSubscrieAllAction();
 }
@@ -72,29 +63,10 @@ std::shared_ptr<ViewModel> ViewModel::Create(int32_t type) {
   return iter->second();
 }
 
-void ViewModel::FireProperty(int32_t property_id, const boost::any& value) {
+void ViewModel::FireProperty(int32_t property_id, const ::google::protobuf::Message* value) {
   if (property_changed_delegate_) {
-    auto iter = properties_.find(property_id);
-    if (iter != properties_.end()) {
       property_changed_delegate_(property_id, value);
-    }
-    else {
-      property_changed_delegate_(property_id, value);
-    }
-    properties_[property_id] = value;
   }
-}
-
-void ViewModel::FireProperty(int32_t property_id, const char* value) {
-  FireProperty(property_id, (value != nullptr) ? std::string(value) : std::string(""));
-}
-
-void ViewModel::FireEvent(int32_t event_id, const char* value) {
-  event_fired_delegate_(event_id, std::string(value));
-}
-
-void ViewModel::FireEvent(int32_t event_id, const boost::any& value) {
-  event_fired_delegate_(event_id, value);
 }
 
 END_NAMESPACE_FRAME

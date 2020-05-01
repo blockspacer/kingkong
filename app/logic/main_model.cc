@@ -3,19 +3,21 @@
 
  MainModel::MainModel() {}
 
- void MainModel::HandleAction(int32_t action, const boost::any& value)  {
+ void MainModel::HandleAction(int32_t action, const ::google::protobuf::Message* value)  {
     BEGIN_HANDLE_ACTION(action)
       HANDLE_ACTION(Main::Action::kActionLogin, HandleLogin)
       HANDLE_ACTION(Main::Action::kActionLogout, HandleLogout)
     END_HANDLE_ACTION()
  }
 
- void MainModel::HandleLogin(const boost::any& value) {
-   FireActionResult(Main::Action::kActionLogin, std::string("result"));
+ void MainModel::HandleLogin(const ::google::protobuf::Message* value) {
+   XMVVM::XMVVM_ParamString param;
+   param.set_value("login sucess");
+   FireActionResult(Main::Action::kActionLogin, &param);
  }
 
- void MainModel::HandleLogout(const boost::any& value) {
-   Main::UserNameParam param;
-   param.school = "school";
-   FireActionResult(Main::Action::kActionLogout, param);
+ void MainModel::HandleLogout(const ::google::protobuf::Message* value) {
+   XMVVM::XMVVM_ParamInt32 param;
+   param.set_value(1);
+   FireActionResult(Main::Action::kActionLogout, &param);
  }

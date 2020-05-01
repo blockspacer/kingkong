@@ -31,11 +31,11 @@ void Model::UnSubscribeActionResult(int64_t id) {
   }
 }
 
-void Model::Call(int32_t action, const boost::any& value) {
+void Model::Call(int32_t action, const ::google::protobuf::Message* value) {
 	HandleAction(action, value);
 }
 
-void Model::FireActionResult(int action, const boost::any& value) {
+void Model::FireActionResult(int action, const ::google::protobuf::Message* value) {
 	auto delegate_iter = event_delegate_.find(action);
 	if (delegate_iter == event_delegate_.end()) {
 		return;

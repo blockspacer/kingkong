@@ -71,37 +71,41 @@ void CMFCMVVMDlg::DoDataExchange(CDataExchange* pDX)
   DDX_Text(pDX, IDC_EDIT_PASSWD, value_);
 }
 
-void CMFCMVVMDlg::OnPropertyChanged(int32_t property_id, const boost::any& before_value, const boost::any& after_value) {
+void CMFCMVVMDlg::OnPropertyChanged(int32_t property_id, const ::google::protobuf::Message* new_value) {
 	BEGIN_HANDLE_PROPERTY(property_id)
 		HANDLE_PROPERTY(Main::kPropertyUserName, OnUserNameChange);
 		HANDLE_PROPERTY(Main::kPropertyPasswd, OnPasswdChange);
 	END_HANDLE_PROPERTY()
 }
 
-void CMFCMVVMDlg::OnEventFired(int32_t event_id, const boost::any& value) {
+void CMFCMVVMDlg::OnEventFired(int32_t event_id, const ::google::protobuf::Message* value) {
 	BEGIN_HANDLE_EVENT(event_id)
 		HANDLE_EVENT(Main::kEventLogin, OnLogin);
 		HANDLE_EVENT(Main::kEventLogout, OnLogout);
 	END_HANDLE_EVENT()
 }
 
-void CMFCMVVMDlg::OnUserNameChange(const boost::any& before_value, const boost::any& after_value) {
-	std::wstring wstr_value = BASE_STRING_UTIL::Utf8ToUnicode(boost::any_cast<std::string>(after_value));
-	username_ = wstr_value.c_str();
+void CMFCMVVMDlg::OnUserNameChange(const ::google::protobuf::Message* new_value) {
+	XMVVM::XMVVM_ParamString* str_value = (XMVVM::XMVVM_ParamString*)new_value;
+	username_ = BASE_STRING_UTIL::Utf8ToUnicode(str_value->value()).c_str();
 	UpdateData(FALSE);
 }
 
-void CMFCMVVMDlg::OnPasswdChange(const boost::any& before_value, const boost::any& after_value) {
-	const Main::UserNameParam* value = boost::any_cast<Main::UserNameParam>(&after_value);
-	value_ = BASE_STRING_UTIL::Utf8ToUnicode(value->school).c_str();
+void CMFCMVVMDlg::OnPasswdChange(const ::google::protobuf::Message* new_value) {
+  XMVVM::XMVVM_ParamInt32* str_value = (XMVVM::XMVVM_ParamInt32*)new_value;
+	if (str_value->value() == 0) {
+		value_ = L"登录成功";
+	}	else {
+		value_ = L"登录失败";
+	}
   UpdateData(FALSE);
 }
 
-void CMFCMVVMDlg::OnLogin(const boost::any& value) {
+void CMFCMVVMDlg::OnLogin(const ::google::protobuf::Message* value) {
 
 }
 
-void CMFCMVVMDlg::OnLogout(const boost::any& value) {
+void CMFCMVVMDlg::OnLogout(const ::google::protobuf::Message* value) {
 
 }
 
@@ -210,10 +214,6 @@ void CMFCMVVMDlg::OnEnChangeEditPasswd()
 	// 同时将 ENM_CHANGE 标志“或”运算到掩码中。
 
 	// TODO:  在此添加控件通知处理程序代码
-	UpdateData(TRUE);
-	std::string utf8_value = BASE_STRING_UTIL::UnicodeToUtf8(value_.GetString());
-	boost::any abc(utf8_value);
-	vm_->NotifyPropertyChanged(Main::kPropertyPasswd, abc);
 }
 
 
@@ -225,10 +225,6 @@ void CMFCMVVMDlg::OnEnChangeEditUsername() {
 
   // TODO:  在此添加控件通知处理程序代码
   UpdateData(TRUE);
-  std::string utf8_value = BASE_STRING_UTIL::UnicodeToUtf8(username_.GetString());
-	Main::UserNameParam param;
-	param.school = "abc";
-	vm_->NotifyPropertyChanged(Main::kPropertyUserName, param);
 }
 
 

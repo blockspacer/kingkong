@@ -13,15 +13,15 @@ public:
     return std::make_shared<MainViewModel>();
   }
   //处理 UI 的事件
-  void OnEventFired(int event, const boost::any& value) override;
+  void OnEventFired(int event, const ::google::protobuf::Message* value) override;
 
 private:
-  void HandleLogin(const boost::any& value);
-  void HandleLogout(const boost::any& value);
+  void HandleLogin(const ::google::protobuf::Message* value);
+  void HandleLogout(const ::google::protobuf::Message* value);
 
   //处理model 的动作回调
-  void OnLoginComplete(const boost::any& value);
-  void OnLogoutComplete(const boost::any& value);
+  void OnLoginComplete(const ::google::protobuf::Message* value);
+  void OnLogoutComplete(const ::google::protobuf::Message* value);
 
 };
 

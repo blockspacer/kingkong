@@ -14,13 +14,15 @@ endforeach()
 
 
 link_directories(${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
-INCLUDE_DIRECTORIES(. .. ../../ ${dirlist} ../../third_party/boost/libs/numeric/conversion/include ../../third_party/boringssl/include)
+INCLUDE_DIRECTORIES(. .. ../../ ${dirlist} ../../third_party/boost/libs/numeric/conversion/include ../../third_party/boringssl/include ../../third_party/protobuf-3.11.4/src)
 
 FILE (GLOB header_files *.h)
 FILE (GLOB source_files *.c *.cc *.cpp)
 
+FILE (GLOB pb pb/*.cc pb/*.h)
+SOURCE_GROUP("pb" FILES ${pb})
 
-add_library (logic ${header_files} ${source_files})
+add_library (logic ${header_files} ${source_files} ${pb})
 if(ANDROID)
     target_link_libraries(logic boost base mvvm)
 endif(ANDROID)

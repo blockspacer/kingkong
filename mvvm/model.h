@@ -15,7 +15,7 @@ public:
   virtual  ~Model() = default;
 
   using ModelBuilder = std::function<Model* ()>;
-  using SuscribeEventDelegate = std::function<void(const boost::any& value)>;
+  using SuscribeEventDelegate = std::function<void(const ::google::protobuf::Message* value)>;
 
   struct SuscribeEventDelegateInfo {
     SuscribeEventDelegate delegate;
@@ -47,13 +47,13 @@ public:
   void UnSubscribeActionResult(int64_t id);
 
   //viewmode 调用model 接口
-  void Call(int32_t action, const boost::any& value);
+  void Call(int32_t action, const ::google::protobuf::Message* value);
 
 protected:
   //model可以触发事件
-  void FireActionResult(int32_t action, const boost::any& value);
+  void FireActionResult(int32_t action, const ::google::protobuf::Message* value);
   //子类实现
-  virtual void HandleAction(int32_t action, const boost::any& value) {}
+  virtual void HandleAction(int32_t action, const ::google::protobuf::Message* value) {}
 
 private:
   std::map<int32_t, std::vector<SuscribeEventDelegateInfo>> event_delegate_;

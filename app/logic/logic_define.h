@@ -2,6 +2,7 @@
 #define _APP_LOGIC_H_
 #include <mvvm/viewmodel.h>
 #include <mvvm/model.h>
+#include <logic/pb/base.pb.h>
 
 enum ModelType {
   kModelTypeBegin = 0,
@@ -28,10 +29,6 @@ namespace Main {
   enum Action {
     kActionLogin,
     kActionLogout
-  };
-
-  struct UserNameParam {
-    std::string school;
   };
 };
 

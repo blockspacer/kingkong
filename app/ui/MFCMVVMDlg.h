@@ -23,16 +23,16 @@ public:
 	protected:
 	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV 支持
 
-	void OnPropertyChanged(int32_t property_id, const boost::any& before_value, const boost::any& after_value) override;
-	void OnEventFired(int32_t event_id, const boost::any& value) override;
+	void OnPropertyChanged(int32_t property_id, const ::google::protobuf::Message* new_value) override;
+	void OnEventFired(int32_t event_id, const ::google::protobuf::Message* value) override;
 	
 	// 实现
 protected:
-	void OnUserNameChange(const boost::any& before_value, const boost::any& after_value);
-	void OnPasswdChange(const boost::any& before_value, const boost::any& after_value);
+	void OnUserNameChange(const ::google::protobuf::Message* new_value);
+	void OnPasswdChange(const ::google::protobuf::Message* new_value);
 
-	void OnLogin(const boost::any& value);
-	void OnLogout(const boost::any& value);
+	void OnLogin(const ::google::protobuf::Message* value);
+	void OnLogout(const ::google::protobuf::Message* value);
 
 	HICON m_hIcon;
 
