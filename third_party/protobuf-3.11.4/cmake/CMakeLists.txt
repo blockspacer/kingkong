@@ -165,7 +165,7 @@ else (protobuf_BUILD_SHARED_LIBS)
         CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE
         CMAKE_CXX_FLAGS_MINSIZEREL CMAKE_CXX_FLAGS_RELWITHDEBINFO)
       if(${flag_var} MATCHES "/MD")
-        string(REGEX REPLACE "/MD" "/MT" ${flag_var} "${${flag_var}}")
+      #  string(REGEX REPLACE "/MD" "/MT" ${flag_var} "${${flag_var}}")
       endif(${flag_var} MATCHES "/MD")
     endforeach(flag_var)
   endif (MSVC AND protobuf_MSVC_STATIC_RUNTIME)
@@ -221,18 +221,18 @@ include_directories(
 
 if (MSVC)
   # Add the "lib" prefix for generated .lib outputs.
-  set(LIB_PREFIX lib)
+  #set(LIB_PREFIX lib)
 else (MSVC)
   # When building with "make", "lib" prefix will be added automatically by
   # the build tool.
-  set(LIB_PREFIX)
+ # set(LIB_PREFIX)
 endif (MSVC)
 
 if (protobuf_UNICODE)
   add_definitions(-DUNICODE -D_UNICODE)
 endif (protobuf_UNICODE)
 
-#include(libprotobuf-lite.cmake)
+include(libprotobuf-lite.cmake)
 include(libprotobuf.cmake)
 if (protobuf_BUILD_PROTOC_BINARIES)
  # include(libprotoc.cmake)
