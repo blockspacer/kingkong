@@ -17,8 +17,6 @@ macro(set_target_folder_if_exist target folder)
 	endif()
 endmacro()
 
-set_target_folder_if_exist(pem boringssl)
-
 
 add_subdirectory(base)
 add_subdirectory(mvvm)

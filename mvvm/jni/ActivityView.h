@@ -5,11 +5,11 @@
 class ActivityView : public  MVVM_FRAME::BaseView {
 public:
     //view model 有了改变，通知到UI
-  void OnPropertyChanged(int32_t property_id, const boost::any& value) override;
-  void OnEventFired(int32_t event_id, const boost::any& value) override ;
+  void OnPropertyChanged(int32_t property_id, const ::google::protobuf::Message* value) override;
+  void OnEventFired(int32_t event_id, const ::google::protobuf::Message* value) override ;
 
   //提供给UI 用的
-  void HandleEvent(int32_t event, const boost::any& value);
+  void HandleEvent(int32_t event, const ::google::protobuf::Message* value);
 };
 
 
