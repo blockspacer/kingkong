@@ -221,11 +221,11 @@ include_directories(
 
 if (MSVC)
   # Add the "lib" prefix for generated .lib outputs.
-  #set(LIB_PREFIX lib)
+  set(LIB_PREFIX)
 else (MSVC)
   # When building with "make", "lib" prefix will be added automatically by
   # the build tool.
- # set(LIB_PREFIX)
+  set(LIB_PREFIX)
 endif (MSVC)
 
 if (protobuf_UNICODE)
