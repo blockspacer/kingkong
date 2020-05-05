@@ -1,5 +1,6 @@
 ﻿#include "net/net_connection.h"
 #include "log.h"
+#include <base/crypto_util.h>
 #include "net/dns_resolver.h"
 #include <boost/random.hpp>
 #include <boost/thread.hpp>
@@ -516,6 +517,18 @@ public:
 HttpDelegate* g_httpdelete = new HttpDelegate;
 
 BOOST_AUTO_TEST_CASE(HttpTest) {
+
+  for (int i = 0; i < 10; i++) {
+    std::stringstream ss;
+    for (int j = 0; j < i; j++) {
+      ss << "a";
+    }
+    std::string src = ss.str();
+    std::string result = BASE_CRYPTO::Base64Encode(src);
+    std::string decode = BASE_CRYPTO::Base64Decode(result);
+    BOOST_TEST(src == decode);
+  }
+
   BASE_UTIL::AtExitManager at;
   BASE_LOOPER::MessageLoop::InitMessageLoop();
   boost::thread_group group;
