@@ -50,7 +50,7 @@ public:
 			:length(0)
 		{}
 		
-		void SetData(unsigned  char* data,int iLen)
+		void SetData(const void* data,int iLen)
 		{
       ptr = boost::shared_array<unsigned  char>(new unsigned  char[iLen]);
       length = iLen;
