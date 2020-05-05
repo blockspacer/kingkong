@@ -17,5 +17,9 @@ std::wstring GBKToUnicode(const std::string& value);
 std::string Utf8ToGBK(const std::string& value);
 std::string GBKToUTF8e(const std::string& value);
 
+//字符串分割
+std::vector<std::string> Split(const std::string& src, const std::string& token, bool allow_empty = false);
+
+
 END_NAMESPACE_STRING
 #endif

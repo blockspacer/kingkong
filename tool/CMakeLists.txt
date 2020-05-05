@@ -1,0 +1,11 @@
+if (BUILD_TOOL)
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+macro(set_target_folder_if_exist target folder)
+	if (TARGET ${target})
+		set_target_properties(${target} PROPERTIES FOLDER ${folder})
+	endif()
+endmacro()
+
+    add_subdirectory(cpp2java)
+    set_target_folder_if_exist(cpp_java tool/)
+endif()
