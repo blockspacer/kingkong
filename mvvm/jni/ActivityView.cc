@@ -16,7 +16,7 @@ static void NotifyEventFired(int64_t instance, int event_id, const std::string& 
   JNU_FreeJbyteArray(env, j_value);
 }
 
-DEFINE_FIND_STATIC_METHOD(KC2Java_NotifyPropertyChanged, KC2Java, "NotifyPropertyChanged", "(JILjava/lang/String;)V")
+DEFINE_FIND_STATIC_METHOD(KC2Java_NotifyPropertyChanged, KC2Java, "NotifyPropertyChanged", "(JI[B)V")
 static void NotifyPropertyChanged(int64_t instance, int event_id, const std::string& new_buffer) {
     LogDebug << "instance:"<<instance<<"  event_id:"<<event_id << "  buffer:" << new_buffer.length();
     VarCache* cache_instance = VarCache::Singleton();

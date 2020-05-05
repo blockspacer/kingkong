@@ -12,7 +12,8 @@ public:
   virtual ~BaseView();
 
 public:
-  void BindVM(int32_t type);
+  void  CreateVM(int32_t type);
+  void BindVM();
   void UnBindVM();
 
 public:

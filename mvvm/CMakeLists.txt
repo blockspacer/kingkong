@@ -23,6 +23,7 @@ SOURCE_GROUP("jni" FILES ${jni})
 
 if(ANDROID)
     ADD_LIBRARY (mvvm ${header_files} ${source_files} ${jni})
+    target_link_libraries(mvvm libprotobuf libprotobuf-lite)
 else(ANDROID)
     ADD_LIBRARY (mvvm ${header_files} ${source_files})
 endif(ANDROID)

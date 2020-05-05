@@ -1,5 +1,6 @@
 ﻿#include "viewmodel.h"
 #include <boost/assert.hpp>
+#include <logic/pb/base.pb.h>
 
 BEGIN_NAMESPACE_FRAME
 std::map< int32_t, ViewModel::ViewModelBuilder> ViewModel::vm_builder_;
@@ -61,6 +62,38 @@ std::shared_ptr<ViewModel> ViewModel::Create(int32_t type) {
     return nullptr;
   }
   return iter->second();
+}
+
+void ViewModel::FireProperty(int32_t property_id, int32_t value) {
+  if (property_changed_delegate_) {
+    mvvm::mvvm_ParamInt32 pb_value;
+    pb_value.set_value(value);
+    property_changed_delegate_(property_id, &pb_value);
+  }
+}
+
+void ViewModel::FireProperty(int32_t property_id, int64_t value) {
+  if (property_changed_delegate_) {
+    mvvm::mvvm_ParamInt64 pb_value;
+    pb_value.set_value(value);
+    property_changed_delegate_(property_id, &pb_value);
+  }
+}
+
+void ViewModel::FireProperty(int32_t property_id, bool value) {
+  if (property_changed_delegate_) {
+    mvvm::mvvm_ParamBool pb_value;
+    pb_value.set_value(value);
+    property_changed_delegate_(property_id, &pb_value);
+  }
+}
+
+void ViewModel::FireProperty(int32_t property_id, const std::string& value) {
+  if (property_changed_delegate_) {
+    mvvm::mvvm_ParamString pb_value;
+    pb_value.set_value(value);
+    property_changed_delegate_(property_id, &pb_value);
+  }
 }
 
 void ViewModel::FireProperty(int32_t property_id, const ::google::protobuf::Message* value) {
