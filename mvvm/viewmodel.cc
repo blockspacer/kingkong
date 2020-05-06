@@ -1,6 +1,6 @@
 ﻿#include "viewmodel.h"
 #include <boost/assert.hpp>
-#include <logic/pb/base.pb.h>
+#include <pb/MvvmBasicParam.pb.h>
 
 BEGIN_NAMESPACE_FRAME
 std::map< int32_t, ViewModel::ViewModelBuilder> ViewModel::vm_builder_;

@@ -20,12 +20,14 @@ FILE (GLOB source_files *.c *.cc)
 FILE (GLOB jni jni/*.cc jni/*.h)
 SOURCE_GROUP("jni" FILES ${jni})
 
+FILE (GLOB pb pb/*.cc pb/*.h)
+SOURCE_GROUP("pb" FILES ${pb})
 
 if(ANDROID)
-    ADD_LIBRARY (mvvm ${header_files} ${source_files} ${jni})
+    ADD_LIBRARY (mvvm ${header_files} ${source_files} ${jni} ${pb})
     target_link_libraries(mvvm libprotobuf libprotobuf-lite)
 else(ANDROID)
-    ADD_LIBRARY (mvvm ${header_files} ${source_files})
+    ADD_LIBRARY (mvvm ${header_files} ${source_files} ${pb})
 endif(ANDROID)
 
 
