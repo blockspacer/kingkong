@@ -8,17 +8,17 @@ std::map< int32_t, ViewModel::ViewModelBuilder> ViewModel::vm_builder_;
 ViewModel::ViewModel(int32_t viewmode_type): viewmode_type_(viewmode_type) {}
 
 ViewModel::~ViewModel() {
-  UnSubscrieAllAction();
+  UnSubscrieAllEvent();
 }
 
-void ViewModel::UnSubscrieAllAction() {
+void ViewModel::UnSubscrieAllEvent() {
   for (auto& item : subscribe_ids_) {
     auto model = Model::ModelOf(item.second);
     if (nullptr == model) {
       continue;
       ;
     }
-    model->UnSubscribeActionResult(item.first);
+    model->UnSubscribeEvent(item.first);
   }
   subscribe_ids_.clear();
 }
@@ -49,7 +49,7 @@ void ViewModel::NotifyUnBind() {
   property_changed_delegate_ = nullptr;
   event_fired_delegate_ = nullptr;
   OnDetach();
-  UnSubscrieAllAction();
+  UnSubscrieAllEvent();
 }
 
 void ViewModel::RegisterViewModel(int32_t type, ViewModelBuilder builder) {
@@ -102,6 +102,44 @@ void ViewModel::FireProperty(int32_t property_id, const ::google::protobuf::Mess
   }
 }
 
+
+void ViewModel::FireEvent(int32_t event_id, int32_t value) {
+  if (event_fired_delegate_) {
+    mvvm::mvvm_ParamInt32 pb_value;
+    pb_value.set_value(value);
+    event_fired_delegate_(event_id, &pb_value);
+  }
+}
+
+void ViewModel::FireEvent(int32_t event_id, int64_t value) {
+  if (event_fired_delegate_) {
+    mvvm::mvvm_ParamInt64 pb_value;
+    pb_value.set_value(value);
+    event_fired_delegate_(event_id, &pb_value);
+  }
+}
+
+void ViewModel::FireEvent(int32_t event_id, bool value) {
+  if (event_fired_delegate_) {
+    mvvm::mvvm_ParamBool pb_value;
+    pb_value.set_value(value);
+    event_fired_delegate_(event_id, &pb_value);
+  }
+}
+
+void ViewModel::FireEvent(int32_t event_id, const std::string& value) {
+  if (event_fired_delegate_) {
+    mvvm::mvvm_ParamString pb_value;
+    pb_value.set_value(value);
+    event_fired_delegate_(event_id, &pb_value);
+  }
+}
+
+void ViewModel::FireEvent(int32_t event_id, const ::google::protobuf::Message* value) {
+  if (event_fired_delegate_) {
+    event_fired_delegate_(event_id, value);
+  }
+}
 END_NAMESPACE_FRAME
 
 

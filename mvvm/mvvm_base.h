@@ -23,17 +23,11 @@
 #define END_HANDLE_EVENT() default: break;}
 
 //ViewModel 订阅Model 事件
-#define BEGIN_SUBSCRIE_ACTION(model_type) if (auto model = MVVM_FRAME::Model::ModelOf(model_type)) { \
+#define BEGIN_SUBSCRIE_EVENT(model_type) if (auto model = MVVM_FRAME::Model::ModelOf(model_type)) { \
 auto tmp_model_type = model_type;
-#define SUBSCRIE_ACTION(action_id, func)  {\
-int64_t id = model->SubscribeActionResult(action_id, std::bind(func, this, std::placeholders::_1));\
+#define SUBSCRIE_EVENT(event_id, func)  {\
+int64_t id = model->SubscribeEvent(event_id, std::bind(func, this, std::placeholders::_1));\
 subscribe_ids_[id] = tmp_model_type; }
-#define END_SUBSCRIE_ACTION() }
-
-
-//Model处理action
-#define BEGIN_HANDLE_ACTION(action_id) switch (action_id) {
-#define HANDLE_ACTION(action_id, func) case action_id: { return func(value);}
-#define END_HANDLE_ACTION() default: break;}
+#define END_SUBSCRIE_EVENT() }
 
 #endif

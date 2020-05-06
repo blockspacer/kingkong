@@ -55,6 +55,14 @@ protected:
   //复杂类型
   void FireProperty(int32_t property_id, const ::google::protobuf::Message* value);
 
+
+  void FireEvent(int32_t event_id, int32_t value);
+  void FireEvent(int32_t event_id, int64_t value);
+  void FireEvent(int32_t event_id, bool value);
+  void FireEvent(int32_t event_id, const std::string& value);
+  //复杂类型
+  void FireEvent(int32_t event_id, const ::google::protobuf::Message* value);
+
   void* context() {
     return context_;
   }
@@ -63,7 +71,7 @@ protected:
   std::map<int64_t, int32_t> subscribe_ids_;
 
 private:
-  void UnSubscrieAllAction();
+  void UnSubscrieAllEvent();
 
   PropertyChangedDelegate property_changed_delegate_;
   EventFiredDelegate event_fired_delegate_;

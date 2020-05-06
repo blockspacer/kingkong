@@ -7,7 +7,7 @@ std::map<int32_t, Model::ModelBuilder> Model::model_builder_;
 std::map<int32_t, Model*> Model::models_;
 
 
-int64_t Model::SubscribeActionResult(int32_t event, SuscribeEventDelegate delegate) {
+int64_t Model::SubscribeEvent(int32_t event, SuscribeEventDelegate delegate) {
 	auto delegate_iter = event_delegate_.find(event);
 	if (delegate_iter == event_delegate_.end()) {
 		delegate_iter = event_delegate_.insert(std::make_pair(event, std::vector<SuscribeEventDelegateInfo>())).first;
@@ -19,7 +19,7 @@ int64_t Model::SubscribeActionResult(int32_t event, SuscribeEventDelegate delega
 	return s_suscribe_id_;
 }
 //需要遍历整个事件列表
-void Model::UnSubscribeActionResult(int64_t id) {
+void Model::UnSubscribeEvent(int64_t id) {
   for (auto begin = event_delegate_.begin(); begin != event_delegate_.end(); begin++) {
 		auto& delegates = begin->second;
 		for (auto delegate = delegates.begin(); delegate != delegates.end(); delegate++) {
@@ -31,8 +31,8 @@ void Model::UnSubscribeActionResult(int64_t id) {
   }
 }
 
-void Model::Call(int32_t action, const ::google::protobuf::Message* value) {
-	HandleAction(action, value);
+void Model::Call(int32_t event, const ::google::protobuf::Message* value) {
+	HandleEvent(event, value);
 }
 
 void Model::FireActionResult(int action, const ::google::protobuf::Message* value) {

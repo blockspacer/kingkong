@@ -43,8 +43,8 @@ public:
    static Model* ModelOf(int32_t model_type);
 
    //Viewmodel 可以订阅和反订阅事件
-  int64_t SubscribeActionResult(int32_t event, SuscribeEventDelegate delegate);
-  void UnSubscribeActionResult(int64_t id);
+  int64_t SubscribeEvent(int32_t event, SuscribeEventDelegate delegate);
+  void UnSubscribeEvent(int64_t id);
 
   //viewmode 调用model 接口
   void Call(int32_t action, const ::google::protobuf::Message* value);
@@ -53,7 +53,7 @@ protected:
   //model可以触发事件
   void FireActionResult(int32_t action, const ::google::protobuf::Message* value);
   //子类实现
-  virtual void HandleAction(int32_t action, const ::google::protobuf::Message* value) {}
+  virtual void HandleEvent(int32_t event, const ::google::protobuf::Message* value) {}
 
 private:
   std::map<int32_t, std::vector<SuscribeEventDelegateInfo>> event_delegate_;
