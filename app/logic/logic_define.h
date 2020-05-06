@@ -2,36 +2,35 @@
 #define _APP_LOGIC_H_
 #include <mvvm/viewmodel.h>
 #include <mvvm/model.h>
-#include <logic/pb/base.pb.h>
+#include <mvvm/pb/MvvmBasicParam.pb.h>
 
-enum ModelType {
-  kModelTypeBegin = 0,
-  kModelMain = kModelTypeBegin
-};
+namespace VMDefine {
+  enum ModelType {
+    kModelMain = __LINE__,
+    kModelProxy,
+    kModelSocks5Server,
+    kModelSelectApp
+  };
 
 
-enum ViewModelType {
-  kViewModelBegin = 0,
-  kViewModelMain = kViewModelBegin
+  enum ViewModelType {
+    kViewModelMain = __LINE__,
+    kViewModelProxy,
+    kViewModelSocks5Server,
+    kViewModelSelectApp
+  };
 };
 
 namespace Main {
-  enum Properties {
-    kPropertyUserName,
-    kPropertyPasswd
-  };
-
   enum Event {
-    kEventLogin,
+    kEventLogin = __LINE__,
     kEventLogout
   };
 
-  enum Action {
-    kActionLogin,
-    kActionLogout
+  enum Properties {
+    kPropertyUserName = __LINE__,
+    kPropertyPasswd
   };
 };
-
-
 #endif
 

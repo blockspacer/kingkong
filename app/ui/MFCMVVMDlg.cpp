@@ -86,13 +86,13 @@ void CMFCMVVMDlg::OnEventFired(int32_t event_id, const ::google::protobuf::Messa
 }
 
 void CMFCMVVMDlg::OnUserNameChange(const ::google::protobuf::Message* new_value) {
-	XMVVM::XMVVM_ParamString* str_value = (XMVVM::XMVVM_ParamString*)new_value;
+	mvvm::mvvm_ParamString* str_value = (mvvm::mvvm_ParamString*)new_value;
 	username_ = BASE_STRING_UTIL::Utf8ToUnicode(str_value->value()).c_str();
 	UpdateData(FALSE);
 }
 
 void CMFCMVVMDlg::OnPasswdChange(const ::google::protobuf::Message* new_value) {
-  XMVVM::XMVVM_ParamInt32* str_value = (XMVVM::XMVVM_ParamInt32*)new_value;
+  mvvm::mvvm_ParamInt32* str_value = (mvvm::mvvm_ParamInt32*)new_value;
 	if (str_value->value() == 0) {
 		value_ = L"登录成功";
 	}	else {
@@ -152,7 +152,8 @@ BOOL CMFCMVVMDlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// 设置小图标
 
 	// TODO: 在此添加额外的初始化代码
-	BindVM(kViewModelMain);
+	CreateVM(VMDefine::kViewModelMain);
+	BindVM();
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
 

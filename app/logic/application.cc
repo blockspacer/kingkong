@@ -10,8 +10,8 @@ void Application::Init(const std::string& data_dir) {
   BASE_LOG::InitLog(BASE_LOG::kLogLevelDebug, boost::filesystem::system_complete(log_dir).string());
   BASE_LOOPER::MessageLoop::InitMessageLoop();
 
-  MVVM_FRAME::ViewModel::RegisterViewModel(kViewModelMain, MainViewModel::CreateViewModel);
-  MVVM_FRAME::Model::RegisterModel(kModelMain, MainModel::CreateModel);
+  MVVM_FRAME::ViewModel::RegisterViewModel(VMDefine::kViewModelMain, MainViewModel::CreateViewModel);
+  MVVM_FRAME::Model::RegisterModel(VMDefine::kModelMain, MainModel::CreateModel);
 }
 
 void Application::UnInit() {

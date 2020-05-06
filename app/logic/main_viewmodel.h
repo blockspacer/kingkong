@@ -21,7 +21,6 @@ private:
 
   //处理model 的动作回调
   void OnLoginComplete(const ::google::protobuf::Message* value);
-  void OnLogoutComplete(const ::google::protobuf::Message* value);
 
 };
 
