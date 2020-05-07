@@ -13,11 +13,11 @@
  void MainModel::HandleLogin(const ::google::protobuf::Message* value) {
     mvvm::mvvm_ParamString param;
    param.set_value("login sucess");
-   FireActionResult(Main::Event::kEventLogin, &param);
+   FireEvent(Main::Event::kEventLogin, &param);
  }
 
  void MainModel::HandleLogout(const ::google::protobuf::Message* value) {
     mvvm::mvvm_ParamInt32 param;
    param.set_value(1);
-   FireActionResult(Main::Event::kEventLogout, &param);
+   FireEvent(Main::Event::kEventLogout, &param);
  }

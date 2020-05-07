@@ -48,12 +48,12 @@ protected:
   virtual void OnEventFired(int32_t event, const ::google::protobuf::Message* value) {}
   
   //提供给子类的帮助函数
-  void FireProperty(int32_t property_id, int32_t value);
-  void FireProperty(int32_t property_id, int64_t value);
-  void FireProperty(int32_t property_id, bool value);
-  void FireProperty(int32_t property_id, const std::string& value);
+  void SetProperty(int32_t property_id, int32_t value);
+  void SetProperty(int32_t property_id, int64_t value);
+  void SetProperty(int32_t property_id, bool value);
+  void SetProperty(int32_t property_id, const std::string& value);
   //复杂类型
-  void FireProperty(int32_t property_id, const ::google::protobuf::Message* value);
+  void SetProperty(int32_t property_id, const ::google::protobuf::Message* value);
 
 
   void FireEvent(int32_t event_id, int32_t value);

@@ -35,8 +35,8 @@ void Model::Call(int32_t event, const ::google::protobuf::Message* value) {
 	HandleEvent(event, value);
 }
 
-void Model::FireActionResult(int action, const ::google::protobuf::Message* value) {
-	auto delegate_iter = event_delegate_.find(action);
+void Model::FireEvent(int event, const ::google::protobuf::Message* value) {
+	auto delegate_iter = event_delegate_.find(event);
 	if (delegate_iter == event_delegate_.end()) {
 		return;
 	}

@@ -64,7 +64,7 @@ std::shared_ptr<ViewModel> ViewModel::Create(int32_t type) {
   return iter->second();
 }
 
-void ViewModel::FireProperty(int32_t property_id, int32_t value) {
+void ViewModel::SetProperty(int32_t property_id, int32_t value) {
   if (property_changed_delegate_) {
     mvvm::mvvm_ParamInt32 pb_value;
     pb_value.set_value(value);
@@ -72,7 +72,7 @@ void ViewModel::FireProperty(int32_t property_id, int32_t value) {
   }
 }
 
-void ViewModel::FireProperty(int32_t property_id, int64_t value) {
+void ViewModel::SetProperty(int32_t property_id, int64_t value) {
   if (property_changed_delegate_) {
     mvvm::mvvm_ParamInt64 pb_value;
     pb_value.set_value(value);
@@ -80,7 +80,7 @@ void ViewModel::FireProperty(int32_t property_id, int64_t value) {
   }
 }
 
-void ViewModel::FireProperty(int32_t property_id, bool value) {
+void ViewModel::SetProperty(int32_t property_id, bool value) {
   if (property_changed_delegate_) {
     mvvm::mvvm_ParamBool pb_value;
     pb_value.set_value(value);
@@ -88,7 +88,7 @@ void ViewModel::FireProperty(int32_t property_id, bool value) {
   }
 }
 
-void ViewModel::FireProperty(int32_t property_id, const std::string& value) {
+void ViewModel::SetProperty(int32_t property_id, const std::string& value) {
   if (property_changed_delegate_) {
     mvvm::mvvm_ParamString pb_value;
     pb_value.set_value(value);
@@ -96,7 +96,7 @@ void ViewModel::FireProperty(int32_t property_id, const std::string& value) {
   }
 }
 
-void ViewModel::FireProperty(int32_t property_id, const ::google::protobuf::Message* value) {
+void ViewModel::SetProperty(int32_t property_id, const ::google::protobuf::Message* value) {
   if (property_changed_delegate_) {
       property_changed_delegate_(property_id, value);
   }

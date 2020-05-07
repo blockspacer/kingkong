@@ -51,7 +51,7 @@ public:
 
 protected:
   //model可以触发事件
-  void FireActionResult(int32_t action, const ::google::protobuf::Message* value);
+  void FireEvent(int32_t event, const ::google::protobuf::Message* value);
   //子类实现
   virtual void HandleEvent(int32_t event, const ::google::protobuf::Message* value) {}
 
