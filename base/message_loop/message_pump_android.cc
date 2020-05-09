@@ -71,7 +71,7 @@ MessagePumpAndroid::~MessagePumpAndroid() {
 
 void MessagePumpAndroid::Wakeup(uint64_t expired_time) {
   auto now = BASE_TIME::GetTickCount2();
-  int64_t nanos = 0;
+  int64_t nanos = 10;
   if (expired_time > now) {
     nanos = (expired_time - now)*1000*1000;
   }

@@ -1,5 +1,7 @@
 ﻿#include "model.h"
 #include <boost/assert.hpp>
+#include <pb/MvvmBasicParam.pb.h>
+
 BEGIN_NAMESPACE_FRAME
 
 int64_t Model::s_suscribe_id_ = 0;
@@ -31,8 +33,14 @@ void Model::UnSubscribeEvent(int64_t id) {
   }
 }
 
-void Model::Call(int32_t event, const ::google::protobuf::Message* value) {
-	HandleEvent(event, value);
+void Model::Call(int32_t event, const ::google::protobuf::Message* value, google::protobuf::Message* result) {
+	HandleEvent(event, value, result);
+}
+
+void Model::FireEvent(int32_t action, const std::string& value) {
+	mvvm::mvvm_ParamString pb_value;
+	pb_value.set_value(value);
+	FireEvent(action, &pb_value);
 }
 
 void Model::FireEvent(int event, const ::google::protobuf::Message* value) {

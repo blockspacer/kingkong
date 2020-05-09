@@ -47,13 +47,14 @@ public:
   void UnSubscribeEvent(int64_t id);
 
   //viewmode 调用model 接口
-  void Call(int32_t action, const ::google::protobuf::Message* value);
+  void Call(int32_t action, const ::google::protobuf::Message* value, google::protobuf::Message* result = nullptr);
 
 protected:
   //model可以触发事件
   void FireEvent(int32_t event, const ::google::protobuf::Message* value);
-  //子类实现
-  virtual void HandleEvent(int32_t event, const ::google::protobuf::Message* value) {}
+  void FireEvent(int32_t action, const std::string& value);
+   //子类实现
+  virtual void HandleEvent(int32_t event, const ::google::protobuf::Message* value, google::protobuf::Message* result) {}
 
 private:
   std::map<int32_t, std::vector<SuscribeEventDelegateInfo>> event_delegate_;

@@ -20,6 +20,7 @@
 //UI ViewModel 处理事件
 #define BEGIN_HANDLE_EVENT(event_id) switch (event_id) {
 #define HANDLE_EVENT(event_id, func) case event_id: { return func(value);}
+#define HANDLE_EVENT_RESULT(event_id, func) case event_id: { return func(value, result);}
 #define END_HANDLE_EVENT() default: break;}
 
 //ViewModel 订阅Model 事件

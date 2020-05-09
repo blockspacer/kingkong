@@ -30,14 +30,18 @@ static void NotifyPropertyChanged(int64_t instance, int event_id, const std::str
 
 void ActivityView::OnPropertyChanged(int32_t property_id, const ::google::protobuf::Message* value) {
     std::string buffer;
-    value->SerializeToString(&buffer);
+    if (nullptr != value) {
+      value->SerializeToString(&buffer);
+    }
     NotifyPropertyChanged((int64_t)this, property_id, buffer);
 }
 
 void ActivityView::OnEventFired(int32_t event_id, const ::google::protobuf::Message* value) {
     std::string buffer;
+  if (nullptr != value) {
     value->SerializeToString(&buffer);
-    NotifyEventFired((int64_t)this, event_id, buffer);
+  }
+  NotifyEventFired((int64_t)this, event_id, buffer);
 }
 
 void ActivityView::HandleEvent(int32_t event, const ::google::protobuf::Message* value) {
