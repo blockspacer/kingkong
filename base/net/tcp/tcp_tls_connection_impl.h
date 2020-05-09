@@ -5,9 +5,10 @@
 #include <base/base_header.h>
 #include <boost/asio.hpp>
 #include <boost/asio/ssl.hpp> 
+#include <boost/beast.hpp>
 
 BEGIN_NAMESPACE_NET
-class TcpTlsConnectionImpl : public TcpConnectionBase<boost::asio::ssl::stream<boost::asio::ip::tcp::socket>> {
+class TcpTlsConnectionImpl : public TcpConnectionBase<boost::asio::ssl::stream<boost::beast::tcp_stream>> {
 public:
   TcpTlsConnectionImpl(std::unique_ptr<NetConnection::NetConnectionRequest> request, NetConnection::NetConnectionDelegate* delegate, std::shared_ptr<BASE_LOOPER::MessagePump> pump);
  

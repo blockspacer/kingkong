@@ -4,9 +4,10 @@
 #include <base/net/tcp/tcp_connection_base.h>
 #include <base/base_header.h>
 #include <boost/asio.hpp>
+#include <boost/beast.hpp>
 
 BEGIN_NAMESPACE_NET
-class TcpConnectionImpl : public TcpConnectionBase<boost::asio::ip::tcp::socket> {
+class TcpConnectionImpl : public TcpConnectionBase<boost::beast::tcp_stream> {
 public:
   TcpConnectionImpl(std::unique_ptr<NetConnection::NetConnectionRequest> request, NetConnection::NetConnectionDelegate* delegate, std::shared_ptr<BASE_LOOPER::MessagePump> pump);
  

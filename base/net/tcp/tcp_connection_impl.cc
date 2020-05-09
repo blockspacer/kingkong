@@ -6,12 +6,13 @@ TcpConnectionImpl::TcpConnectionImpl(std::unique_ptr<NetConnection::NetConnectio
   NetConnection::NetConnectionDelegate* delegate,
   std::shared_ptr<BASE_LOOPER::MessagePump> pump):
   TcpConnectionBase(std::move(request), delegate, std::move(pump)) {
-  socket_ = std::make_unique<boost::asio::ip::tcp::socket>(GetIOService());
+  socket_ = std::make_unique<boost::beast::tcp_stream>(GetIOService());
 }
 
 void TcpConnectionImpl::DoConnect(const boost::asio::ip::tcp::resolver::results_type& endpoints) {
   auto self = shared_from_this();
-  boost::asio::async_connect(*socket_, endpoints,
+  socket_->expires_after(std::chrono::seconds(10));
+  socket_->async_connect(endpoints,
     [self](boost::system::error_code ec,
       boost::asio::ip::tcp::endpoint endpoint) mutable {
         self->NotifyConnectComplete(std::move(ec));
@@ -22,8 +23,8 @@ void TcpConnectionImpl::DoConnect(const boost::asio::ip::tcp::resolver::results_
 
 void TcpConnectionImpl::DoCleanUp() {
   boost::system::error_code ec;
-  socket_->shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
-  socket_->close(ec);
+    socket_->socket().shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
+    socket_->socket().close(ec);
 }
 
 

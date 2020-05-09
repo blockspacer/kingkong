@@ -10,11 +10,12 @@ TcpTlsConnectionImpl::TcpTlsConnectionImpl(std::unique_ptr<NetConnection::NetCon
   ssl_context_(boost::asio::ssl::context::sslv23_client) {
   boost::system::error_code ec;
   ssl_context_.set_default_verify_paths(ec);
-  socket_ = std::make_unique<boost::asio::ssl::stream<boost::asio::ip::tcp::socket>>(GetIOService(), ssl_context_);
+  socket_ = std::make_unique<boost::asio::ssl::stream<boost::beast::tcp_stream>>(GetIOService(), ssl_context_);
 }
 
 void TcpTlsConnectionImpl::DoConnect(const boost::asio::ip::tcp::resolver::results_type& endpoints) {
   auto self = shared_from_this();
+  boost::beast::get_lowest_layer(*socket_).expires_after(std::chrono::seconds(10));
   boost::asio::async_connect(socket_->lowest_layer(), endpoints,
     [self](boost::system::error_code ec,
       boost::asio::ip::tcp::endpoint endpoint) mutable {
