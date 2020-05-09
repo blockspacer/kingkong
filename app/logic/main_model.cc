@@ -3,7 +3,7 @@
 
  MainModel::MainModel() {}
 
- void MainModel::HandleEvent(int32_t event, const ::google::protobuf::Message* value)  {
+ void MainModel::HandleEvent(int32_t event, const ::google::protobuf::Message* value, ::google::protobuf::Message* result)  {
    BEGIN_HANDLE_EVENT(event)
     HANDLE_EVENT(Main::Event::kEventLogin, HandleLogin)
     HANDLE_EVENT(Main::Event::kEventLogout, HandleLogout)

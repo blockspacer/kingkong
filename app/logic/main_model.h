@@ -10,7 +10,7 @@ public:
     return new MainModel;
   }
 
-  void HandleEvent(int32_t event, const ::google::protobuf::Message* value) override;
+  void HandleEvent(int32_t event, const ::google::protobuf::Message* value, ::google::protobuf::Message* result) override;
 
 private:
   void HandleLogin(const ::google::protobuf::Message* value);

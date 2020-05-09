@@ -23,4 +23,22 @@ BOOST_AUTO_TEST_CASE(Main) {
     std::string decode = BASE_CRYPTO::Base64Decode(result);
     BOOST_TEST(src == decode);
   }
+
+  for (size_t i = 0; i < 1000; i++) {
+    std::stringstream ss;
+    for (int j = 0; j < i; j++) {
+      ss << "a";
+    }
+    std::string enc;
+    BASE_CRYPTO::EncryptByPublicKey(ss.str(), enc);
+
+    std::string dec;
+    BASE_CRYPTO::DecryptByPrivateKey(enc, dec);
+    BOOST_ASSERT(ss.str() == dec);
+
+    std::string sign;
+    BASE_CRYPTO::RSA_Sign(ss.str(), sign);
+
+    BOOST_ASSERT(BASE_CRYPTO::RSA_Verify(ss.str(), sign));
+  }
 }
