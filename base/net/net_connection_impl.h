@@ -5,13 +5,17 @@
 #include <base/net/net_connection.h>
 #include <base/base_header.h>
 #include <boost/shared_array.hpp>
+#include <boost/beast.hpp>
 #include <boost/asio.hpp>
+#include <boost/asio/spawn.hpp>
+#include "socks5_client.h"
 #include <queue>
 
 BEGIN_NAMESPACE_NET
 //所有的网络操作都需要抛到pump 线程执行
 class NetConnectionImpl : public NetConnection,
   public DnsResolver::DnsResolverDelegate,
+  public Socks5Client::Socks5HandshakeDelegate,
   public std::enable_shared_from_this<NetConnectionImpl> {
 public:
   NetConnectionImpl(std::unique_ptr<NetConnection::NetConnectionRequest> request, NetConnection::NetConnectionDelegate* delegate, std::shared_ptr<BASE_LOOPER::MessagePump> pump);
@@ -38,6 +42,9 @@ public:
   //websocket 需要的握手
   virtual void DoWebsocketHandshake();
 
+  //SOCKS5 握手的时候需要拿到底层指针进行握手
+  virtual  boost::beast::tcp_stream& GetLowestLayer() = 0;
+
   //通用的一些接口，具体的业务完成之后用来通知
   void NotifySendComplete(boost::system::error_code ec, std::size_t length);
   void NotifyRecvData(boost::system::error_code ec, std::size_t length);
@@ -48,6 +55,8 @@ public:
   boost::asio::io_service& GetIOService();
 
 private:
+  void OnSocks5Handshake(int32_t state) override;
+
   void OnDnsResolvered(const boost::asio::ip::tcp::resolver::results_type& result, int code, const std::string& msg) override;
 
   //都是在同一个pump 线程执行
@@ -63,6 +72,8 @@ private:
   void HandleRecvData(std::size_t length);
   //开始接收数据
   void StartRecvDate();
+  //开始tls 或者 websocket 握手
+  void DoOtherHandshake(int32_t code, const std::string& msg);
 
 protected:
   std::unique_ptr<NetConnection::NetConnectionRequest> request_;
@@ -84,7 +95,7 @@ private:
   std::atomic_bool stoped_;
   //是否已经清理过
   bool already_clean_up = false;
-
+  std::shared_ptr<Socks5Client> socks5_client_;
   DECLARE_OBJECT_RECORD(NetConnectionImpl)
 };
 

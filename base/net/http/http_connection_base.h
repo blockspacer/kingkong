@@ -75,6 +75,9 @@ class HttpConnectionBase : public HttpClient,
   }
 
  protected:
+   boost::beast::tcp_stream& GetLowestLayer() override {
+     return boost::beast::get_lowest_layer(*stream_);
+  }
   void OnConnect(NetConnection* tcp,
                  int code,
                  const std::string& msg) override {

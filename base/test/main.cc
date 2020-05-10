@@ -4,7 +4,7 @@
 #include <boost/test/unit_test.hpp>
 #include <boost/test/unit_test_parameters.hpp>
 #include <base/crypto_util.h>
-
+#include <boost/coroutine2/all.hpp>
 
 
 BOOST_AUTO_TEST_CASE(Main) {
@@ -24,7 +24,7 @@ BOOST_AUTO_TEST_CASE(Main) {
     BOOST_TEST(src == decode);
   }
 
-  for (size_t i = 0; i < 1000; i++) {
+  for (size_t i = 0; i < 10; i++) {
     std::stringstream ss;
     for (int j = 0; j < i; j++) {
       ss << "a";

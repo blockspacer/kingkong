@@ -14,6 +14,8 @@ public:
  
 
 protected:
+  boost::beast::tcp_stream& GetLowestLayer() override;
+
   void DoConnect(const boost::asio::ip::tcp::resolver::results_type& endpoints) override;
   void DoCleanUp() override;
   void DoTlsHandshake() override;

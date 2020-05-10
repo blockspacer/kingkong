@@ -13,6 +13,10 @@ TcpTlsConnectionImpl::TcpTlsConnectionImpl(std::unique_ptr<NetConnection::NetCon
   socket_ = std::make_unique<boost::asio::ssl::stream<boost::beast::tcp_stream>>(GetIOService(), ssl_context_);
 }
 
+boost::beast::tcp_stream& TcpTlsConnectionImpl::GetLowestLayer() {
+  return boost::beast::get_lowest_layer(*socket_);
+}
+
 void TcpTlsConnectionImpl::DoConnect(const boost::asio::ip::tcp::resolver::results_type& endpoints) {
   auto self = shared_from_this();
   boost::beast::get_lowest_layer(*socket_).expires_after(std::chrono::seconds(10));

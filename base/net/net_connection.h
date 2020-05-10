@@ -24,7 +24,11 @@ public:
 		NetType net_type = kNetTypeTcp;
 		//http，或者websocket 的paht
 		std::string path = "/";
-
+		//socks5 代理参数
+		std::string proxy_host;
+		uint16_t proxy_port;
+		std::string proxy_username;
+		std::string proxy_passwd;
 	};
 
 	class NetConnectionDelegate {

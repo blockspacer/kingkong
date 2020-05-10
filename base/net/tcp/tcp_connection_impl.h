@@ -13,6 +13,7 @@ public:
  
 
 protected:
+  boost::beast::tcp_stream& GetLowestLayer();
   void DoConnect(const boost::asio::ip::tcp::resolver::results_type& endpoints) override;
   void DoCleanUp() override;
 

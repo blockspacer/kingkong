@@ -9,9 +9,13 @@ TcpConnectionImpl::TcpConnectionImpl(std::unique_ptr<NetConnection::NetConnectio
   socket_ = std::make_unique<boost::beast::tcp_stream>(GetIOService());
 }
 
+boost::beast::tcp_stream& TcpConnectionImpl::GetLowestLayer() {
+  return *socket_;
+}
+
 void TcpConnectionImpl::DoConnect(const boost::asio::ip::tcp::resolver::results_type& endpoints) {
   auto self = shared_from_this();
-  socket_->expires_after(std::chrono::seconds(10));
+  socket_->expires_after(std::chrono::seconds(30));
   socket_->async_connect(endpoints,
     [self](boost::system::error_code ec,
       boost::asio::ip::tcp::endpoint endpoint) mutable {

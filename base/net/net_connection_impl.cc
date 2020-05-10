@@ -66,6 +66,16 @@ NetConnection::NetType NetConnectionImpl::net_type() {
   return request_->net_type;
 }
 
+void NetConnectionImpl::OnSocks5Handshake(int32_t state) {
+  if (state != 0) {
+    HandleCleanUp();
+    HandleConnectStatus(-1, "socks5 handshake failed");
+  } else {
+    DoOtherHandshake(state, "");
+  }
+  socks5_client_ = nullptr;
+}
+
 void NetConnectionImpl::OnDnsResolvered(
     const boost::asio::ip::tcp::resolver::results_type& result,
     int code,
@@ -88,8 +98,16 @@ void NetConnectionImpl::OnDnsResolvered(
 void NetConnectionImpl::DoDnsResolve() {
   auto dns_resolver_request =
       std::make_unique<BASE_NET::DnsResolver::DnsResolverRequest>();
-  dns_resolver_request->host = request_->host;
-  dns_resolver_request->schem = boost::lexical_cast<std::string>(request_->port);
+  //如果有代理，就先解析代理IP
+  if (!request_->proxy_host.empty()) {
+    dns_resolver_request->host = request_->proxy_host;
+    dns_resolver_request->schem =
+        boost::lexical_cast<std::string>(request_->proxy_port);
+
+  } else {
+    dns_resolver_request->host = request_->host;
+    dns_resolver_request->schem = boost::lexical_cast<std::string>(request_->port);
+  }
 
   dns_resolver_ = BASE_NET::CreateDnsResolver(std::move(dns_resolver_request),
                                          this, pump_);
@@ -98,24 +116,19 @@ void NetConnectionImpl::DoDnsResolve() {
 
 void NetConnectionImpl::NotifyConnectComplete(boost::system::error_code ec) {
   if (!ec) {
-    switch (request_->net_type) {
-    case kNetTypeWebsocketTls:
-    case kNetTypeTcpTls: 
-    case kNetTypeHttps: {
-      DoTlsHandshake();
-    }
-                       break;
-    case kNetTypeWebsocket: {
-      DoWebsocketHandshake();
-    }
-                          break;
-    default:
-    {
-      //普通的连接直接完成
-      HandleConnectStatus(ec.value(), ec.message());
-      StartRecvDate();
-    }
-    break;
+    //如果有代理的话，需要进行socks5 握手
+    if (!request_->proxy_host.empty()) {
+      Socks5Client::Socks5ProxyProperty proxy_property;
+      proxy_property.server = request_->host;
+      proxy_property.port = request_->port;
+      proxy_property.username = request_->proxy_username;
+      proxy_property.password = request_->proxy_passwd;
+      socks5_client_ = CreateSocks5Client(GetLowestLayer(),
+          proxy_property,
+          this);
+      socks5_client_->Connect();
+    } else {
+      DoOtherHandshake(ec.value(), ec.message());
     }
   }
   else {
@@ -210,6 +223,9 @@ void NetConnectionImpl::HandleCleanUp() {
     return;
   }
   already_clean_up = true;
+  if (nullptr != socks5_client_) {
+    socks5_client_ = nullptr;
+  }
   if (nullptr != dns_resolver_) {
     dns_resolver_->Cancel();
     dns_resolver_ = nullptr;
@@ -250,5 +266,24 @@ void NetConnectionImpl::StartRecvDate() {
   DoRecvData(asio_buffers_);
 }
 
+void NetConnectionImpl::DoOtherHandshake(int32_t code, const std::string& msg) {
+  switch (request_->net_type) {
+    case kNetTypeWebsocketTls:
+    case kNetTypeTcpTls:
+    case kNetTypeHttps: {
+      DoTlsHandshake();
+    } break;
+    case kNetTypeWebsocket: {
+      DoWebsocketHandshake();
+    } break;
+    default: {
+      //普通的连接直接完成
+      HandleConnectStatus(code, msg);
+      StartRecvDate();
+    } break;
+  }
+}
+
 END_NAMESPACE_NET
+
 

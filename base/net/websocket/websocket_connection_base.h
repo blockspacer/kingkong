@@ -20,6 +20,10 @@ public:
 
 
 protected:
+  boost::beast::tcp_stream& GetLowestLayer() override{
+    return boost::beast::get_lowest_layer(*ws_);
+  }
+
   void DoConnect(const boost::asio::ip::tcp::resolver::results_type& endpoints) override {
     boost::beast::get_lowest_layer(*ws_).expires_after(std::chrono::seconds(10));
     auto self = shared_from_this();
