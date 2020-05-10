@@ -27,7 +27,7 @@
 #define BEGIN_SUBSCRIE_EVENT(model_type) if (auto model = MVVM_FRAME::Model::ModelOf(model_type)) { \
 auto tmp_model_type = model_type;
 #define SUBSCRIE_EVENT(event_id, func)  {\
-int64_t id = model->SubscribeEvent(event_id, std::bind(func, this, std::placeholders::_1));\
+int64_t id = model->SubscribeEvent(event_id, std::bind(func, this, std::placeholders::_1, std::placeholders::_2));\
 subscribe_ids_[id] = tmp_model_type; }
 #define END_SUBSCRIE_EVENT() }
 
