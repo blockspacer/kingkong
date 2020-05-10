@@ -24,6 +24,11 @@ public:
 		std::string url;
 		HttpMethod method = kHttpMethodGet;
 		std::map<std::string, std::string> heads;
+		//socks 5代理相关
+    std::string proxy_host;
+		uint16_t proxy_port;
+		std::string proxy_username;
+		std::string proxy_passwd;
 	};
 
 public:

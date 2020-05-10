@@ -68,6 +68,10 @@ std::shared_ptr<HttpClient> CreateHttpClient(
       net_connection_request->path = "/";
     }
   }
+  net_connection_request->proxy_host = request->proxy_host;
+  net_connection_request->proxy_port = request->proxy_port;
+  net_connection_request->proxy_username = request->proxy_username;
+  net_connection_request->proxy_passwd = request->proxy_passwd;
   if (net_connection_request->net_type == NetConnection::kNetTypeHttp) {
     return std::make_shared<HttpClientImpl>(std::move(request),
                                             std::move(net_connection_request),

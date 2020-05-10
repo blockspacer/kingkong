@@ -230,7 +230,7 @@ BOOST_AUTO_TEST_CASE(TCP) {
 #endif // ENABLE_TCP_TEST
 
 
-#define ENABLE_TCP_TLS_TEST
+//#define ENABLE_TCP_TLS_TEST
 #ifdef ENABLE_TCP_TLS_TEST
 
 BOOST_AUTO_TEST_CASE(TCPTLS) {
@@ -336,7 +336,7 @@ BOOST_AUTO_TEST_CASE(TCPTLS) {
 #endif // ENABLE_TCP_TLS_TEST
 
 
-#define ENABLE_WEBSOCKET_TEST
+//#define ENABLE_WEBSOCKET_TEST
 
 #ifdef ENABLE_WEBSOCKET_TEST
 
@@ -354,6 +354,11 @@ BOOST_AUTO_TEST_CASE(WEBSOCKETTEST) {
             std::make_unique<BASE_NET::NetConnection::NetConnectionRequest>();
         tcp_request->host = "121.40.165.18";
         tcp_request->port = 8800;
+
+        tcp_request->proxy_host = "222.186.37.106";
+        tcp_request->proxy_port = 10249;
+        tcp_request->proxy_username = "tw2800";
+        tcp_request->proxy_passwd = "tw2800";
         tcp_request->net_type = BASE_NET::NetConnection::kNetTypeWebsocket;
         auto tcp =
             BASE_NET::CreateTcp(std::move(tcp_request), callback, io_pump);
@@ -394,9 +399,14 @@ BOOST_AUTO_TEST_CASE(WEBSOCKETTEST) {
       for (size_t i = 0; i < 300; i++) {
         auto tcp_request =
             std::make_unique<BASE_NET::NetConnection::NetConnectionRequest>();
-        tcp_request->host = "121.40.165.18";
+        tcp_request->host = "echo.websocket.org";
         tcp_request->port = 8800;
         tcp_request->net_type = BASE_NET::NetConnection::kNetTypeWebsocket;
+
+        tcp_request->proxy_host = "222.186.37.106";
+        tcp_request->proxy_port = 10249;
+        tcp_request->proxy_username = "tw2800";
+        tcp_request->proxy_passwd = "tw2800";
         auto tcp =
             BASE_NET::CreateTcp(std::move(tcp_request), callback, io_pump);
         tcp->Connect();
@@ -433,7 +443,7 @@ BOOST_AUTO_TEST_CASE(WEBSOCKETTEST) {
 }
 #endif // ENABLE_WEBSOCKET_TEST
 
-#define  ENABLE_WEBSOCKET_TLS_TEST
+//#define  ENABLE_WEBSOCKET_TLS_TEST
 #ifdef ENABLE_WEBSOCKET_TLS_TEST
 
 BOOST_AUTO_TEST_CASE(WEBSOCKETTLSTEST) {
@@ -451,6 +461,11 @@ BOOST_AUTO_TEST_CASE(WEBSOCKETTLSTEST) {
         tcp_request->host = "echo.websocket.org";
         tcp_request->port = 443;
         tcp_request->net_type = BASE_NET::NetConnection::kNetTypeWebsocketTls;
+
+        tcp_request->proxy_host = "222.186.37.106";
+        tcp_request->proxy_port = 10249;
+        tcp_request->proxy_username = "tw2800";
+        tcp_request->proxy_passwd = "tw2800";
         auto tcp =
             BASE_NET::CreateTcp(std::move(tcp_request), callback, io_pump);
         tcp->Connect();
@@ -514,6 +529,11 @@ BOOST_AUTO_TEST_CASE(WEBSOCKETTLSTEST) {
         tcp_request->host = "echo.websocket.org";
         tcp_request->port = 443;
         tcp_request->net_type = BASE_NET::NetConnection::kNetTypeWebsocketTls;
+
+        tcp_request->proxy_host = "222.186.37.106";
+        tcp_request->proxy_port = 10249;
+        tcp_request->proxy_username = "tw2800";
+        tcp_request->proxy_passwd = "tw2800";
         auto tcp =
             BASE_NET::CreateTcp(std::move(tcp_request), callback, io_pump);
         tcp->Connect();
@@ -568,6 +588,10 @@ BOOST_AUTO_TEST_CASE(HttpTest) {
         auto tcp_request =
           std::make_unique<BASE_NET::HttpClient::HttpClientRequest>();
         tcp_request->url = "https://www.qq.com";
+        tcp_request->proxy_host = "222.186.37.106";
+        tcp_request->proxy_port = 10249;
+        tcp_request->proxy_username = "tw2800";
+        tcp_request->proxy_passwd = "tw2800";
         auto tcp =
           BASE_NET::CreateHttpClient(std::move(tcp_request), g_httpdelete, io_pump);
         tcp->Request();
@@ -586,7 +610,11 @@ BOOST_AUTO_TEST_CASE(HttpTest) {
         for (size_t i = 0; i < 10000; i++) {
           auto tcp_request =
             std::make_unique<BASE_NET::HttpClient::HttpClientRequest>();
-          tcp_request->url = "http://www.qq.com";
+          tcp_request->url = "https://www.qq.com";
+          tcp_request->proxy_host = "222.186.37.106";
+          tcp_request->proxy_port = 10249;
+          tcp_request->proxy_username = "tw2800";
+          tcp_request->proxy_passwd = "tw2800";
           auto tcp =
             BASE_NET::CreateHttpClient(std::move(tcp_request), g_httpdelete, io_pump);
           tcp->Request();
@@ -606,6 +634,10 @@ BOOST_AUTO_TEST_CASE(HttpTest) {
           auto tcp_request =
             std::make_unique<BASE_NET::HttpClient::HttpClientRequest>();
           tcp_request->url = "https://www.baidu.com";
+          tcp_request->proxy_host = "222.186.37.106";
+          tcp_request->proxy_port = 10249;
+          tcp_request->proxy_username = "tw2800";
+          tcp_request->proxy_passwd = "tw2800";
           auto tcp =
             BASE_NET::CreateHttpClient(std::move(tcp_request), g_httpdelete, io_pump);
           tcp->Request();
