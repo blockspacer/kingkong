@@ -73,11 +73,11 @@ std::shared_ptr<HttpClient> CreateHttpClient(
   net_connection_request->proxy_username = request->proxy_username;
   net_connection_request->proxy_passwd = request->proxy_passwd;
   if (net_connection_request->net_type == NetConnection::kNetTypeHttp) {
-    return std::make_shared<HttpClientImpl>(std::move(request),
+    return std::make_shared<HttpClientImpl<>>(std::move(request),
                                             std::move(net_connection_request),
                                             delegate, std::move(pump));
   } else {
-    return std::make_shared<HttpsClientImpl>(std::move(request),
+    return std::make_shared<HttpsClientImpl<>>(std::move(request),
                                             std::move(net_connection_request),
                                             delegate, std::move(pump));
   }

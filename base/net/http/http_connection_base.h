@@ -7,7 +7,7 @@
 
 BEGIN_NAMESPACE_NET
 
-template <class StreamType>
+template <class StreamType, class BodyType>
 class HttpConnectionBase : public HttpClient,
                            public NetConnectionImpl,
                            public NetConnection::NetConnectionDelegate {
@@ -118,7 +118,7 @@ class HttpConnectionBase : public HttpClient,
 
  private:
   boost::beast::http::request<boost::beast::http::empty_body> req_;
-  boost::beast::http::response<boost::beast::http::string_body> res_;
+  boost::beast::http::response<BodyType> res_;
 
   boost::beast::flat_buffer buffer_;
   std::mutex delegate_mutex_;
