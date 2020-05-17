@@ -2,7 +2,8 @@
 #define _HTTP_CLIENT_H_
 #include <base/message_loop/message_pump.h>
 #include <base/base_header.h>
-#include <map>
+#include <boost/beast.hpp>
+#include <unordered_map>
 BEGIN_NAMESPACE_NET
 
 class HttpClient {
@@ -11,7 +12,9 @@ public:
 
 	class HttpClientDelegate {
 	public:
-		virtual void OnHttpResponse(int32_t http_code, const std::string& content) = 0;
+		virtual void OnHttpHeads(const std::unordered_map<std::string, std::string>& heads) = 0;
+		virtual void OnHttpResponse(boost::string_view content) = 0;
+    	virtual void OnHttpComplete(boost::beast::http::status http_code) = 0;
 	};
 
 	enum HttpMethod {
@@ -23,7 +26,7 @@ public:
 	struct HttpClientRequest {
 		std::string url;
 		HttpMethod method = kHttpMethodGet;
-		std::map<std::string, std::string> heads;
+		std::unordered_map<std::string, std::string> heads;
 		//socks 5代理相关
     std::string proxy_host;
 		uint16_t proxy_port;

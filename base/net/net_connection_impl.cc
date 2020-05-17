@@ -91,6 +91,7 @@ void NetConnectionImpl::OnDnsResolvered(
     HandleCleanUp();
   } else {
     //DNS 解析完成 开始连接
+    GetLowestLayer().expires_after(std::chrono::seconds(30));
     DoConnect(result);
   }
 }
@@ -263,6 +264,7 @@ void NetConnectionImpl::HandleRecvData(std::size_t length) {
 void NetConnectionImpl::StartRecvDate() {
   read_buffer_ = boost::shared_array<char>(new char[MAX_RECV_READ]);
   asio_buffers_ = boost::asio::buffer(read_buffer_.get(), MAX_RECV_READ);
+  GetLowestLayer().expires_never();
   DoRecvData(asio_buffers_);
 }
 

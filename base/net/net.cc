@@ -6,6 +6,7 @@
 #include "http/http_client_impl.h"
 #include "http/https_client_impl.h"
 #include "http/http_parser.h"
+#include "http/http_downloader_impl.h"
 #include <boost/asio/ssl.hpp> 
 
 //http://blog.sina.com.cn/s/blog_541348370101czw8.html
@@ -73,13 +74,22 @@ std::shared_ptr<HttpClient> CreateHttpClient(
   net_connection_request->proxy_username = request->proxy_username;
   net_connection_request->proxy_passwd = request->proxy_passwd;
   if (net_connection_request->net_type == NetConnection::kNetTypeHttp) {
-    return std::make_shared<HttpClientImpl<>>(std::move(request),
+    return std::make_shared<HttpClientImpl>(std::move(request),
                                             std::move(net_connection_request),
                                             delegate, std::move(pump));
   } else {
-    return std::make_shared<HttpsClientImpl<>>(std::move(request),
+    return std::make_shared<HttpsClientImpl>(std::move(request),
                                             std::move(net_connection_request),
                                             delegate, std::move(pump));
   }
+}
+
+
+
+std::shared_ptr<HttpDownloader> CreateHttpDownloader(
+    std::unique_ptr<HttpDownloader::HttpDownloaderRequest> request,
+    HttpDownloader::HttpDownloaderDelegate* delegate,
+    std::shared_ptr<BASE_LOOPER::MessagePump> pump) {
+  return std::make_shared<HttpDownloaderImpl>(std::move(request), delegate, std::move(pump));
 }
 END_NAMESPACE_NET

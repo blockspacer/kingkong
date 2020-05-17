@@ -25,7 +25,6 @@ protected:
   }
 
   void DoConnect(const boost::asio::ip::tcp::resolver::results_type& endpoints) override {
-    boost::beast::get_lowest_layer(*ws_).expires_after(std::chrono::seconds(10));
     auto self = shared_from_this();
     boost::beast::get_lowest_layer(*ws_).async_connect(endpoints,
       [self](boost::system::error_code ec,

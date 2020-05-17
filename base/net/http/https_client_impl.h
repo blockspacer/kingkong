@@ -3,11 +3,9 @@
 #include "http_connection_base.h"
 #include <base/base_header.h>
 #include <boost/beast/ssl.hpp>
-
 BEGIN_NAMESPACE_NET
 
-template<class BodyType = boost::beast::http::string_body>
-class HttpsClientImpl : public HttpConnectionBase<boost::beast::ssl_stream<boost::beast::tcp_stream>, BodyType> {
+class HttpsClientImpl : public HttpConnectionBase<boost::beast::ssl_stream<boost::beast::tcp_stream>> {
  public:
    HttpsClientImpl(std::unique_ptr<HttpClientRequest> http_request,
                  std::unique_ptr<NetConnection::NetConnectionRequest> net_connection_request,
@@ -40,8 +38,6 @@ class HttpsClientImpl : public HttpConnectionBase<boost::beast::ssl_stream<boost
       return;
     }
 
-    boost::beast::get_lowest_layer(*stream_).expires_after(
-        std::chrono::seconds(30));
     auto self = shared_from_this();
     boost::beast::get_lowest_layer(*stream_).async_connect(
         endpoints, [self](boost::system::error_code ec,
@@ -71,7 +67,7 @@ class HttpsClientImpl : public HttpConnectionBase<boost::beast::ssl_stream<boost
 };
 
 
-template<class BodyType> boost::asio::ssl::context HttpsClientImpl<BodyType>::ssl_context_(
+boost::asio::ssl::context HttpsClientImpl::ssl_context_(
     boost::asio::ssl::context::sslv23_client);
 
 END_NAMESPACE_NET

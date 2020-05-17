@@ -19,7 +19,6 @@ boost::beast::tcp_stream& TcpTlsConnectionImpl::GetLowestLayer() {
 
 void TcpTlsConnectionImpl::DoConnect(const boost::asio::ip::tcp::resolver::results_type& endpoints) {
   auto self = shared_from_this();
-  boost::beast::get_lowest_layer(*socket_).expires_after(std::chrono::seconds(10));
   boost::asio::async_connect(socket_->lowest_layer(), endpoints,
     [self](boost::system::error_code ec,
       boost::asio::ip::tcp::endpoint endpoint) mutable {

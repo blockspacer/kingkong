@@ -5,8 +5,7 @@
 
 BEGIN_NAMESPACE_NET
 
-template<class BodyType = boost::beast::http::string_body>
-class HttpClientImpl : public HttpConnectionBase<boost::beast::tcp_stream, BodyType> {
+class HttpClientImpl : public HttpConnectionBase<boost::beast::tcp_stream> {
  public:
   HttpClientImpl(std::unique_ptr<HttpClientRequest> http_request,
                  std::unique_ptr<NetConnection::NetConnectionRequest> net_connection_request,
@@ -21,7 +20,6 @@ class HttpClientImpl : public HttpConnectionBase<boost::beast::tcp_stream, BodyT
 
   void DoConnect(
       const boost::asio::ip::tcp::resolver::results_type& endpoints) {
-    stream_->expires_after(std::chrono::seconds(30));
     auto self = shared_from_this();
     stream_->async_connect(
         endpoints, [self](boost::system::error_code ec,
