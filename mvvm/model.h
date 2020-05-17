@@ -15,7 +15,7 @@ public:
   virtual  ~Model() = default;
 
   using ModelBuilder = std::function<Model* ()>;
-  using SuscribeEventDelegate = std::function<void(const ::google::protobuf::Message* value)>;
+  using SuscribeEventDelegate = std::function<void(int32_t event, const ::google::protobuf::Message* value)>;
 
   struct SuscribeEventDelegateInfo {
     SuscribeEventDelegate delegate;
@@ -52,7 +52,7 @@ public:
 protected:
   //model可以触发事件
   void FireEvent(int32_t event, const ::google::protobuf::Message* value);
-  void FireEvent(int32_t action, const std::string& value);
+  void FireEvent(int32_t event, const std::string& value);
    //子类实现
   virtual void HandleEvent(int32_t event, const ::google::protobuf::Message* value, google::protobuf::Message* result) {}
 

@@ -37,19 +37,19 @@ void Model::Call(int32_t event, const ::google::protobuf::Message* value, google
 	HandleEvent(event, value, result);
 }
 
-void Model::FireEvent(int32_t action, const std::string& value) {
+void Model::FireEvent(int32_t event, const std::string& value) {
 	mvvm::mvvm_ParamString pb_value;
 	pb_value.set_value(value);
-	FireEvent(action, &pb_value);
+	FireEvent(event, &pb_value);
 }
 
-void Model::FireEvent(int event, const ::google::protobuf::Message* value) {
+void Model::FireEvent(int32_t event, const ::google::protobuf::Message* value) {
 	auto delegate_iter = event_delegate_.find(event);
 	if (delegate_iter == event_delegate_.end()) {
 		return;
 	}
 	for (auto& item : delegate_iter->second) {
-		item.delegate(value);
+		item.delegate(event, value);
 	}
 }
 

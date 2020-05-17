@@ -140,6 +140,10 @@ void ViewModel::FireEvent(int32_t event_id, const ::google::protobuf::Message* v
     event_fired_delegate_(event_id, value);
   }
 }
+
+void ViewModel::RouteEventToUI(int32_t event_id, const ::google::protobuf::Message* value) {
+  FireEvent(event_id, value);
+}
 END_NAMESPACE_FRAME
 
 

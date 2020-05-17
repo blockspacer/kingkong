@@ -39,6 +39,8 @@ public:
   static void RegisterViewModel(int32_t type, ViewModelBuilder builder);
   static std::shared_ptr<ViewModel> Create(int32_t type);
 
+  void RouteEventToUI(int32_t event_id, const ::google::protobuf::Message* value);
+
 protected:
   //VM 需要实现这个方法，用来初始化UI，或者监听一些Model数据变化
   virtual void OnAttach() = 0;
@@ -62,6 +64,7 @@ protected:
   void FireEvent(int32_t event_id, const std::string& value);
   //复杂类型
   void FireEvent(int32_t event_id, const ::google::protobuf::Message* value);
+
 
   void* context() {
     return context_;
