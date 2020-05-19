@@ -60,6 +60,7 @@ class HttpsClientImpl : public HttpConnectionBase<boost::beast::ssl_stream<boost
     boost::system::error_code ec;
     boost::beast::get_lowest_layer(*stream_).socket().shutdown(
         boost::asio::ip::tcp::socket::shutdown_both, ec);
+
   }
 
  private:

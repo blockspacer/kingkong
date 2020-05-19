@@ -43,11 +43,21 @@ public:
 	virtual void DisConnect() = 0;
 	virtual void Send(const void* buffer, int32_t buffer_len) = 0;
 	virtual NetType net_type() = 0;
+	virtual const std::string& connection_id() const = 0;
 };
 
-std::shared_ptr<NetConnection> CreateTcp(std::unique_ptr<NetConnection::NetConnectionRequest> request,
+std::ostream& operator<<(std::ostream& ostream,
+												 NetConnection::NetType net_type); 
+
+std::shared_ptr<NetConnection> CreateTcpClient(std::unique_ptr<NetConnection::NetConnectionRequest> request,
 	NetConnection::NetConnectionDelegate* delegate,
 	std::shared_ptr<BASE_LOOPER::MessagePump> pump);
+
+
+std::shared_ptr<NetConnection> CreateWebsocket(
+    std::unique_ptr<NetConnection::NetConnectionRequest> request,
+    NetConnection::NetConnectionDelegate* delegate,
+    std::shared_ptr<BASE_LOOPER::MessagePump> pump);
 
 END_NAMESPACE_NET
 

@@ -1,10 +1,42 @@
 ﻿#include "net_connection_impl.h"
 #include "log.h"
 #include <boost/lexical_cast.hpp>
+#include <boost/format.hpp>
+
 BEGIN_NAMESPACE_NET
 #define MAX_RECV_READ 1024
 
+std::ostream& operator<<(std::ostream& ostream,
+                         NetConnection::NetType net_type)
+{
+  switch (net_type) {
+    case NetConnection::kNetTypeTcp: {
+      return ostream << "Tcp";
+    }
+    case NetConnection::kNetTypeTcpTls: {
+      return ostream << "TcpTLS";
+    }
+    case NetConnection::kNetTypeWebsocket: {
+      return ostream << "TcpWebsocketTLS";
+    }
+    case NetConnection::kNetTypeWebsocketTls: {
+      return ostream << "WebsocketTls";
+    }
+    case NetConnection::kNetTypeHttp: {
+      return ostream << "Http";
+    }
+    case NetConnection::kNetTypeHttps: {
+      return ostream << "Https";
+    }
+    default:
+      break;
+  }
+  return ostream << net_type;
+}
+
 IMPLEMET_OBJECT_RECORD(NetConnectionImpl)
+
+std::atomic_int32_t NetConnectionImpl::id_ = 0;
 
 NetConnectionImpl::NetConnectionImpl(std::unique_ptr<NetConnection::NetConnectionRequest> request,
   NetConnection::NetConnectionDelegate* delegate,
@@ -14,6 +46,11 @@ NetConnectionImpl::NetConnectionImpl(std::unique_ptr<NetConnection::NetConnectio
       pump_(std::move(pump)),
       stoped_(false) {
   ADD_OBJECT_RECORD()
+  int32_t tmp_id = ++id_;
+  boost::format fmt("conn:%1%");
+  fmt% tmp_id;
+  connection_id_ = fmt.str();
+  LogDebug << "connection_id:" << connection_id_ << " host:" << request_->host << " net_type:" << request_->net_type;
 }
 
 
@@ -21,6 +58,7 @@ NetConnectionImpl::NetConnectionImpl(std::unique_ptr<NetConnection::NetConnectio
    if (!stoped_) {
      LogFatal << "not stoped, call DisConnect";
    }
+   LogDebug << "connection_id:" << connection_id_;
    REMOVE_OBJECT_RECORD()
  }
 
@@ -66,10 +104,15 @@ NetConnection::NetType NetConnectionImpl::net_type() {
   return request_->net_type;
 }
 
+const std::string& NetConnectionImpl::connection_id() const {
+  return connection_id_;
+}
+
 void NetConnectionImpl::OnSocks5Handshake(int32_t state) {
   if (state != 0) {
+    LogError << "connection_id:" << connection_id_ << " socks5 handshake state:" << state;
     HandleCleanUp();
-    HandleConnectStatus(-1, "socks5 handshake failed");
+    HandleConnectStatus(state, "socks5 handshake failed");
   } else {
     DoOtherHandshake(state, "");
   }
@@ -87,6 +130,7 @@ void NetConnectionImpl::OnDnsResolvered(
   }
   //DNS 解析失败
   if (0 != code) {
+    LogError << "connection_id:" << connection_id_ << " DNS parse failed: " << msg;
     HandleConnectStatus(code, msg);
     HandleCleanUp();
   } else {
@@ -133,6 +177,7 @@ void NetConnectionImpl::NotifyConnectComplete(boost::system::error_code ec) {
     }
   }
   else {
+    LogError << "connection_id:" << connection_id_ << " connect failed: " << ec.message();
     HandleCleanUp();
     HandleConnectStatus(ec.value(), ec.message());
   }
@@ -154,6 +199,7 @@ void NetConnectionImpl::NotifyTlsHandshakeComplete(boost::system::error_code ec)
     }
   
   } else {
+    LogError << "connection_id:" << connection_id_ << " tls handshake failed: " << ec.message();
     HandleConnectStatus(ec.value(), ec.message());
     HandleCleanUp();
   }
@@ -166,6 +212,7 @@ void NetConnectionImpl::NotifyWebsocketHandshakeComplte(boost::system::error_cod
     StartRecvDate();
   }
   else {
+    LogError << "connection_id:" << connection_id_ << " websocket handshake failed: " << ec.message();
     HandleCleanUp();
   }
 }
@@ -195,6 +242,7 @@ void NetConnectionImpl::DoWebsocketHandshake() {
 void NetConnectionImpl::NotifySendComplete(boost::system::error_code ec, std::size_t length) {
   if (ec) {
     //发生了错误，通知断开连接
+    LogError << "connection_id:" << connection_id_ << " send failed: " << ec.message();
     NotifyDisconnect(ec);
     HandleCleanUp();
   }
@@ -211,6 +259,7 @@ void NetConnectionImpl::NotifySendComplete(boost::system::error_code ec, std::si
 void NetConnectionImpl::NotifyRecvData(boost::system::error_code ec, std::size_t length) {
   if (ec) {
     //发生了错误，通知断开连接
+    LogError << "connection_id:" << connection_id_ << " recv failed: " << ec.message();
     NotifyDisconnect(ec);
     HandleCleanUp();
   }

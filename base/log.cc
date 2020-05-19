@@ -7,6 +7,7 @@
 #include <boost/log/utility/setup/common_attributes.hpp>
 #include <boost/log/attributes/timer.hpp>
 #include <boost/log/attributes/named_scope.hpp>
+#include <boost/log/sinks.hpp>
 #include <boost/phoenix.hpp>
 #include <boost/log/sources/logger.hpp>
 #include <boost/log/support/date_time.hpp>
@@ -15,6 +16,36 @@
 BEGIN_NAMESPACE_LOG
 
 boost::log::sources::severity_logger<LogLevel> s_named_logger;
+
+
+class CustomSink : public boost::log::sinks::sink {
+public:
+  CustomSink():
+    boost::log::sinks::sink(false) {
+
+  }
+  bool will_consume(boost::log::attribute_value_set const& attributes) override  {
+    return true;
+  }
+
+  void consume(boost::log::record_view const& rec) override  {
+    for (auto& item : rec.attribute_values()) {
+      auto& first = item.first;
+      auto& second = item.second;
+    }
+  }
+
+  void flush() override  {
+    
+  }
+
+};
+
+
+
+
+
+
 
 BOOST_LOG_ATTRIBUTE_KEYWORD(log_severity, "Severity", LogLevel)
 BOOST_LOG_ATTRIBUTE_KEYWORD(log_timestamp,
@@ -79,6 +110,8 @@ void InitConsole(LogLevel log_level) {
   console_sink->set_formatter(formatter_console);
   console_sink->set_filter(log_severity >= log_level);
   boost::log::core::get()->add_sink(console_sink);
+
+  boost::log::core::get()->add_sink(boost::make_shared<CustomSink>());
 }
 
 void InitLogFile(LogLevel log_level, const std::string& log_dir) {

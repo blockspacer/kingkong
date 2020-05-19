@@ -12,7 +12,7 @@
 //http://blog.sina.com.cn/s/blog_541348370101czw8.html
 
 BEGIN_NAMESPACE_NET
-std::shared_ptr<NetConnection> CreateTcp(
+std::shared_ptr<NetConnection> CreateTcpClient(
   std::unique_ptr<NetConnection::NetConnectionRequest> request,
   NetConnection::NetConnectionDelegate* delegate,
   std::shared_ptr<BASE_LOOPER::MessagePump> pump) {
@@ -25,18 +25,26 @@ std::shared_ptr<NetConnection> CreateTcp(
       return std::make_shared<BASE_NET::TcpTlsConnectionImpl>(
         std::move(request), delegate, std::move(pump));
     }
-  case BASE_NET::NetConnection::kNetTypeWebsocket: {
-      return std::make_shared<BASE_NET::WebsocketConnectionImpl>(
-        std::move(request), delegate, std::move(pump));
-    }
-  case BASE_NET::NetConnection::kNetTypeWebsocketTls: {
-    return std::make_shared<BASE_NET::WebsocketTlsConnectionImpl>(
-      std::move(request), delegate, std::move(pump));
-  }
   }
   return nullptr;
 }
 
+std::shared_ptr<NetConnection> CreateWebsocket(
+    std::unique_ptr<NetConnection::NetConnectionRequest> request,
+    NetConnection::NetConnectionDelegate* delegate,
+    std::shared_ptr<BASE_LOOPER::MessagePump> pump) {
+  switch (request->net_type) {
+    case BASE_NET::NetConnection::kNetTypeWebsocket: {
+      return std::make_shared<BASE_NET::WebsocketConnectionImpl>(
+          std::move(request), delegate, std::move(pump));
+    }
+    case BASE_NET::NetConnection::kNetTypeWebsocketTls: {
+      return std::make_shared<BASE_NET::WebsocketTlsConnectionImpl>(
+          std::move(request), delegate, std::move(pump));
+    }
+  }
+  return nullptr;
+}
 
 
 std::shared_ptr<HttpClient> CreateHttpClient(

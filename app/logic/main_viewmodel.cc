@@ -32,6 +32,6 @@ void MainViewModel::HandleLogout(const ::google::protobuf::Message* value) {
   }
 }
 
-void MainViewModel::OnLoginComplete(const ::google::protobuf::Message* value) {
+void MainViewModel::OnLoginComplete(int32_t event_id, const ::google::protobuf::Message* value) {
 
 }

@@ -20,7 +20,7 @@ private:
   void HandleLogout(const ::google::protobuf::Message* value);
 
   //处理model 的动作回调
-  void OnLoginComplete(const ::google::protobuf::Message* value);
+  void OnLoginComplete(int32_t event_id, const ::google::protobuf::Message* value);
 
 };
 

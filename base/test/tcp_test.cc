@@ -140,7 +140,7 @@ BOOST_AUTO_TEST_CASE(TCP) {
         tcp_request->proxy_username = "tw2800";
         tcp_request->proxy_passwd = "tw2800";
         auto tcp =
-          BASE_NET::CreateTcp(std::move(tcp_request), callback, io_pump);
+          BASE_NET::CreateTcpClient(std::move(tcp_request), callback, io_pump);
         tcp->Connect();
         boost::this_thread::sleep(boost::posix_time::milliseconds(real2(gen2)));
         // boost::this_thread::sleep(boost::posix_time::seconds(10000));
@@ -165,7 +165,7 @@ BOOST_AUTO_TEST_CASE(TCP) {
         tcp_request->proxy_username = "tw2800";
         tcp_request->proxy_passwd = "tw2800";
         auto tcp =
-          BASE_NET::CreateTcp(std::move(tcp_request), callback, io_pump);
+          BASE_NET::CreateTcpClient(std::move(tcp_request), callback, io_pump);
         tcp->Connect();
         boost::this_thread::sleep(boost::posix_time::milliseconds(real2(gen2)));
         // boost::this_thread::sleep(boost::posix_time::seconds(10000));
@@ -190,7 +190,7 @@ BOOST_AUTO_TEST_CASE(TCP) {
         tcp_request->proxy_username = "tw2800";
         tcp_request->proxy_passwd = "tw2800";
         auto tcp =
-          BASE_NET::CreateTcp(std::move(tcp_request), callback, io_pump);
+          BASE_NET::CreateTcpClient(std::move(tcp_request), callback, io_pump);
         tcp->Connect();
         boost::this_thread::sleep(boost::posix_time::milliseconds(real2(gen2)));
         // boost::this_thread::sleep(boost::posix_time::seconds(10000));
@@ -215,7 +215,7 @@ BOOST_AUTO_TEST_CASE(TCP) {
         tcp_request->proxy_username = "tw2800";
         tcp_request->proxy_passwd = "tw2800";
         auto tcp =
-          BASE_NET::CreateTcp(std::move(tcp_request), callback, io_pump);
+          BASE_NET::CreateTcpClient(std::move(tcp_request), callback, io_pump);
         tcp->Connect();
         boost::this_thread::sleep(boost::posix_time::milliseconds(real2(gen2)));
         // boost::this_thread::sleep(boost::posix_time::seconds(10000));
@@ -250,7 +250,7 @@ BOOST_AUTO_TEST_CASE(TCPTLS) {
         tcp_request->port = 443;
         tcp_request->net_type = BASE_NET::NetConnection::kNetTypeTcpTls;
         auto tcp =
-          BASE_NET::CreateTcp(std::move(tcp_request), callback, io_pump);
+          BASE_NET::CreateTcpClient(std::move(tcp_request), callback, io_pump);
         tcp->Connect();
         boost::this_thread::sleep(boost::posix_time::milliseconds(real2(gen2)));
         // boost::this_thread::sleep(boost::posix_time::seconds(10000));
@@ -271,7 +271,7 @@ BOOST_AUTO_TEST_CASE(TCPTLS) {
         tcp_request->port = 443;
         tcp_request->net_type = BASE_NET::NetConnection::kNetTypeTcpTls;
         auto tcp =
-          BASE_NET::CreateTcp(std::move(tcp_request), callback, io_pump);
+          BASE_NET::CreateTcpClient(std::move(tcp_request), callback, io_pump);
         tcp->Connect();
         boost::this_thread::sleep(boost::posix_time::milliseconds(real2(gen2)));
         // boost::this_thread::sleep(boost::posix_time::seconds(10000));
@@ -296,7 +296,7 @@ BOOST_AUTO_TEST_CASE(TCPTLS) {
         tcp_request->proxy_username = "tw2800";
         tcp_request->proxy_passwd = "tw2800";
         auto tcp =
-          BASE_NET::CreateTcp(std::move(tcp_request), callback, io_pump);
+          BASE_NET::CreateTcpClient(std::move(tcp_request), callback, io_pump);
         tcp->Connect();
         boost::this_thread::sleep(boost::posix_time::milliseconds(real2(gen2)));
         // boost::this_thread::sleep(boost::posix_time::seconds(10000));
@@ -321,7 +321,7 @@ BOOST_AUTO_TEST_CASE(TCPTLS) {
         tcp_request->proxy_username = "tw2800";
         tcp_request->proxy_passwd = "tw2800";
         auto tcp =
-          BASE_NET::CreateTcp(std::move(tcp_request), callback, io_pump);
+          BASE_NET::CreateTcpClient(std::move(tcp_request), callback, io_pump);
         tcp->Connect();
         boost::this_thread::sleep(boost::posix_time::milliseconds(real2(gen2)));
         // boost::this_thread::sleep(boost::posix_time::seconds(10000));
@@ -362,7 +362,7 @@ BOOST_AUTO_TEST_CASE(WEBSOCKETTEST) {
         tcp_request->proxy_passwd = "tw2800";
         tcp_request->net_type = BASE_NET::NetConnection::kNetTypeWebsocket;
         auto tcp =
-          BASE_NET::CreateTcp(std::move(tcp_request), callback, io_pump);
+          BASE_NET::CreateTcpClient(std::move(tcp_request), callback, io_pump);
         tcp->Connect();
         boost::this_thread::sleep(boost::posix_time::milliseconds(real2(gen2)));
         // boost::this_thread::sleep(boost::posix_time::seconds(10000));
@@ -383,7 +383,7 @@ BOOST_AUTO_TEST_CASE(WEBSOCKETTEST) {
         tcp_request->port = 8800;
         tcp_request->net_type = BASE_NET::NetConnection::kNetTypeWebsocket;
         auto tcp =
-          BASE_NET::CreateTcp(std::move(tcp_request), callback, io_pump);
+          BASE_NET::CreateTcpClient(std::move(tcp_request), callback, io_pump);
         tcp->Connect();
         boost::this_thread::sleep(boost::posix_time::milliseconds(real2(gen2)));
         // boost::this_thread::sleep(boost::posix_time::seconds(10000));
@@ -409,7 +409,7 @@ BOOST_AUTO_TEST_CASE(WEBSOCKETTEST) {
         tcp_request->proxy_username = "tw2800";
         tcp_request->proxy_passwd = "tw2800";
         auto tcp =
-          BASE_NET::CreateTcp(std::move(tcp_request), callback, io_pump);
+          BASE_NET::CreateTcpClient(std::move(tcp_request), callback, io_pump);
         tcp->Connect();
         boost::this_thread::sleep(boost::posix_time::milliseconds(real2(gen2)));
         // boost::this_thread::sleep(boost::posix_time::seconds(10000));
@@ -430,7 +430,7 @@ BOOST_AUTO_TEST_CASE(WEBSOCKETTEST) {
         tcp_request->port = 8800;
         tcp_request->net_type = BASE_NET::NetConnection::kNetTypeWebsocket;
         auto tcp =
-          BASE_NET::CreateTcp(std::move(tcp_request), callback, io_pump);
+          BASE_NET::CreateTcpClient(std::move(tcp_request), callback, io_pump);
         tcp->Connect();
         boost::this_thread::sleep(boost::posix_time::milliseconds(real2(gen2)));
         // boost::this_thread::sleep(boost::posix_time::seconds(10000));
@@ -468,7 +468,7 @@ BOOST_AUTO_TEST_CASE(WEBSOCKETTLSTEST) {
         tcp_request->proxy_username = "tw2800";
         tcp_request->proxy_passwd = "tw2800";
         auto tcp =
-          BASE_NET::CreateTcp(std::move(tcp_request), callback, io_pump);
+          BASE_NET::CreateTcpClient(std::move(tcp_request), callback, io_pump);
         tcp->Connect();
         boost::this_thread::sleep(boost::posix_time::milliseconds(real2(gen2)));
         // boost::this_thread::sleep(boost::posix_time::seconds(10000));
@@ -489,7 +489,7 @@ BOOST_AUTO_TEST_CASE(WEBSOCKETTLSTEST) {
         tcp_request->port = 443;
         tcp_request->net_type = BASE_NET::NetConnection::kNetTypeWebsocketTls;
         auto tcp =
-          BASE_NET::CreateTcp(std::move(tcp_request), callback, io_pump);
+          BASE_NET::CreateTcpClient(std::move(tcp_request), callback, io_pump);
         tcp->Connect();
         boost::this_thread::sleep(boost::posix_time::milliseconds(real2(gen2)));
         //    boost::this_thread::sleep(boost::posix_time::seconds(10000));
@@ -510,7 +510,7 @@ BOOST_AUTO_TEST_CASE(WEBSOCKETTLSTEST) {
         tcp_request->port = 443;
         tcp_request->net_type = BASE_NET::NetConnection::kNetTypeWebsocketTls;
         auto tcp =
-          BASE_NET::CreateTcp(std::move(tcp_request), callback, io_pump);
+          BASE_NET::CreateTcpClient(std::move(tcp_request), callback, io_pump);
         tcp->Connect();
         boost::this_thread::sleep(boost::posix_time::milliseconds(real2(gen2)));
         //boost::this_thread::sleep(boost::posix_time::seconds(10000));
@@ -536,7 +536,7 @@ BOOST_AUTO_TEST_CASE(WEBSOCKETTLSTEST) {
         tcp_request->proxy_username = "tw2800";
         tcp_request->proxy_passwd = "tw2800";
         auto tcp =
-          BASE_NET::CreateTcp(std::move(tcp_request), callback, io_pump);
+          BASE_NET::CreateTcpClient(std::move(tcp_request), callback, io_pump);
         tcp->Connect();
         boost::this_thread::sleep(boost::posix_time::milliseconds(real2(gen2)));
         // boost::this_thread::sleep(boost::posix_time::seconds(10000));
@@ -568,7 +568,7 @@ public:
 
 
 HttpDelegate* g_httpdelete = new HttpDelegate;
-//#define  HTTPTEST
+#define  HTTPTEST
 #ifdef HTTPTEST
 
 BOOST_AUTO_TEST_CASE(HttpTest) {
@@ -662,7 +662,7 @@ protected:
 
 HttpTestDelegate* g_httpdownload = new HttpTestDelegate;
 
-#define HTTP_DOWNLOAD_TEST
+//#define HTTP_DOWNLOAD_TEST
 #ifdef HTTP_DOWNLOAD_TEST
 BOOST_AUTO_TEST_CASE(HttpDownload) {
   BASE_UTIL::AtExitManager at;

@@ -28,6 +28,8 @@ public:
   void Send(const void* buffer, int32_t buffer_len) override;
   NetConnection::NetType net_type() override;
 
+  const std::string& connection_id() const override;
+
 public:
   //不能的模块用来实现不同的连接
   virtual void DoConnect(const boost::asio::ip::tcp::resolver::results_type& endpoints) = 0;
@@ -96,6 +98,8 @@ private:
   //是否已经清理过
   bool already_clean_up = false;
   std::shared_ptr<Socks5Client> socks5_client_;
+  std::string connection_id_;
+  static std::atomic_int32_t id_;
   DECLARE_OBJECT_RECORD(NetConnectionImpl)
 };
 
