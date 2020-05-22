@@ -47,8 +47,8 @@ SOURCE_GROUP("net" FILES ${net})
 FILE (GLOB net_websocket net/websocket/*.cc net/websocket/*.h)
 SOURCE_GROUP("net\\websocket" FILES ${net_websocket})
 
-FILE (GLOB net_tcp net/tcp/*.cc net/tcp/*.h)
-SOURCE_GROUP("net\\tcp" FILES ${net_tcp})
+FILE (GLOB net_tcp_client net/tcp_client/*.cc net/tcp_client/*.h)
+SOURCE_GROUP("net\\tcp_client" FILES ${net_tcp_client})
 
 FILE (GLOB net_http net/http/*.cc net/http/*.h net/http/*.c)
 SOURCE_GROUP("net\\http" FILES ${net_http})
@@ -56,11 +56,26 @@ SOURCE_GROUP("net\\http" FILES ${net_http})
 FILE (GLOB jni jni_util/*.cc jni_util/*.h)
 SOURCE_GROUP("jni" FILES ${jni})
 
+FILE (GLOB net_tcp_server net/tcp_server/*.cc net/tcp_server/*.h)
+SOURCE_GROUP("net\\tcp_server" FILES ${net_tcp_server})
+
+Set (base_common_src ${header_files} 
+    ${source_files} 
+    ${message_loop}
+    ${message_loop_platform}
+    ${net} 
+    ${net_websocket}
+    ${net_tcp_client}
+    ${net_http}
+    ${net_tcp_server}
+	)
+
+
 if (ANDROID)
-    ADD_LIBRARY (base ${header_files} ${source_files} ${message_loop} ${message_loop_platform} ${net} ${net_websocket} ${net_tcp} ${net_http} ${jni})
+    ADD_LIBRARY (base  ${base_common_src} ${jni})
     target_link_libraries(base boost ssl crypto android)
 else(ANDROID)
-    ADD_LIBRARY (base ${header_files} ${source_files} ${message_loop} ${message_loop_platform} ${net} ${net_websocket} ${net_tcp} ${net_http})
+    ADD_LIBRARY (base ${base_common_src})
 endif(ANDROID)
 
 if (ENABLE_BASE_TEST)

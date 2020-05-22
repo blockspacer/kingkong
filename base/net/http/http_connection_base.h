@@ -68,7 +68,6 @@ class HttpConnectionBase : public HttpClient,
     }
     req_.target(request_->path);
     req_.keep_alive(true);
-    req_.set(boost::beast::http::field::keep_alive, "1");
     req_.set(boost::beast::http::field::host, request_->host);
 
     boost::beast::http::async_write(

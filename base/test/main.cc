@@ -5,12 +5,29 @@
 #include <boost/test/unit_test_parameters.hpp>
 #include <base/crypto_util.h>
 #include <boost/coroutine2/all.hpp>
+#include <boost/interprocess/shared_memory_object.hpp>
+#include <boost/interprocess/mapped_region.hpp>
 
 
 BOOST_AUTO_TEST_CASE(Main) {
   //这里用来初始化一些全局配置
   std::string current_dir = boost::filesystem::current_path().string();
   BASE_LOG::InitLog(BASE_LOG::kLogLevelDebug, current_dir);
+
+
+  try {
+    // opening an existing shared memory object
+    boost::interprocess::shared_memory_object sharedmem2(boost::interprocess::open_or_create, "Hellotest", boost::interprocess::read_write);
+
+    // map shared memory object in current address space
+    boost::interprocess::mapped_region mmap(sharedmem2, boost::interprocess::read_write);
+
+    // need to type-cast since get_address returns void*
+    char* str1 = static_cast<char*>(mmap.get_address());
+    std::cout << str1 << std::endl;
+  } catch (boost::interprocess::interprocess_exception& e) {
+    std::cout << e.what() << std::endl;
+  }
 
 
   for (int i=0;i<10;i++) {

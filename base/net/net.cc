@@ -1,6 +1,6 @@
 ﻿#include "net_connection.h"
-#include "tcp/tcp_connection_impl.h"
-#include "tcp/tcp_tls_connection_impl.h"
+#include "tcp_client/tcp_connection_impl.h"
+#include "tcp_client/tcp_tls_connection_impl.h"
 #include "websocket/websocket_connection_impl.h"
 #include "websocket/websocket_tls_connection_impl.h"
 #include "http/http_client_impl.h"

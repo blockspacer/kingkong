@@ -18,30 +18,6 @@ BEGIN_NAMESPACE_LOG
 boost::log::sources::severity_logger<LogLevel> s_named_logger;
 
 
-class CustomSink : public boost::log::sinks::sink {
-public:
-  CustomSink():
-    boost::log::sinks::sink(false) {
-
-  }
-  bool will_consume(boost::log::attribute_value_set const& attributes) override  {
-    return true;
-  }
-
-  void consume(boost::log::record_view const& rec) override  {
-    for (auto& item : rec.attribute_values()) {
-      auto& first = item.first;
-      auto& second = item.second;
-    }
-  }
-
-  void flush() override  {
-    
-  }
-
-};
-
-
 
 
 
@@ -61,6 +37,26 @@ BOOST_LOG_ATTRIBUTE_KEYWORD(
   thread_id,
   "ThreadID",
   boost::log::attributes::current_thread_id::value_type)
+
+
+  
+
+class CustomSink : public boost::log::sinks::sink {
+ public:
+  CustomSink() : boost::log::sinks::sink(false) {}
+  bool will_consume(
+      boost::log::attribute_value_set const& attributes) override {
+    return true;
+  }
+
+  void consume(boost::log::record_view const& rec) override {
+    std::string message = *rec[boost::log::expressions::smessage];
+    
+  }
+
+  void flush() override {}
+};
+
 
 
   // The formatting logic for the severity level

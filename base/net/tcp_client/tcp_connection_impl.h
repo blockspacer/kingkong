@@ -1,7 +1,7 @@
 ﻿#ifndef _BASE_TCP_CONNECTION_IMPL_H_
 #define _BASE_TCP_CONNECTION_IMPL_H_
 
-#include <base/net/tcp/tcp_connection_base.h>
+#include <base/net/tcp_client/tcp_connection_base.h>
 #include <base/base_header.h>
 #include <boost/asio.hpp>
 #include <boost/beast.hpp>
