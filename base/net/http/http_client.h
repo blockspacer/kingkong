@@ -41,8 +41,7 @@ public:
 
 std::shared_ptr<HttpClient> CreateHttpClient(
     std::unique_ptr<HttpClient::HttpClientRequest> request,
-		HttpClient::HttpClientDelegate* delegate,
-    std::shared_ptr<BASE_LOOPER::MessagePump> pump);
+		HttpClient::HttpClientDelegate* delegate);
 
 END_NAMESPACE_NET
 

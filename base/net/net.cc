@@ -1,4 +1,5 @@
 ﻿#include "net_connection.h"
+#include "message_loop/message_loop.h"
 #include "tcp_client/tcp_connection_impl.h"
 #include "tcp_client/tcp_tls_connection_impl.h"
 #include "websocket/websocket_connection_impl.h"
@@ -14,16 +15,15 @@
 BEGIN_NAMESPACE_NET
 std::shared_ptr<NetConnection> CreateTcpClient(
   std::unique_ptr<NetConnection::NetConnectionRequest> request,
-  NetConnection::NetConnectionDelegate* delegate,
-  std::shared_ptr<BASE_LOOPER::MessagePump> pump) {
+  NetConnection::NetConnectionDelegate* delegate) {
   switch (request->net_type) {
   case BASE_NET::NetConnection::kNetTypeTcp: {
       return std::make_shared<BASE_NET::TcpConnectionImpl>(
-        std::move(request), delegate, std::move(pump));
+        std::move(request), delegate, BASE_LOOPER::MessageLoop::IOMessagePump());
     }
   case BASE_NET::NetConnection::kNetTypeTcpTls: {
       return std::make_shared<BASE_NET::TcpTlsConnectionImpl>(
-        std::move(request), delegate, std::move(pump));
+        std::move(request), delegate, BASE_LOOPER::MessageLoop::IOMessagePump());
     }
   }
   return nullptr;
@@ -31,16 +31,15 @@ std::shared_ptr<NetConnection> CreateTcpClient(
 
 std::shared_ptr<NetConnection> CreateWebsocket(
     std::unique_ptr<NetConnection::NetConnectionRequest> request,
-    NetConnection::NetConnectionDelegate* delegate,
-    std::shared_ptr<BASE_LOOPER::MessagePump> pump) {
+    NetConnection::NetConnectionDelegate* delegate) {
   switch (request->net_type) {
     case BASE_NET::NetConnection::kNetTypeWebsocket: {
       return std::make_shared<BASE_NET::WebsocketConnectionImpl>(
-          std::move(request), delegate, std::move(pump));
+          std::move(request), delegate, BASE_LOOPER::MessageLoop::IOMessagePump());
     }
     case BASE_NET::NetConnection::kNetTypeWebsocketTls: {
       return std::make_shared<BASE_NET::WebsocketTlsConnectionImpl>(
-          std::move(request), delegate, std::move(pump));
+          std::move(request), delegate, BASE_LOOPER::MessageLoop::IOMessagePump());
     }
   }
   return nullptr;
@@ -49,8 +48,7 @@ std::shared_ptr<NetConnection> CreateWebsocket(
 
 std::shared_ptr<HttpClient> CreateHttpClient(
   std::unique_ptr<HttpClient::HttpClientRequest> request,
-  HttpClient::HttpClientDelegate* delegate,
-  std::shared_ptr<BASE_LOOPER::MessagePump> pump) {
+  HttpClient::HttpClientDelegate* delegate) {
   auto net_connection_request = std::make_unique<NetConnection::NetConnectionRequest>();
   //开始解析URL
   http_parser_url parse_url;
@@ -84,11 +82,11 @@ std::shared_ptr<HttpClient> CreateHttpClient(
   if (net_connection_request->net_type == NetConnection::kNetTypeHttp) {
     return std::make_shared<HttpClientImpl>(std::move(request),
                                             std::move(net_connection_request),
-                                            delegate, std::move(pump));
+                                            delegate, BASE_LOOPER::MessageLoop::IOMessagePump());
   } else {
     return std::make_shared<HttpsClientImpl>(std::move(request),
                                             std::move(net_connection_request),
-                                            delegate, std::move(pump));
+                                            delegate, BASE_LOOPER::MessageLoop::IOMessagePump());
   }
 }
 
@@ -96,8 +94,7 @@ std::shared_ptr<HttpClient> CreateHttpClient(
 
 std::shared_ptr<HttpDownloader> CreateHttpDownloader(
     std::unique_ptr<HttpDownloader::HttpDownloaderRequest> request,
-    HttpDownloader::HttpDownloaderDelegate* delegate,
-    std::shared_ptr<BASE_LOOPER::MessagePump> pump) {
-  return std::make_shared<HttpDownloaderImpl>(std::move(request), delegate, std::move(pump));
+    HttpDownloader::HttpDownloaderDelegate* delegate) {
+  return std::make_shared<HttpDownloaderImpl>(std::move(request), delegate);
 }
 END_NAMESPACE_NET

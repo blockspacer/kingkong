@@ -12,8 +12,7 @@ class HttpDownloaderImpl : public HttpDownloader,
 public:
   HttpDownloaderImpl(
       std::unique_ptr<HttpDownloader::HttpDownloaderRequest> request,
-      HttpDownloader::HttpDownloaderDelegate* delegate,
-      std::shared_ptr<BASE_LOOPER::MessagePump> pump);
+      HttpDownloader::HttpDownloaderDelegate* delegate);
 
 
 public:

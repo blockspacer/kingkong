@@ -5,8 +5,7 @@ BEGIN_NAMESPACE_NET
 
 HttpDownloaderImpl::HttpDownloaderImpl(
     std::unique_ptr<HttpDownloader::HttpDownloaderRequest> request,
-    HttpDownloader::HttpDownloaderDelegate* delegate,
-    std::shared_ptr<BASE_LOOPER::MessagePump> pump)
+    HttpDownloader::HttpDownloaderDelegate* delegate)
     : delegate_(delegate), download_request_(std::move(request)) {
   auto http_request = std::make_unique<HttpClient::HttpClientRequest>();
   http_request->url = download_request_->url;
@@ -17,7 +16,7 @@ HttpDownloaderImpl::HttpDownloaderImpl(
   http_request->proxy_username = download_request_->proxy_username;
 
   http_client_ =
-      CreateHttpClient(std::move(http_request), this, std::move(pump));
+      CreateHttpClient(std::move(http_request), this);
 }
 
 void HttpDownloaderImpl::OnHttpComplete(boost::beast::http::status http_code) {

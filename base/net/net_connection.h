@@ -50,14 +50,12 @@ std::ostream& operator<<(std::ostream& ostream,
 												 NetConnection::NetType net_type); 
 
 std::shared_ptr<NetConnection> CreateTcpClient(std::unique_ptr<NetConnection::NetConnectionRequest> request,
-	NetConnection::NetConnectionDelegate* delegate,
-	std::shared_ptr<BASE_LOOPER::MessagePump> pump);
+	NetConnection::NetConnectionDelegate* delegate);
 
 
 std::shared_ptr<NetConnection> CreateWebsocket(
     std::unique_ptr<NetConnection::NetConnectionRequest> request,
-    NetConnection::NetConnectionDelegate* delegate,
-    std::shared_ptr<BASE_LOOPER::MessagePump> pump);
+    NetConnection::NetConnectionDelegate* delegate);
 
 END_NAMESPACE_NET
 

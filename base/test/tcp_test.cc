@@ -38,13 +38,12 @@ BOOST_AUTO_TEST_CASE(DnsResolver) {
     group.create_thread([] {
       boost::uniform_int<> real2(200, 2000);
       boost::random::mt19937 gen2;
-      auto io_pump = BASE_LOOPER::MessageLoop::IOMessagePump();
       for (int i = 0; i < 50; i++) {
         auto tcp_request =
           std::make_unique<BASE_NET::DnsResolver::DnsResolverRequest>();
         tcp_request->host = "www.baidu.com";
         auto tcp = BASE_NET::CreateDnsResolver(std::move(tcp_request),
-                                               dns_callback, io_pump);
+                                               dns_callback);
         tcp->Resolver();
         boost::this_thread::sleep(boost::posix_time::milliseconds(real2(gen2)));
         tcp->Cancel();
@@ -56,13 +55,12 @@ BOOST_AUTO_TEST_CASE(DnsResolver) {
     group.create_thread([] {
       boost::uniform_int<> real2(200, 2000);
       boost::random::mt19937 gen2;
-      auto io_pump = BASE_LOOPER::MessageLoop::FileMessagePump();
       for (int i = 0; i < 50; i++) {
         auto tcp_request =
           std::make_unique<BASE_NET::DnsResolver::DnsResolverRequest>();
         tcp_request->host = "www.163.com";
         auto tcp = BASE_NET::CreateDnsResolver(std::move(tcp_request),
-                                               dns_callback, io_pump);
+                                               dns_callback);
         tcp->Resolver();
         boost::this_thread::sleep(boost::posix_time::milliseconds(real2(gen2)));
         tcp->Cancel();
@@ -74,13 +72,12 @@ BOOST_AUTO_TEST_CASE(DnsResolver) {
     group.create_thread([] {
       boost::uniform_int<> real2(200, 2000);
       boost::random::mt19937 gen2;
-      auto io_pump = BASE_LOOPER::MessageLoop::WorkMessagePump();
       for (int i = 0; i < 50; i++) {
         auto tcp_request =
           std::make_unique<BASE_NET::DnsResolver::DnsResolverRequest>();
         tcp_request->host = "www.qq.com";
         auto tcp = BASE_NET::CreateDnsResolver(std::move(tcp_request),
-                                               dns_callback, io_pump);
+                                               dns_callback);
         tcp->Resolver();
         boost::this_thread::sleep(boost::posix_time::milliseconds(real2(gen2)));
         tcp->Cancel();
@@ -116,7 +113,7 @@ class TcpDelegate :public BASE_NET::NetConnection::NetConnectionDelegate {
 TcpDelegate* callback = new TcpDelegate;
 
 
-//#define ENABLE_TCP_TEST
+#define ENABLE_TCP_TEST
 
 #ifdef ENABLE_TCP_TEST
 
@@ -128,7 +125,6 @@ BOOST_AUTO_TEST_CASE(TCP) {
     group.create_thread([] {
       boost::uniform_int<> real2(10, 50);
       boost::random::mt19937 gen2;
-      auto io_pump = BASE_LOOPER::MessageLoop::IOMessagePump();
       for (size_t i = 0; i < 300; i++) {
         auto tcp_request =
           std::make_unique<BASE_NET::NetConnection::NetConnectionRequest>();
@@ -140,7 +136,7 @@ BOOST_AUTO_TEST_CASE(TCP) {
         tcp_request->proxy_username = "tw2800";
         tcp_request->proxy_passwd = "tw2800";
         auto tcp =
-          BASE_NET::CreateTcpClient(std::move(tcp_request), callback, io_pump);
+          BASE_NET::CreateTcpClient(std::move(tcp_request), callback);
         tcp->Connect();
         boost::this_thread::sleep(boost::posix_time::milliseconds(real2(gen2)));
         // boost::this_thread::sleep(boost::posix_time::seconds(10000));
@@ -153,7 +149,6 @@ BOOST_AUTO_TEST_CASE(TCP) {
     group.create_thread([] {
       boost::uniform_int<> real2(500, 1000);
       boost::random::mt19937 gen2;
-      auto io_pump = BASE_LOOPER::MessageLoop::IOMessagePump();
       for (size_t i = 0; i < 300; i++) {
         auto tcp_request =
           std::make_unique<BASE_NET::NetConnection::NetConnectionRequest>();
@@ -165,7 +160,7 @@ BOOST_AUTO_TEST_CASE(TCP) {
         tcp_request->proxy_username = "tw2800";
         tcp_request->proxy_passwd = "tw2800";
         auto tcp =
-          BASE_NET::CreateTcpClient(std::move(tcp_request), callback, io_pump);
+          BASE_NET::CreateTcpClient(std::move(tcp_request), callback);
         tcp->Connect();
         boost::this_thread::sleep(boost::posix_time::milliseconds(real2(gen2)));
         // boost::this_thread::sleep(boost::posix_time::seconds(10000));
@@ -178,7 +173,6 @@ BOOST_AUTO_TEST_CASE(TCP) {
     group.create_thread([] {
       boost::uniform_int<> real2(50, 300);
       boost::random::mt19937 gen2;
-      auto io_pump = BASE_LOOPER::MessageLoop::FileMessagePump();
       for (size_t i = 0; i < 300; i++) {
         auto tcp_request =
           std::make_unique<BASE_NET::NetConnection::NetConnectionRequest>();
@@ -190,7 +184,7 @@ BOOST_AUTO_TEST_CASE(TCP) {
         tcp_request->proxy_username = "tw2800";
         tcp_request->proxy_passwd = "tw2800";
         auto tcp =
-          BASE_NET::CreateTcpClient(std::move(tcp_request), callback, io_pump);
+          BASE_NET::CreateTcpClient(std::move(tcp_request), callback);
         tcp->Connect();
         boost::this_thread::sleep(boost::posix_time::milliseconds(real2(gen2)));
         // boost::this_thread::sleep(boost::posix_time::seconds(10000));
@@ -203,7 +197,6 @@ BOOST_AUTO_TEST_CASE(TCP) {
     group.create_thread([] {
       boost::uniform_int<> real2(100, 3000);
       boost::random::mt19937 gen2;
-      auto io_pump = BASE_LOOPER::MessageLoop::WorkMessagePump();
       for (size_t i = 0; i < 300; i++) {
         auto tcp_request =
           std::make_unique<BASE_NET::NetConnection::NetConnectionRequest>();
@@ -215,7 +208,7 @@ BOOST_AUTO_TEST_CASE(TCP) {
         tcp_request->proxy_username = "tw2800";
         tcp_request->proxy_passwd = "tw2800";
         auto tcp =
-          BASE_NET::CreateTcpClient(std::move(tcp_request), callback, io_pump);
+          BASE_NET::CreateTcpClient(std::move(tcp_request), callback);
         tcp->Connect();
         boost::this_thread::sleep(boost::posix_time::milliseconds(real2(gen2)));
         // boost::this_thread::sleep(boost::posix_time::seconds(10000));
@@ -242,7 +235,6 @@ BOOST_AUTO_TEST_CASE(TCPTLS) {
     group.create_thread([] {
       boost::uniform_int<> real2(10, 50);
       boost::random::mt19937 gen2;
-      auto io_pump = BASE_LOOPER::MessageLoop::IOMessagePump();
       for (size_t i = 0; i < 300; i++) {
         auto tcp_request =
           std::make_unique<BASE_NET::NetConnection::NetConnectionRequest>();
@@ -250,7 +242,7 @@ BOOST_AUTO_TEST_CASE(TCPTLS) {
         tcp_request->port = 443;
         tcp_request->net_type = BASE_NET::NetConnection::kNetTypeTcpTls;
         auto tcp =
-          BASE_NET::CreateTcpClient(std::move(tcp_request), callback, io_pump);
+          BASE_NET::CreateTcpClient(std::move(tcp_request), callback);
         tcp->Connect();
         boost::this_thread::sleep(boost::posix_time::milliseconds(real2(gen2)));
         // boost::this_thread::sleep(boost::posix_time::seconds(10000));
@@ -263,7 +255,6 @@ BOOST_AUTO_TEST_CASE(TCPTLS) {
     group.create_thread([] {
       boost::uniform_int<> real2(500, 1000);
       boost::random::mt19937 gen2;
-      auto io_pump = BASE_LOOPER::MessageLoop::IOMessagePump();
       for (size_t i = 0; i < 300; i++) {
         auto tcp_request =
           std::make_unique<BASE_NET::NetConnection::NetConnectionRequest>();
@@ -271,7 +262,7 @@ BOOST_AUTO_TEST_CASE(TCPTLS) {
         tcp_request->port = 443;
         tcp_request->net_type = BASE_NET::NetConnection::kNetTypeTcpTls;
         auto tcp =
-          BASE_NET::CreateTcpClient(std::move(tcp_request), callback, io_pump);
+          BASE_NET::CreateTcpClient(std::move(tcp_request), callback);
         tcp->Connect();
         boost::this_thread::sleep(boost::posix_time::milliseconds(real2(gen2)));
         // boost::this_thread::sleep(boost::posix_time::seconds(10000));
@@ -284,7 +275,6 @@ BOOST_AUTO_TEST_CASE(TCPTLS) {
     group.create_thread([] {
       boost::uniform_int<> real2(50, 300);
       boost::random::mt19937 gen2;
-      auto io_pump = BASE_LOOPER::MessageLoop::FileMessagePump();
       for (size_t i = 0; i < 300; i++) {
         auto tcp_request =
           std::make_unique<BASE_NET::NetConnection::NetConnectionRequest>();
@@ -296,7 +286,7 @@ BOOST_AUTO_TEST_CASE(TCPTLS) {
         tcp_request->proxy_username = "tw2800";
         tcp_request->proxy_passwd = "tw2800";
         auto tcp =
-          BASE_NET::CreateTcpClient(std::move(tcp_request), callback, io_pump);
+          BASE_NET::CreateTcpClient(std::move(tcp_request), callback);
         tcp->Connect();
         boost::this_thread::sleep(boost::posix_time::milliseconds(real2(gen2)));
         // boost::this_thread::sleep(boost::posix_time::seconds(10000));
@@ -309,7 +299,6 @@ BOOST_AUTO_TEST_CASE(TCPTLS) {
     group.create_thread([] {
       boost::uniform_int<> real2(100, 3000);
       boost::random::mt19937 gen2;
-      auto io_pump = BASE_LOOPER::MessageLoop::FileMessagePump();
       for (size_t i = 0; i < 300; i++) {
         auto tcp_request =
           std::make_unique<BASE_NET::NetConnection::NetConnectionRequest>();
@@ -321,7 +310,7 @@ BOOST_AUTO_TEST_CASE(TCPTLS) {
         tcp_request->proxy_username = "tw2800";
         tcp_request->proxy_passwd = "tw2800";
         auto tcp =
-          BASE_NET::CreateTcpClient(std::move(tcp_request), callback, io_pump);
+          BASE_NET::CreateTcpClient(std::move(tcp_request), callback);
         tcp->Connect();
         boost::this_thread::sleep(boost::posix_time::milliseconds(real2(gen2)));
         // boost::this_thread::sleep(boost::posix_time::seconds(10000));
@@ -349,7 +338,6 @@ BOOST_AUTO_TEST_CASE(WEBSOCKETTEST) {
     group.create_thread([] {
       boost::uniform_int<> real2(100, 5000);
       boost::random::mt19937 gen2;
-      auto io_pump = BASE_LOOPER::MessageLoop::IOMessagePump();
       for (size_t i = 0; i < 300; i++) {
         auto tcp_request =
           std::make_unique<BASE_NET::NetConnection::NetConnectionRequest>();
@@ -362,7 +350,7 @@ BOOST_AUTO_TEST_CASE(WEBSOCKETTEST) {
         tcp_request->proxy_passwd = "tw2800";
         tcp_request->net_type = BASE_NET::NetConnection::kNetTypeWebsocket;
         auto tcp =
-          BASE_NET::CreateTcpClient(std::move(tcp_request), callback, io_pump);
+          BASE_NET::CreateTcpClient(std::move(tcp_request), callback);
         tcp->Connect();
         boost::this_thread::sleep(boost::posix_time::milliseconds(real2(gen2)));
         // boost::this_thread::sleep(boost::posix_time::seconds(10000));
@@ -375,7 +363,6 @@ BOOST_AUTO_TEST_CASE(WEBSOCKETTEST) {
     group.create_thread([] {
       boost::uniform_int<> real2(500, 1000);
       boost::random::mt19937 gen2;
-      auto io_pump = BASE_LOOPER::MessageLoop::IOMessagePump();
       for (size_t i = 0; i < 300; i++) {
         auto tcp_request =
           std::make_unique<BASE_NET::NetConnection::NetConnectionRequest>();
@@ -383,7 +370,7 @@ BOOST_AUTO_TEST_CASE(WEBSOCKETTEST) {
         tcp_request->port = 8800;
         tcp_request->net_type = BASE_NET::NetConnection::kNetTypeWebsocket;
         auto tcp =
-          BASE_NET::CreateTcpClient(std::move(tcp_request), callback, io_pump);
+          BASE_NET::CreateTcpClient(std::move(tcp_request), callback);
         tcp->Connect();
         boost::this_thread::sleep(boost::posix_time::milliseconds(real2(gen2)));
         // boost::this_thread::sleep(boost::posix_time::seconds(10000));
@@ -396,7 +383,6 @@ BOOST_AUTO_TEST_CASE(WEBSOCKETTEST) {
     group.create_thread([] {
       boost::uniform_int<> real2(50, 300);
       boost::random::mt19937 gen2;
-      auto io_pump = BASE_LOOPER::MessageLoop::FileMessagePump();
       for (size_t i = 0; i < 300; i++) {
         auto tcp_request =
           std::make_unique<BASE_NET::NetConnection::NetConnectionRequest>();
@@ -409,7 +395,7 @@ BOOST_AUTO_TEST_CASE(WEBSOCKETTEST) {
         tcp_request->proxy_username = "tw2800";
         tcp_request->proxy_passwd = "tw2800";
         auto tcp =
-          BASE_NET::CreateTcpClient(std::move(tcp_request), callback, io_pump);
+          BASE_NET::CreateTcpClient(std::move(tcp_request), callback);
         tcp->Connect();
         boost::this_thread::sleep(boost::posix_time::milliseconds(real2(gen2)));
         // boost::this_thread::sleep(boost::posix_time::seconds(10000));
@@ -422,7 +408,6 @@ BOOST_AUTO_TEST_CASE(WEBSOCKETTEST) {
     group.create_thread([] {
       boost::uniform_int<> real2(100, 3000);
       boost::random::mt19937 gen2;
-      auto io_pump = BASE_LOOPER::MessageLoop::FileMessagePump();
       for (size_t i = 0; i < 300; i++) {
         auto tcp_request =
           std::make_unique<BASE_NET::NetConnection::NetConnectionRequest>();
@@ -430,7 +415,7 @@ BOOST_AUTO_TEST_CASE(WEBSOCKETTEST) {
         tcp_request->port = 8800;
         tcp_request->net_type = BASE_NET::NetConnection::kNetTypeWebsocket;
         auto tcp =
-          BASE_NET::CreateTcpClient(std::move(tcp_request), callback, io_pump);
+          BASE_NET::CreateTcpClient(std::move(tcp_request), callback);
         tcp->Connect();
         boost::this_thread::sleep(boost::posix_time::milliseconds(real2(gen2)));
         // boost::this_thread::sleep(boost::posix_time::seconds(10000));
@@ -455,7 +440,6 @@ BOOST_AUTO_TEST_CASE(WEBSOCKETTLSTEST) {
     group.create_thread([] {
       boost::uniform_int<> real2(100, 5000);
       boost::random::mt19937 gen2;
-      auto io_pump = BASE_LOOPER::MessageLoop::IOMessagePump();
       for (size_t i = 0; i < 300; i++) {
         auto tcp_request =
           std::make_unique<BASE_NET::NetConnection::NetConnectionRequest>();
@@ -468,7 +452,7 @@ BOOST_AUTO_TEST_CASE(WEBSOCKETTLSTEST) {
         tcp_request->proxy_username = "tw2800";
         tcp_request->proxy_passwd = "tw2800";
         auto tcp =
-          BASE_NET::CreateTcpClient(std::move(tcp_request), callback, io_pump);
+          BASE_NET::CreateTcpClient(std::move(tcp_request), callback);
         tcp->Connect();
         boost::this_thread::sleep(boost::posix_time::milliseconds(real2(gen2)));
         // boost::this_thread::sleep(boost::posix_time::seconds(10000));
@@ -481,7 +465,6 @@ BOOST_AUTO_TEST_CASE(WEBSOCKETTLSTEST) {
     group.create_thread([] {
       boost::uniform_int<> real2(500, 1000);
       boost::random::mt19937 gen2;
-      auto io_pump = BASE_LOOPER::MessageLoop::IOMessagePump();
       for (size_t i = 0; i < 300; i++) {
         auto tcp_request =
           std::make_unique<BASE_NET::NetConnection::NetConnectionRequest>();
@@ -489,7 +472,7 @@ BOOST_AUTO_TEST_CASE(WEBSOCKETTLSTEST) {
         tcp_request->port = 443;
         tcp_request->net_type = BASE_NET::NetConnection::kNetTypeWebsocketTls;
         auto tcp =
-          BASE_NET::CreateTcpClient(std::move(tcp_request), callback, io_pump);
+          BASE_NET::CreateTcpClient(std::move(tcp_request), callback);
         tcp->Connect();
         boost::this_thread::sleep(boost::posix_time::milliseconds(real2(gen2)));
         //    boost::this_thread::sleep(boost::posix_time::seconds(10000));
@@ -502,7 +485,6 @@ BOOST_AUTO_TEST_CASE(WEBSOCKETTLSTEST) {
     group.create_thread([] {
       boost::uniform_int<> real2(50, 300);
       boost::random::mt19937 gen2;
-      auto io_pump = BASE_LOOPER::MessageLoop::FileMessagePump();
       for (size_t i = 0; i < 300; i++) {
         auto tcp_request =
           std::make_unique<BASE_NET::NetConnection::NetConnectionRequest>();
@@ -510,7 +492,7 @@ BOOST_AUTO_TEST_CASE(WEBSOCKETTLSTEST) {
         tcp_request->port = 443;
         tcp_request->net_type = BASE_NET::NetConnection::kNetTypeWebsocketTls;
         auto tcp =
-          BASE_NET::CreateTcpClient(std::move(tcp_request), callback, io_pump);
+          BASE_NET::CreateTcpClient(std::move(tcp_request), callback);
         tcp->Connect();
         boost::this_thread::sleep(boost::posix_time::milliseconds(real2(gen2)));
         //boost::this_thread::sleep(boost::posix_time::seconds(10000));
@@ -523,7 +505,6 @@ BOOST_AUTO_TEST_CASE(WEBSOCKETTLSTEST) {
     group.create_thread([] {
       boost::uniform_int<> real2(100, 3000);
       boost::random::mt19937 gen2;
-      auto io_pump = BASE_LOOPER::MessageLoop::FileMessagePump();
       for (size_t i = 0; i < 300; i++) {
         auto tcp_request =
           std::make_unique<BASE_NET::NetConnection::NetConnectionRequest>();
@@ -536,7 +517,7 @@ BOOST_AUTO_TEST_CASE(WEBSOCKETTLSTEST) {
         tcp_request->proxy_username = "tw2800";
         tcp_request->proxy_passwd = "tw2800";
         auto tcp =
-          BASE_NET::CreateTcpClient(std::move(tcp_request), callback, io_pump);
+          BASE_NET::CreateTcpClient(std::move(tcp_request), callback);
         tcp->Connect();
         boost::this_thread::sleep(boost::posix_time::milliseconds(real2(gen2)));
         // boost::this_thread::sleep(boost::posix_time::seconds(10000));
@@ -568,7 +549,7 @@ public:
 
 
 HttpDelegate* g_httpdelete = new HttpDelegate;
-#define  HTTPTEST
+//#define  HTTPTEST
 #ifdef HTTPTEST
 
 BOOST_AUTO_TEST_CASE(HttpTest) {
@@ -580,14 +561,13 @@ BOOST_AUTO_TEST_CASE(HttpTest) {
     group.create_thread([] {
       boost::uniform_int<> real2(100, 5000);
       boost::random::mt19937 gen2;
-      auto io_pump = BASE_LOOPER::MessageLoop::IOMessagePump();
       for (size_t i = 0; i < 1000; i++) {
         auto tcp_request =
           std::make_unique<BASE_NET::HttpClient::HttpClientRequest>();
         tcp_request->url = "http://www.google.com";
         tcp_request->method = BASE_NET::HttpClient::kHttpMethodGet;
         auto tcp =
-          BASE_NET::CreateHttpClient(std::move(tcp_request), g_httpdelete, io_pump);
+          BASE_NET::CreateHttpClient(std::move(tcp_request), g_httpdelete);
         tcp->Request();
        // boost::this_thread::sleep(boost::posix_time::milliseconds(real2(gen2)));
         boost::this_thread::sleep(boost::posix_time::seconds(1000000));
@@ -600,7 +580,6 @@ BOOST_AUTO_TEST_CASE(HttpTest) {
     group.create_thread([] {
       boost::uniform_int<> real2(100, 5000);
       boost::random::mt19937 gen2;
-      auto io_pump = BASE_LOOPER::MessageLoop::IOMessagePump();
       for (size_t i = 0; i < 10000; i++) {
         auto tcp_request =
           std::make_unique<BASE_NET::HttpClient::HttpClientRequest>();
@@ -610,7 +589,7 @@ BOOST_AUTO_TEST_CASE(HttpTest) {
         tcp_request->proxy_username = "tw2800";
         tcp_request->proxy_passwd = "tw2800";
         auto tcp =
-          BASE_NET::CreateHttpClient(std::move(tcp_request), g_httpdelete, io_pump);
+          BASE_NET::CreateHttpClient(std::move(tcp_request), g_httpdelete);
         tcp->Request();
         boost::this_thread::sleep(boost::posix_time::milliseconds(real2(gen2)));
         //boost::this_thread::sleep(boost::posix_time::seconds(10000));
@@ -623,7 +602,6 @@ BOOST_AUTO_TEST_CASE(HttpTest) {
     group.create_thread([] {
       boost::uniform_int<> real2(100, 5000);
       boost::random::mt19937 gen2;
-      auto io_pump = BASE_LOOPER::MessageLoop::IOMessagePump();
       for (size_t i = 0; i < 10000; i++) {
         auto tcp_request =
           std::make_unique<BASE_NET::HttpClient::HttpClientRequest>();
@@ -633,7 +611,7 @@ BOOST_AUTO_TEST_CASE(HttpTest) {
         tcp_request->proxy_username = "tw2800";
         tcp_request->proxy_passwd = "tw2800";
         auto tcp =
-          BASE_NET::CreateHttpClient(std::move(tcp_request), g_httpdelete, io_pump);
+          BASE_NET::CreateHttpClient(std::move(tcp_request), g_httpdelete);
         tcp->Request();
         boost::this_thread::sleep(boost::posix_time::milliseconds(real2(gen2)));
         //boost::this_thread::sleep(boost::posix_time::seconds(10000));
@@ -673,14 +651,13 @@ BOOST_AUTO_TEST_CASE(HttpDownload) {
     group.create_thread([] {
       boost::uniform_int<> real2(100, 5000);
       boost::random::mt19937 gen2;
-      auto io_pump = BASE_LOOPER::MessageLoop::IOMessagePump();
       for (size_t i = 0; i < 1; i++) {
         auto tcp_request =
             std::make_unique<BASE_NET::HttpDownloader::HttpDownloaderRequest>();
         tcp_request->url = "https://res06.bignox.com/full/20200113/d07258f92e3e4c488ef5b482316f5d11.exe?filename=nox_setup_v6.6.0.0_full.exe";
         tcp_request->path = "D:\\test\\text.exe";
         auto tcp = BASE_NET::CreateHttpDownloader(std::move(tcp_request),
-                                              g_httpdownload, io_pump);
+                                              g_httpdownload);
         tcp->Start();
         // boost::this_thread::sleep(boost::posix_time::milliseconds(real2(gen2)));
         boost::this_thread::sleep(boost::posix_time::seconds(1000000));
