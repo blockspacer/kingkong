@@ -10,6 +10,7 @@
 #include <boost/asio/spawn.hpp>
 #include "socks5_client.h"
 #include <queue>
+#include <atomic>
 
 BEGIN_NAMESPACE_NET
 //所有的网络操作都需要抛到pump 线程执行
@@ -99,7 +100,7 @@ private:
   bool already_clean_up = false;
   std::shared_ptr<Socks5Client> socks5_client_;
   std::string connection_id_;
-  static std::atomic_int32_t id_;
+  static std::atomic<int32_t> id_;
   DECLARE_OBJECT_RECORD(NetConnectionImpl)
 };
 

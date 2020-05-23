@@ -36,7 +36,7 @@ std::ostream& operator<<(std::ostream& ostream,
 
 IMPLEMET_OBJECT_RECORD(NetConnectionImpl)
 
-std::atomic_int32_t NetConnectionImpl::id_ = 0;
+std::atomic<int32_t> NetConnectionImpl::id_(0);
 
 NetConnectionImpl::NetConnectionImpl(std::unique_ptr<NetConnection::NetConnectionRequest> request,
   NetConnection::NetConnectionDelegate* delegate,
