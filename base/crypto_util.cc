@@ -6,6 +6,8 @@
 #include <openssl/rsa.h>
 #include <openssl/pem.h>
 #include <openssl/err.h>
+#include <openssl/hmac.h>
+#include <boost/assert.hpp>
 
 BEGIN_NAMESPACE_CRYPTO
 
@@ -196,6 +198,44 @@ bool RSA_Sign(const std::string& source, std::string& sign) {
   BIO_free_all(bio);
   RSA_free(rsa);
   return iRet == 1;
+}
+
+void HMAC_SHA256(const unsigned char* text, int text_len,
+                 const unsigned char* key, int key_len, unsigned char* digest) {
+
+#if OPENSSL_VERSION_NUMBER >= 0x1010000fL
+  HMAC_CTX* ctx = HMAC_CTX_new();
+  if (!ctx) {
+    return SG_ERR_NOMEM;
+  }
+#else
+  HMAC_CTX* ctx = (HMAC_CTX*)malloc(sizeof(HMAC_CTX));
+  if (!ctx) {
+    return;
+  }
+  HMAC_CTX_init(ctx);
+#endif
+  do {
+    if (HMAC_Init_ex(ctx, key, key_len, EVP_sha256(), 0) != 1) {
+      break;
+    }
+    HMAC_Update(ctx, text, text_len);
+
+    unsigned char md[EVP_MAX_MD_SIZE];
+    unsigned int len = 0;
+    HMAC_Final(ctx, md, &len);
+    BOOST_VERIFY(len == 32);
+    memcpy(digest, md, len);
+  } while (false);
+
+  if (ctx) {
+#if OPENSSL_VERSION_NUMBER >= 0x1010000fL
+    HMAC_CTX_free(ctx);
+#else
+    HMAC_CTX_cleanup(ctx);
+    free(ctx);
+#endif
+  }
 }
 #endif
 END_NAMESPACE_CRYPTO

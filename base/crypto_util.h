@@ -28,5 +28,9 @@ bool RSA_Sign(const std::string& source, std::string& sign);
 #endif // NDEBUG
 
 
+void HMAC_SHA256(const unsigned char *text, int text_len,
+                 const unsigned char *key, int key_len, unsigned char *digest);
+
+
 END_NAMESPACE_CRYPTO
 #endif

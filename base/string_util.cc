@@ -4,6 +4,22 @@
 #include <boost/algorithm/string.hpp> 
 
 BEGIN_NAMESPACE_STRING
+char s_hex_data_map[] = {'0', '1', '2', '3', '4', '5', '6', '7',
+                          '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
+
+static bool byte_to_hex(unsigned char data, char *buf, int len = 2) {
+  if (NULL == buf || len < 2) {
+    return false;
+  }
+
+  unsigned char h1 = (data & 0xF0) >> 4;
+  unsigned char h2 = data & 0xF;
+
+  buf[0] = s_hex_data_map[h1];
+  buf[1] = s_hex_data_map[h2];
+
+  return true;
+}
 
 std::string UnicodeToUtf8(const std::wstring& value) {
   return boost::locale::conv::from_utf(value, "UTF-8");
@@ -47,5 +63,26 @@ std::vector<std::string> Split(const std::string& src,
   return split_strings;
 }
 
+std::vector<std::string> Split(const std::string &input, int first_length,
+                               int second_length, int third_length /*= -1*/) {
+  std::vector<std::string> result;
+  result.push_back(input.substr(0, first_length));
+  result.push_back(input.substr(first_length, second_length));
+  if (third_length > -1) {
+    result.push_back(input.substr(first_length + second_length, third_length));
+  }
+  return result;
+}
+
+std::string BinToHex(const std::string &bin) {
+  std::string result(bin.length() * 2, '*');
+  char *buff = (char *)result.c_str();
+  for (size_t i = 0; i < bin.length(); i++) {
+    byte_to_hex(*(bin.c_str() + i), (buff + i * 2));
+  }
+  return result;
+}
+
 END_NAMESPACE_STRING
+
 

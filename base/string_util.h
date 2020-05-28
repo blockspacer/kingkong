@@ -20,6 +20,12 @@ std::string GBKToUTF8e(const std::string& value);
 //字符串分割
 std::vector<std::string> Split(const std::string& src, const std::string& token, bool allow_empty = false);
 
+//二进制转16 禁止
+std::string BinToHex(const std::string &bin);
+
+//字符串分割
+std::vector<std::string> Split(const std::string &input, int first_length,
+                                    int second_length, int third_length = -1);
 
 END_NAMESPACE_STRING
 #endif

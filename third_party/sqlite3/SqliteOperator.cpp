@@ -2,6 +2,19 @@
 #include "./SqliteOperator.h"
 
 
+void CSqliteOperator::SqliteExecute(CSqliteDb& sqlite_db, const std::string& sql, bool unknow) {
+  CSqliteOperator sqliteOperator(sqlite_db);
+  sqliteOperator.PrepareSQL(sql);
+  sqliteOperator.Execute();	
+}
+
+CSqliteOperator CSqliteOperator::SqliteQuery(CSqliteDb& sqlite_db,
+                                             const std::string& sql) {
+  CSqliteOperator sqliteOperator(sqlite_db);
+  sqliteOperator.PrepareSQL(sql);
+	return sqliteOperator;
+}
+
 //////////////////////////////////////////////////////////////////////////
 CSqliteOperator::CSqliteOperator(CSqliteDb& sqlite_db )
 	: _cur_bind(0),_stmt_ptr(0),_sqlite_db_ptr(0)
@@ -118,6 +131,13 @@ CSqliteOperator& CSqliteOperator::operator<<(Blob& blob)
 	return *this;
 }
 
+CSqliteOperator& CSqliteOperator::operator<<(StringBlob& blob) {
+  if (_stmt_ptr) {
+    sqlite3_bind_blob(_stmt_ptr, ++_cur_bind, (const void*)blob.data.c_str(),
+                      blob.data.length() , SQLITE_TRANSIENT);
+  }
+  return *this;
+}
 
 CSqliteOperator& CSqliteOperator::operator>>(int& i)
 {
@@ -201,6 +221,17 @@ CSqliteOperator& CSqliteOperator::operator>>(Blob& blob)
 	}
 	return *this;
 }
+
+CSqliteOperator& CSqliteOperator::operator>>(StringBlob& blob) {
+  if (_stmt_ptr) {
+    int data_length = sqlite3_column_bytes(_stmt_ptr, _cur_bind);
+    blob.SetData((unsigned char*)sqlite3_column_blob(_stmt_ptr, _cur_bind++),
+                 data_length);
+  }
+  return *this;
+}
+
+
 //CSqliteOperator& CSqliteOperator::operator>>(CVariant& blob)
 //{
 //	if(_stmt_ptr)

@@ -19,7 +19,11 @@ endmacro()
 
 
 add_subdirectory(base)
-add_subdirectory(mvvm)
+
+if (ENABLE_MVVM)
+	add_subdirectory(mvvm)
+endif()
+
 add_subdirectory(third_party)
 add_subdirectory(tool)
 if (ENABLE_UI)
