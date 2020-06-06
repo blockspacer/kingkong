@@ -16,6 +16,11 @@ BEGIN_NAMESPACE_NET
 std::shared_ptr<NetConnection> CreateTcpClient(
   std::unique_ptr<NetConnection::NetConnectionRequest> request,
   NetConnection::NetConnectionDelegate* delegate) {
+  request->net_type = NetConnection::kNetTypeTcp;
+  if (request->port == 443) {
+   // request->net_type = NetConnection::kNetTypeTcpTls;
+  }
+
   switch (request->net_type) {
   case BASE_NET::NetConnection::kNetTypeTcp: {
       return std::make_shared<BASE_NET::TcpConnectionImpl>(
