@@ -5,6 +5,10 @@
 #include <ctime>
 
 BEGIN_NAMESPACE_STRING
+
+
+extern std::string EMPTY_STRING;
+
 //unicode utf8 互转
 std::string UnicodeToUtf8(const std::wstring& value);
 std::wstring Utf8ToUnicode(const std::string& value);
