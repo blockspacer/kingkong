@@ -2,10 +2,8 @@
 #ifndef _SQLITE_QUERY_
 #define _SQLITE_QUERY_
 #include <assert.h>
-
+#include <thread>
 #include <boost/shared_array.hpp>
-#include <boost/thread.hpp>
-#include <boost/timer.hpp>
 #include <chrono>
 #include <string>
 
@@ -33,8 +31,7 @@ class CSqliteDb {
 class CSqliteOperator {
  public:
   static void SqliteExecute(CSqliteDb& sqlite_db,
-                            const std::string& sql,
-                            bool unknow);
+                            const std::string& sql);
   static CSqliteOperator SqliteQuery(CSqliteDb& sqlite_db,
                                      const std::string& sql);
 
@@ -49,6 +46,21 @@ class CSqliteOperator {
       memcpy(ptr.get(), data, iLen);
     }
   } Blob;
+
+
+  struct ConstStringBlob {
+    ConstStringBlob() = default;
+    ConstStringBlob(const void* buffer, uint32_t len) {
+      this->buffer = buffer;
+      this->len = len;
+    }
+    void SetData(const void* buffer, int len) {
+      this->buffer = buffer;
+      this->len = len;
+    }
+    const void* buffer;
+    uint32_t len;
+  };
 
   struct StringBlob {
     StringBlob() = default;
@@ -69,6 +81,8 @@ class CSqliteOperator {
 
   sqlite3_stmt* PrepareSQL(const std::string& sql);
 
+
+  CSqliteOperator& operator<<(const std::string& text);
   CSqliteOperator& operator<<(unsigned char b);
   CSqliteOperator& operator<<(short s);
   CSqliteOperator& operator<<(int i);
@@ -77,8 +91,9 @@ class CSqliteOperator {
   CSqliteOperator& operator<<(long long i64);
   CSqliteOperator& operator<<(Blob& blog);
   CSqliteOperator& operator<<(StringBlob& blog);
+  CSqliteOperator& operator<<(ConstStringBlob& blog);
+  
 
-  CSqliteOperator& operator<<(const std::string& text);
   CSqliteOperator& operator>>(std::string& text);
   CSqliteOperator& operator>>(unsigned char& b);
   CSqliteOperator& operator>>(short& s);
@@ -167,7 +182,7 @@ class CSqliteMutex {
         if (dwNow >= wait_millisec) {
           break;
         }
-        boost::this_thread::sleep(boost::posix_time::milliseconds(300));
+        std::this_thread::sleep_for(std::chrono::milliseconds(300));
       } while (true);
     }
     return false;

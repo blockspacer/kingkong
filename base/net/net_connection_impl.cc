@@ -93,9 +93,9 @@ void NetConnectionImpl::Send(const void* buffer, int32_t buffer_len) {
   }
   auto send_buffer = std::make_shared<std::string>((const char*)buffer, buffer_len);
   std::weak_ptr< NetConnectionImpl> weak_self = shared_from_this();
-  pump_->PostRunable([weak_self, send_buffer] {
+  pump_->PostRunable([weak_self, send_buffer = std::move(send_buffer)] {
     if (auto self = weak_self.lock()) {
-      self->DoSendFromQueue(send_buffer);
+      self->DoSendFromQueue(std::move(send_buffer));
     }
   });
 }
@@ -137,7 +137,7 @@ void NetConnectionImpl::OnDnsResolvered(
     //DNS 解析完成 开始连接
     for (auto& item : result) {
       auto &endpoints = item.endpoint();
-      LogDebug << "connection_id:" << connection_id_ << endpoints;
+      LogDebug << "connection_id:" << connection_id_ << " " << endpoints;
     }
     
    
