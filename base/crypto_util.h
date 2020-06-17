@@ -11,9 +11,16 @@ std::string Base64Encode(const std::string& buffer);
 std::string Base64Decode(const void* buffer, int32_t len);
 std::string Base64Decode(const std::string& buffer);
 
+std::string Base64EncodeUrlSafe(const std::string& buffer);
+std::string Base64EncodeUrlSafe(const void* buffer, int32_t len);
+
+
 //计算MD5 hash
 std::string Md5(const void* source, int32_t len);
 std::string Md5(const std::string& source);
+
+std::string Md5Hex(const void *source, int32_t len);
+std::string Md5Hex(const std::string &source);
 
 
 //RSA 加解密,公钥加密
@@ -31,6 +38,16 @@ bool RSA_Sign(const std::string& source, std::string& sign);
 void HMAC_SHA256(const unsigned char *text, int text_len,
                  const unsigned char *key, int key_len, unsigned char *digest);
 
+
+void HMAC_SHA(const unsigned char* text,
+                 int text_len,
+                 const unsigned char* key,
+                 int key_len,
+                 unsigned char* digest);
+
+
+std::string EncryptByAESGCM(const std::string &key, int64_t iv,
+                     const std::string &source, const std::string &addata);
 
 END_NAMESPACE_CRYPTO
 #endif

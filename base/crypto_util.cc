@@ -8,6 +8,9 @@
 #include <openssl/err.h>
 #include <openssl/hmac.h>
 #include <boost/assert.hpp>
+#include <boost/algorithm/algorithm.hpp>
+#include <boost/algorithm/string.hpp>
+#include "string_util.h"
 
 BEGIN_NAMESPACE_CRYPTO
 
@@ -64,6 +67,18 @@ std::string Base64Decode(const std::string& buffer) {
   return Base64Decode(buffer.c_str(), buffer.length());
 }
 
+std::string Base64EncodeUrlSafe(const void* buffer, int32_t len) {
+  std::string base_64 = Base64Encode(buffer, len);
+  boost::algorithm::replace_all(base_64, "+", "-");
+  boost::algorithm::replace_all(base_64, "/", "_");
+  boost::algorithm::replace_all(base_64, "=", "");
+  return base_64;
+}
+
+std::string Base64EncodeUrlSafe(const std::string& buffer) {
+  return Base64EncodeUrlSafe(buffer.c_str(), buffer.length());
+}
+
 std::string Md5(const std::string& source) {
   char digst[16] = { 0 };
   MD5((const uint8_t*)source.c_str(), source.length(),(uint8_t*)digst);
@@ -74,6 +89,14 @@ std::string Md5(const void* source, int32_t len) {
   char digst[16] = { 0 };
   MD5((const uint8_t*)source, len, (uint8_t*)digst);
   return std::string(digst, 16);
+}
+
+std::string Md5Hex(const void *source, int32_t len) {
+  return BASE_STRING_UTIL::BinToHex(Md5(source, len));
+}
+
+std::string Md5Hex(const std::string &source) {
+  return Md5Hex(source.c_str(), source.length());
 }
 
 bool EncryptByPublicKey(const void* buffer, int32_t len, std::string& result) {
@@ -237,6 +260,88 @@ void HMAC_SHA256(const unsigned char* text, int text_len,
 #endif
   }
 }
+
+void HMAC_SHA(const unsigned char* text,
+              int text_len,
+              const unsigned char* key,
+              int key_len,
+              unsigned char* digest) {
+#if OPENSSL_VERSION_NUMBER >= 0x1010000fL
+  HMAC_CTX* ctx = HMAC_CTX_new();
+  if (!ctx) {
+    return SG_ERR_NOMEM;
+  }
+#else
+  HMAC_CTX* ctx = (HMAC_CTX*)malloc(sizeof(HMAC_CTX));
+  if (!ctx) {
+    return;
+  }
+  HMAC_CTX_init(ctx);
+#endif
+  do {
+    if (HMAC_Init_ex(ctx, key, key_len, EVP_sha1(), 0) != 1) {
+      break;
+    }
+    HMAC_Update(ctx, text, text_len);
+
+    unsigned char md[EVP_MAX_MD_SIZE];
+    unsigned int len = 0;
+    HMAC_Final(ctx, md, &len);
+    BOOST_VERIFY(len == 20);
+    memcpy(digest, md, len);
+  } while (false);
+
+  if (ctx) {
+#if OPENSSL_VERSION_NUMBER >= 0x1010000fL
+    HMAC_CTX_free(ctx);
+#else
+    HMAC_CTX_cleanup(ctx);
+    free(ctx);
+#endif
+  }
+}
+
+std::string EncryptByAESGCM(const std::string &key, int64_t iv,
+                     const std::string &source, const std::string &addata) {
+  EVP_CIPHER_CTX *ctx = EVP_CIPHER_CTX_new();
+  std::string iv_str;
+  iv_str.resize(12);
+  iv_str[11] = (uint8_t)iv;
+  iv_str[10] = (uint8_t)(iv >> 8);
+  iv_str[9] = (uint8_t)(iv >> 16);
+  iv_str[8] = (uint8_t)(iv >> 24);
+  iv_str[7] = (uint8_t)(iv >> 32);
+  iv_str[6] = (uint8_t)(iv >> 40);
+  iv_str[5] = (uint8_t)(iv >> 48);
+  iv_str[4] = (uint8_t)(iv >> 56);
+  EVP_EncryptInit_ex(ctx, EVP_aes_256_gcm(), nullptr, nullptr, nullptr);
+  EVP_CIPHER_CTX_ctrl(ctx, EVP_CTRL_GCM_SET_IVLEN , iv_str.length(),
+                      nullptr);
+  EVP_EncryptInit_ex(ctx, nullptr, nullptr, (const uint8_t *)key.c_str(),
+                     (const uint8_t *)iv_str.c_str());
+  //添加add ， 第二个参数为null
+  int out_len = 0;
+  EVP_EncryptUpdate(ctx, nullptr, &out_len, (const uint8_t*)addata.c_str(), addata.length());
+
+  const uint8_t *base_source = (const uint8_t*)source.c_str();
+  uint8_t result_buffer[1024];
+  std::string result;
+  //128 字节一轮
+  for (int i = 0; i < source.length();) {
+    out_len = 0;
+    int input_size =
+        (source.length() > (i + 128)) ? 128 : (source, source.length() - i);
+    EVP_EncryptUpdate(ctx, result_buffer, &out_len, base_source + i,
+                      input_size);
+    result.append((const char*)result_buffer, out_len);
+    i += 128;
+  }
+  EVP_EncryptFinal_ex(ctx, result_buffer, &out_len);
+  EVP_CIPHER_CTX_ctrl(ctx, EVP_CTRL_GCM_GET_TAG, 16, result_buffer);
+  result.append((const char*)result_buffer, 16);
+  return result;
+}
+
 #endif
 END_NAMESPACE_CRYPTO
 
