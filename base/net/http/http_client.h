@@ -14,7 +14,7 @@ public:
 	public:
 		virtual void OnHttpHeads(const std::unordered_map<std::string, std::string>& heads) = 0;
 		virtual void OnHttpResponse(boost::string_view content) = 0;
-    	virtual void OnHttpComplete(boost::beast::http::status http_code) = 0;
+    virtual void OnHttpComplete(boost::beast::http::status http_code) = 0;
 	};
 
 	enum HttpMethod {

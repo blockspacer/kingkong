@@ -67,8 +67,13 @@ class HttpConnectionBase : public HttpClient,
         break;
     }
     req_.target(request_->path);
-    req_.keep_alive(true);
+    //req_.keep_alive(true);
     req_.set(boost::beast::http::field::host, request_->host);
+    for (auto& item : http_request_->heads) {
+      req_.insert(item.first, item.second);
+    }
+
+
 
     boost::beast::http::async_write(
         *stream_, req_,

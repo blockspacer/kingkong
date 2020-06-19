@@ -90,45 +90,64 @@ std::string BinToHex(const char *bin, int32_t len) {
   return result;
 }
 
-std::string HexToBin(const std::string& hex) {
-  std::string result;
-  int dwCur = 0;
 
-  std::string hex_temp = hex;
+static int hex_to_int(uint8_t ch) {
+  if (ch >= '0' && ch <= '9') {
+    return ch - '0';
+  } else if (ch >= 'A' && ch <= 'F') {
+    return ch - 'A' + 10;
+  } else if (ch >= 'a' && ch <= 'f') {
+    return ch - 'a' + 10;
+  } else {
+    return -1;
+  }
+}
 
-  result.resize(hex.length() / 2);
-
-  while (hex_temp.length() >= 2) {
-    std::string strTemp = hex_temp.substr(0, 2);
-    if (hex_temp.length() >= 3) {
-      hex_temp = hex_temp.substr(3, hex_temp.length() - 3);
-    } else {
-      hex_temp = "";
-    }
-
-    int dwHex = 0;
-    unsigned char c = strTemp[0];
-    if (c >= '0' && c <= '9') {
-      dwHex += (c - '0') * 16;
-    } else if (c >= 'a' && c <= 'f') {
-      dwHex += (c - 'a' + 10) * 16;
-    } else {
-      continue;
-    }
-
-    c = strTemp[1];
-    if (c >= '0' && c <= '9') {
-      dwHex += (c - '0');
-    } else if (c >= 'a' && c <= 'f') {
-      dwHex += (c - 'a' + 10);
-    } else {
-      continue;
-    }
-
-    result[dwCur++] = dwHex;
+static int hex_string_to_bytes(const char *hex_buffer, unsigned int hex_len,
+                               unsigned char *buffer, unsigned int buffer_len) {
+  if (NULL == hex_buffer || NULL == buffer) {
+    return -1;
+  }
+  if (hex_len % 2 != 0) {
+    return -1;
   }
 
-  return result;
+  unsigned int nbytes = hex_len / 2;
+  if (buffer_len < nbytes) {
+    return -1;
+  }
+
+  for (unsigned int i = 0; i < nbytes; i++) {
+    uint8_t c1 = hex_buffer[i * 2];
+    int h1 = hex_to_int(c1);
+    if (h1 < 0) {
+      return -1;
+    }
+
+    uint8_t c2 = hex_buffer[i * 2 + 1];
+    int h2 = hex_to_int(c2);
+    if (h2 < 0) {
+      return -1;
+    }
+
+    uint8_t b = (uint8_t)((h1 << 4) | h2);
+    buffer[i] = b;
+  }
+
+  return nbytes;
+}
+
+std::string HexToBin(const std::string& hex) {
+  std::string ret;
+  ret.resize(hex.size() / 2);
+  int len = hex_string_to_bytes(hex.c_str(), (unsigned int)hex.size(),
+                                (uint8_t *)ret.c_str(), (unsigned int)ret.size());
+  if (len == -1) {
+    ret.erase();
+  } else {
+    ret.resize(len);
+  }
+  return ret;
 }
 
 char s_hex_data_map3[] = {'0', '1', '2', '3', '4', '5', '6', '7',

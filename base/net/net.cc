@@ -61,6 +61,9 @@ std::shared_ptr<HttpClient> CreateHttpClient(
   int code = http_parser_parse_url(request->url.c_str(), request->url.length(), false, &parse_url);
   if (0 == code) {
     net_connection_request->port = parse_url.port;
+    std::string query =
+        request->url.substr(parse_url.field_data[UF_QUERY].off,
+                                            parse_url.field_data[UF_QUERY].len);
     std::string scheme = request->url.substr(parse_url.field_data[UF_SCHEMA].off, parse_url.field_data[UF_SCHEMA].len);
     if (scheme == "https") {
       net_connection_request->net_type = NetConnection::kNetTypeHttps;
@@ -75,7 +78,7 @@ std::shared_ptr<HttpClient> CreateHttpClient(
       }
     }
     net_connection_request->host = request->url.substr(parse_url.field_data[UF_HOST].off, parse_url.field_data[UF_HOST].len);
-    net_connection_request->path = request->url.substr(parse_url.field_data[UF_PATH].off, parse_url.field_data[UF_PATH].len);
+    net_connection_request->path = request->url.substr(parse_url.field_data[UF_PATH].off);
     if (net_connection_request->path.empty()) {
       net_connection_request->path = "/";
     }
