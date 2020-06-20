@@ -6,6 +6,7 @@
 #include <openssl/rsa.h>
 #include <openssl/pem.h>
 #include <openssl/err.h>
+#include <openssl/sha.h>
 #include <openssl/hmac.h>
 #include <boost/assert.hpp>
 #include <boost/algorithm/algorithm.hpp>
@@ -223,18 +224,18 @@ bool RSA_Sign(const std::string& source, std::string& sign) {
   return iRet == 1;
 }
 
-void HMAC_SHA256(const unsigned char* text, int text_len,
-                 const unsigned char* key, int key_len, unsigned char* digest) {
-
+std::string HMAC_SHA256(const unsigned char* text, int text_len,
+                 const unsigned char* key, int key_len) {
+  std::string resutl;
 #if OPENSSL_VERSION_NUMBER >= 0x1010000fL
   HMAC_CTX* ctx = HMAC_CTX_new();
   if (!ctx) {
-    return SG_ERR_NOMEM;
+    return "";
   }
 #else
   HMAC_CTX* ctx = (HMAC_CTX*)malloc(sizeof(HMAC_CTX));
   if (!ctx) {
-    return;
+    return "";
   }
   HMAC_CTX_init(ctx);
 #endif
@@ -248,7 +249,8 @@ void HMAC_SHA256(const unsigned char* text, int text_len,
     unsigned int len = 0;
     HMAC_Final(ctx, md, &len);
     BOOST_VERIFY(len == 32);
-    memcpy(digest, md, len);
+    resutl.resize(len);
+    memcpy(&resutl[0], md, len);
   } while (false);
 
   if (ctx) {
@@ -259,6 +261,14 @@ void HMAC_SHA256(const unsigned char* text, int text_len,
     free(ctx);
 #endif
   }
+  return resutl;
+}
+
+std::string SHA256Hash(const std::string& source) {
+  std::string result;
+  result.resize(32);
+  SHA256((const uint8_t*)source.c_str(), source.length(), (uint8_t*)&result[0]);
+  return result;
 }
 
 void HMAC_SHA(const unsigned char* text,
@@ -330,7 +340,7 @@ std::string EncryptByAESGCM(const std::string &key, int64_t iv,
   for (int i = 0; i < source.length();) {
     out_len = 0;
     int input_size =
-        (source.length() > (i + 128)) ? 128 : (source, source.length() - i);
+        (source.length() > (i + 128)) ? 128 : (source.length() - i);
     EVP_EncryptUpdate(ctx, result_buffer, &out_len, base_source + i,
                       input_size);
     result.append((const char*)result_buffer, out_len);
@@ -339,6 +349,52 @@ std::string EncryptByAESGCM(const std::string &key, int64_t iv,
   EVP_EncryptFinal_ex(ctx, result_buffer, &out_len);
   EVP_CIPHER_CTX_ctrl(ctx, EVP_CTRL_GCM_GET_TAG, 16, result_buffer);
   result.append((const char*)result_buffer, 16);
+  EVP_CIPHER_CTX_free(ctx);
+  return result;
+}
+
+std::string DecryptByAESGCM(const std::string& key,
+                            int64_t iv,
+                            const std::string& source,
+                            const std::string& addata) {
+  EVP_CIPHER_CTX* ctx = EVP_CIPHER_CTX_new();
+  std::string iv_str;
+  iv_str.resize(12);
+  iv_str[11] = (uint8_t)iv;
+  iv_str[10] = (uint8_t)(iv >> 8);
+  iv_str[9] = (uint8_t)(iv >> 16);
+  iv_str[8] = (uint8_t)(iv >> 24);
+  iv_str[7] = (uint8_t)(iv >> 32);
+  iv_str[6] = (uint8_t)(iv >> 40);
+  iv_str[5] = (uint8_t)(iv >> 48);
+  iv_str[4] = (uint8_t)(iv >> 56);
+  EVP_DecryptInit(ctx, EVP_aes_256_gcm(), nullptr, nullptr);
+  EVP_CIPHER_CTX_ctrl(ctx, EVP_CTRL_GCM_SET_IVLEN, iv_str.length(), nullptr);
+  EVP_DecryptInit(ctx, nullptr, (const uint8_t*)key.c_str(),
+                     (const uint8_t*)iv_str.c_str());
+
+  int out_len = 0;
+  EVP_DecryptUpdate(ctx, nullptr, &out_len, (const uint8_t*)addata.c_str(),
+                    addata.length());
+
+
+  const uint8_t* base_source = (const uint8_t*)source.c_str();
+  uint8_t result_buffer[1024];
+  std::string result;
+  int32_t data_len = source.length() - 16;
+  // 128 字节一轮
+  for (int i = 0; i < data_len;) {
+    out_len = 0;
+    int input_size =
+      (data_len > (i + 128)) ? 128 : (data_len - i);
+    EVP_DecryptUpdate(ctx, result_buffer, &out_len, base_source + i,
+                      input_size);
+    result.append((const char*)result_buffer, out_len);
+    i += 128;
+  }
+  EVP_DecryptFinal_ex(ctx, result_buffer, &out_len);
+  EVP_CIPHER_CTX_ctrl(ctx, EVP_CTRL_GCM_GET_TAG, 16, result_buffer);
+  EVP_CIPHER_CTX_free(ctx);
   return result;
 }
 

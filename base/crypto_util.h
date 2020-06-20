@@ -35,9 +35,11 @@ bool RSA_Sign(const std::string& source, std::string& sign);
 #endif // NDEBUG
 
 
-void HMAC_SHA256(const unsigned char *text, int text_len,
-                 const unsigned char *key, int key_len, unsigned char *digest);
+std::string HMAC_SHA256(const unsigned char *text, int text_len,
+                 const unsigned char *key, int key_len);
 
+
+std::string SHA256Hash(const std::string& source);
 
 void HMAC_SHA(const unsigned char* text,
                  int text_len,
@@ -48,6 +50,12 @@ void HMAC_SHA(const unsigned char* text,
 
 std::string EncryptByAESGCM(const std::string &key, int64_t iv,
                      const std::string &source, const std::string &addata);
+
+
+std::string DecryptByAESGCM(const std::string& key,
+                            int64_t iv,
+                            const std::string& source,
+                            const std::string& addata);
 
 END_NAMESPACE_CRYPTO
 #endif
