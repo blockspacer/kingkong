@@ -30,7 +30,7 @@ public:
     request.set_type((xauth::product)info.product_type);
     request.set_token(info.token);
     request.set_version(info.version);
-    info.device_id = "aaa";
+    info.device_id = "nodeviceid";
     request.set_deviceid(info.device_id);
     boost::uuids::uuid random_id = boost::uuids::random_generator()();
     info.random_id = boost::uuids::to_string(random_id);
