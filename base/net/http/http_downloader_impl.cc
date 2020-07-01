@@ -19,7 +19,7 @@ HttpDownloaderImpl::HttpDownloaderImpl(
       CreateHttpClient(std::move(http_request), this);
 }
 
-void HttpDownloaderImpl::OnHttpComplete(boost::beast::http::status http_code) {
+void HttpDownloaderImpl::OnHttpComplete(HttpClient* client, boost::beast::http::status http_code) {
   boost::system::error_code code;
   file_.close(code);
   NotifyDownloadComplte((http_code == boost::beast::http::status::ok) ? 0 : -1);
@@ -60,7 +60,7 @@ void HttpDownloaderImpl::Cancel() {
   }
 }
 
-void HttpDownloaderImpl::OnHttpResponse(boost::string_view content) {
+void HttpDownloaderImpl::OnHttpResponse(HttpClient* client, boost::string_view content) {
   if (!file_.is_open()) {
     boost::system::error_code code;
     file_.open(download_request_->path.c_str(), boost::beast::file_mode::write, code);
@@ -87,7 +87,7 @@ void HttpDownloaderImpl::OnHttpResponse(boost::string_view content) {
   NotifyDownloadProgress();
 }
 
-void HttpDownloaderImpl::OnHttpHeads(
+void HttpDownloaderImpl::OnHttpHeads(HttpClient* client,
     const std::unordered_map<std::string, std::string>& heads) {
   auto it = heads.find("Content-Length");
   if (it != heads.end()) {

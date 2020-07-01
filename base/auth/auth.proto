@@ -1,0 +1,22 @@
+syntax = "proto2";
+package xauth;
+
+enum product{
+    wa=0;
+}
+
+message request {
+    required product type=1;
+    required int32 version = 2;
+    required string token = 3;
+    required string deviceid = 4;
+    required string randomid = 5;
+}
+
+message response {
+    //100 成功
+    required int32 code = 1;
+    required string signature = 2;
+    optional string desc = 3;
+    optional string rights =4;
+}

@@ -13,7 +13,7 @@ endforeach()
 
 #message(${dirlist})
 
-INCLUDE_DIRECTORIES(. .. ${dirlist} ../third_party/boost/libs/numeric/conversion/include ../third_party/boringssl/include)
+INCLUDE_DIRECTORIES(. .. ${dirlist} ../third_party/boost/libs/numeric/conversion/include ../third_party/boringssl/include ../third_party/protobuf-3.11.4/src)
 
 FILE (GLOB header_files *.h)
 FILE (GLOB source_files *.c *.cc)
@@ -59,6 +59,10 @@ SOURCE_GROUP("jni" FILES ${jni})
 FILE (GLOB net_tcp_server net/tcp_server/*.cc net/tcp_server/*.h)
 SOURCE_GROUP("net\\tcp_server" FILES ${net_tcp_server})
 
+FILE (GLOB auth auth/*.cc auth/*.h)
+SOURCE_GROUP("auth" FILES ${auth})
+
+
 Set (base_common_src ${header_files} 
     ${source_files} 
     ${message_loop}
@@ -67,6 +71,7 @@ Set (base_common_src ${header_files}
     ${net_websocket}
     ${net_tcp_client}
     ${net_http}
+	${auth}
     ${net_tcp_server}
 	)
 

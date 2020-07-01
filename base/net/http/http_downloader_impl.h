@@ -20,10 +20,10 @@ public:
   void Cancel() override;
 
 protected:
-  void OnHttpResponse(boost::string_view content) override;
-  void OnHttpHeads(const std::unordered_map<std::string, std::string>& heads) override;
+  void OnHttpResponse(HttpClient* client, boost::string_view content) override;
+  void OnHttpHeads(HttpClient* client, const std::unordered_map<std::string, std::string>& heads) override;
 
- void OnHttpComplete(boost::beast::http::status http_code) override;
+ void OnHttpComplete(HttpClient* client, boost::beast::http::status http_code) override;
 
 protected:
   void NotifyDownloadStart();

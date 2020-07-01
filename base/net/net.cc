@@ -82,6 +82,8 @@ std::shared_ptr<HttpClient> CreateHttpClient(
     if (net_connection_request->path.empty()) {
       net_connection_request->path = "/";
     }
+  } else {
+    BOOST_VERIFY(false);
   }
   net_connection_request->proxy_host = request->proxy_host;
   net_connection_request->proxy_port = request->proxy_port;

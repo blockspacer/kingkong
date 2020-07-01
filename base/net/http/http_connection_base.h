@@ -143,7 +143,7 @@ protected:
     //http头解析完成之后，会回调一次，可以在这里通知上层解析完成
     std::lock_guard<std::mutex> lock(delegate_mutex_);
     if (nullptr != delegate_) {
-      delegate_->OnHttpHeads(heads_);
+      delegate_->OnHttpHeads(this, heads_);
     }
   }
 
@@ -184,14 +184,14 @@ private:
   void NotifyComplete() {
    std::lock_guard<std::mutex> lock(delegate_mutex_);
    if (nullptr != delegate_) {
-     delegate_->OnHttpComplete(http_code_);
+     delegate_->OnHttpComplete(this, http_code_);
    }
   }
 
   void NotifyResponse(boost::string_view message) {
     std::lock_guard<std::mutex> lock(delegate_mutex_);
     if (nullptr != delegate_) {
-      delegate_->OnHttpResponse(std::move(message));
+      delegate_->OnHttpResponse(this, std::move(message));
     }
   }
 
