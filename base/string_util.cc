@@ -1,5 +1,7 @@
 ﻿#include "string_util.h"
-#include <boost/locale/encoding.hpp>
+#ifdef WIN32
+  #include <boost/locale/encoding.hpp>
+#endif
 #include <boost/tokenizer.hpp>   
 #include <boost/algorithm/string.hpp> 
 
@@ -24,6 +26,7 @@ static bool byte_to_hex(unsigned char data, char *buf, int len = 2) {
   return true;
 }
 
+#ifdef WIN32
 std::string UnicodeToUtf8(const std::wstring& value) {
   return boost::locale::conv::from_utf(value, "UTF-8");
 }
@@ -47,6 +50,7 @@ std::string Utf8ToGBK(const std::string& value) {
 std::string GBKToUTF8e(const std::string& value) {
   return boost::locale::conv::between(value, "UTF-8", "GBK");
 }
+#endif
 
 std::vector<std::string> Split(const std::string& src,
                                const std::string& token,

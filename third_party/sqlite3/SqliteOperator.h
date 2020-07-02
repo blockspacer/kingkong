@@ -6,6 +6,7 @@
 #include <boost/shared_array.hpp>
 #include <chrono>
 #include <string>
+#include <cstring>
 
 #include "sqlite3.h"
 struct sqlite3_stmt;

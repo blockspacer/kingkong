@@ -136,7 +136,7 @@ void NetConnectionImpl::OnDnsResolvered(
   } else {
     //DNS 解析完成 开始连接
     for (auto& item : result) {
-      auto &endpoints = item.endpoint();
+      const auto &endpoints = item.endpoint();
       LogDebug << "connection_id:" << connection_id_ << " " << endpoints;
     }
     

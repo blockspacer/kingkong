@@ -8,7 +8,7 @@ BEGIN_NAMESPACE_STRING
 
 
 extern std::string EMPTY_STRING;
-
+#ifdef WIN32
 //unicode utf8 互转
 std::string UnicodeToUtf8(const std::wstring& value);
 std::wstring Utf8ToUnicode(const std::string& value);
@@ -20,6 +20,7 @@ std::wstring GBKToUnicode(const std::string& value);
 //utf8 gbk 互转
 std::string Utf8ToGBK(const std::string& value);
 std::string GBKToUTF8e(const std::string& value);
+#endif
 
 //字符串分割
 std::vector<std::string> Split(const std::string& src, const std::string& token, bool allow_empty = false);
